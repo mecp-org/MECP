@@ -346,7 +346,7 @@ The engine also exports helper functions: `isMECP()` (checks if a string is a va
 
 ## 7. The Full Code Table
 
-MECP defines **108 codes** across **12 categories**. Each code is a single letter (category) plus two digits.
+MECP defines **109 codes** across **12 categories**. Each code is a single letter (category) plus two digits.
 
 ### M — Medical (15 codes)
 | Code | Meaning |
@@ -616,7 +616,7 @@ The web tool is a single HTML file that embeds all 20 language files and provide
 - **Real-time byte budget:** Shows exactly how many bytes remain, accounting for GPS (22 bytes), timestamp (6 bytes), language hint (4 bytes), and person count (7 bytes) overhead
 - **Auto-insert:** GPS coordinates (severity 0-1), timestamp, and language hint are automatically appended to reduce compose friction
 - **Decode view:** Paste any MECP message to see it decoded with full localised descriptions, category icons, and severity badge
-- **Bilingual reference card:** Shows all 108 codes in two languages side-by-side
+- **Bilingual reference card:** Shows all 109 codes in two languages side-by-side
 - **Language selector:** Dropdown with all 20 languages
 - **Message history:** With export capability
 - **Dark theme:** Designed for outdoor/low-light readability
@@ -718,7 +718,7 @@ The project roadmap includes:
 
 - **Mobile app completion:** Finalising the Meshtastic Bluetooth integration, iOS support, and app store distribution
 - **Formal protocol specification:** Publishing `spec/mecp-protocol-v1.0.md` as a standalone, implementer-ready document
-- **Community feedback:** The code table (108 codes, 12 categories) is open for community review and proposals via GitHub issues
+- **Community feedback:** The code table (109 codes, 12 categories) is open for community review and proposals via GitHub issues
 - **Additional language support:** The template system makes adding new languages straightforward -- community contributions welcome
 - **Cross-platform adoption:** Encouraging other mesh networking platforms (Reticulum/Sideband, etc.) to support MECP message encoding/decoding
 
