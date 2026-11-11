@@ -10,6 +10,10 @@ All notable changes to MECP will be documented in this file.
 ### Protocol
 - Code table now: **12 categories, 109 codes** (was 108 codes)
 
+### Infrastructure
+- Added `engine/tests/validate-languages.ts` so the Validate Language Files CI workflow can run against `languages/*.json`
+- Mobile app moved to [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app) (consumes this repo via git submodule)
+
 ---
 
 ## [1.1.0] - 2026-02-27

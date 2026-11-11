@@ -263,6 +263,8 @@ Single HTML file (self-contained, no build step) enhanced with PWA capabilities:
 
 ### 3.2 Phase 2: React Native Mobile App
 
+**Repository:** [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app) (separate from this protocol repo; consumes engine + languages via a `vendor/mecp` git submodule).
+
 **AIDL-first strategy for Android Meshtastic** (from ecosystem research):
 
 | Integration Path | Complexity | Reliability | Time |
@@ -483,20 +485,6 @@ MECP/
 │   ├── index.html                       # Self-contained web tool
 │   ├── service-worker.js                # PWA offline support
 │   └── manifest.json                    # PWA manifest
-├── app/                                 # React Native mobile app (Phase 2)
-│   ├── package.json
-│   ├── src/
-│   │   ├── mecp/                        # Shared MECP engine (symlinked or copied from engine/)
-│   │   ├── transport/
-│   │   │   ├── MeshTransport.ts         # Interface
-│   │   │   ├── MeshtasticAdapter.ts
-│   │   │   └── MeshCoreAdapter.ts
-│   │   ├── storage/
-│   │   │   └── MessageDatabase.ts       # SQLite message persistence
-│   │   ├── screens/
-│   │   └── components/
-│   └── android/
-│       └── app/src/main/java/.../       # AIDL native module
 ├── cards/
 │   ├── generator/                       # Reference card PDF generator
 │   └── output/                          # Generated PDFs per language pair
@@ -509,13 +497,13 @@ MECP/
 │   └── workflows/
 │       ├── test-engine.yml              # CI: run MECP engine unit tests
 │       ├── validate-languages.yml       # CI: validate language file schema
-│       └── build-web.yml                # CI: build and deploy web tool to GitHub Pages
+│       └── deploy-web.yml               # CI: build and deploy web tool to GitHub Pages
 └── examples/
     ├── python/                          # Python encoder/decoder example
     │   └── mecp.py
     ├── arduino/                         # Arduino/ESP32 minimal decoder
     │   └── mecp_decoder.ino
-    └── curl/                            # Shell script examples
+    └── shell/                           # Shell script examples
         └── mecp_encode.sh
 ```
 
