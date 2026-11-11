@@ -48,7 +48,7 @@ MECP/<severity>/<codes> [freetext]
 | H | Have/Offer Resources | H03 Have medical supplies |
 | B | Beacon | B01 Distress beacon active |
 
-See `spec/mecp-protocol-v1.0.md` for the complete code table.
+See `languages/en.json` for the complete code table, or [MECP_Comprehensive_Brief.md](MECP_Comprehensive_Brief.md) for protocol detail.
 
 ## Examples
 
@@ -67,9 +67,9 @@ MECP/2/B03                                   Cancel beacon — I am OK
 
 ```
 engine/     TypeScript MECP encoder/decoder (npm package)
+app/        React Native mobile app (Expo, Meshtastic AIDL)
 languages/  Translation files (JSON, one per language)
 web/        Self-contained web encoder/decoder (single HTML file)
-spec/       Formal protocol specification
 examples/   Reference implementations (Python, Arduino, Shell)
 docs/       Developer brief, design plan, guides
 cards/      Printable reference card generator

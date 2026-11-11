@@ -3,7 +3,7 @@
 
 **Version:** 1.1
 **Date:** February 2026
-**Repository:** [github.com/xiang-dev-1/MECP](https://github.com/xiang-dev-1/MECP) (public, open-source)
+**Repository:** [github.com/mecp-org/MECP](https://github.com/mecp-org/MECP) (public, open-source)
 **License:** GPLv3 (code) | CC0 (protocol) | CC BY 4.0 (translations)
 **Status:** Engine complete, web tool live, mobile app in development
 
@@ -600,7 +600,7 @@ Every MECP code, severity level, category name, and UI string has been translate
 | Traditional Chinese | zh-tw | CJK | LTR |
 | Farsi (Persian) | fa | Arabic | **RTL** |
 
-Each language file is a JSON document containing: localised severity labels, all 12 category names, all 108 code descriptions, and 40+ UI strings for the application interface (including 14 beacon-specific UI keys).
+Each language file is a JSON document containing: localised severity labels, all 12 category names, all 109 code descriptions, and 40+ UI strings for the application interface (including 14 beacon-specific UI keys).
 
 ### 9.3 Web Tool (PWA)
 
@@ -656,7 +656,7 @@ The mobile app is designed to be the primary user interface for MECP on Meshtast
 ### 9.6 Project Infrastructure
 
 - **Monorepo:** Root `package.json` with npm workspaces (`engine` + `app`)
-- **GitHub repository:** [github.com/xiang-dev-1/MECP](https://github.com/xiang-dev-1/MECP) — public, open-source
+- **GitHub repository:** [github.com/mecp-org/MECP](https://github.com/mecp-org/MECP) — public, open-source
 - **CI workflows:** Automated testing on push
 - **Issue templates:** Bug reports, new code proposals, translation reviews
 - **Contributing guide:** Detailed process for translations and code contributions
@@ -671,7 +671,7 @@ The mobile app is designed to be the primary user interface for MECP on Meshtast
 
 **Right now, today:**
 
-1. Open `web/index.html` in your phone's browser (download it from the [GitHub repo](https://github.com/xiang-dev-1/MECP/blob/master/web/index.html) or clone the repo).
+1. Open `web/index.html` in your phone's browser (download it from the [GitHub repo](https://github.com/mecp-org/MECP/blob/master/web/index.html) or clone the repo).
 2. Compose an MECP message using the visual interface.
 3. Copy the resulting message string to your clipboard.
 4. Paste it into the Meshtastic app as a text message and send.
@@ -699,7 +699,7 @@ The protocol is intentionally simple to implement. The decoder is roughly 80 lin
 The language files are CC BY 4.0 licensed. To add a new language:
 
 1. Copy `languages/_template.json`
-2. Translate all 108 code descriptions, 4 severity labels, 12 category names, and UI strings
+2. Translate all 109 code descriptions, 4 severity labels, 12 category names, and UI strings
 3. Submit a pull request
 
 The project has GitHub issue templates specifically for translation reviews.
@@ -708,7 +708,7 @@ The project has GitHub issue templates specifically for translation reviews.
 
 MECP can be adopted as a messaging standard for any organisation that uses or plans to use LoRa mesh networks for field communications. The protocol is public domain -- you can implement it in your own tools, train your teams on the code table, and print reference cards without any licensing constraints.
 
-The 108-code table covers the scenarios most commonly encountered in disaster response, search and rescue, wilderness safety, and community emergency communication. The four severity levels align with existing emergency triage conventions.
+The 109-code table covers the scenarios most commonly encountered in disaster response, search and rescue, wilderness safety, and community emergency communication. The four severity levels align with existing emergency triage conventions.
 
 ---
 
@@ -779,7 +779,7 @@ The project roadmap includes:
 - IEEE: [LoRa-based Mesh Network for Off-grid Emergency Communications](https://ieeexplore.ieee.org/document/9342944/)
 
 ### MECP Project
-- Repository: [github.com/xiang-dev-1/MECP](https://github.com/xiang-dev-1/MECP)
+- Repository: [github.com/mecp-org/MECP](https://github.com/mecp-org/MECP)
 - Licence (code): [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html)
 - Licence (protocol): [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)
 - Licence (translations): [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)

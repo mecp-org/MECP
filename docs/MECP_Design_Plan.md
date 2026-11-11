@@ -509,13 +509,13 @@ MECP/
 │   └── workflows/
 │       ├── test-engine.yml              # CI: run MECP engine unit tests
 │       ├── validate-languages.yml       # CI: validate language file schema
-│       └── build-web.yml                # CI: build and deploy web tool to GitHub Pages
+│       └── deploy-web.yml               # CI: build and deploy web tool to GitHub Pages
 └── examples/
     ├── python/                          # Python encoder/decoder example
     │   └── mecp.py
     ├── arduino/                         # Arduino/ESP32 minimal decoder
     │   └── mecp_decoder.ino
-    └── curl/                            # Shell script examples
+    └── shell/                           # Shell script examples
         └── mecp_encode.sh
 ```
 

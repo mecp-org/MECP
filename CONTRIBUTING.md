@@ -11,8 +11,9 @@ The highest-impact contribution is adding or verifying a language translation.
 1. Copy `languages/_template.json` to `languages/XX.json` (ISO 639-1 code)
 2. Translate every code and UI string
 3. Use the English file (`languages/en.json`) as the reference for context on each code
-4. Submit a pull request with the title: `lang: Add [Language Name] translation`
-5. A native speaker must review before merge
+4. Validate the file schema: `cd engine && npm run validate-languages`
+5. Submit a pull request with the title: `lang: Add [Language Name] translation`
+6. A native speaker must review before merge
 
 **Warning:** Machine-translated emergency phrases are dangerous. "Fracture" mistranslated as "crack" in the wrong sense could cause real problems. Every translation must be verified by a native speaker who understands emergency/medical terminology.
 
@@ -48,6 +49,7 @@ Use the "Bug Report" issue template. Include:
 cd engine
 npm install
 npm test
+npm run validate-languages
 
 # Web tool
 # Just open web/index.html in a browser. No build step needed.
