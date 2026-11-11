@@ -2,6 +2,16 @@
 
 All notable changes to MECP will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- **M16** Medical supply drop needed (Medical category) — requested by mesh-client user [@rneese1969](https://github.com/rneese1969) via [Colorado-Mesh/mesh-client#1073](https://github.com/Colorado-Mesh/mesh-client/issues/1073); proposal [xiang-dev-1/MECP#4](https://github.com/xiang-dev-1/MECP/issues/4)
+
+### Protocol
+- Code table now: **12 categories, 109 codes** (was 108 codes)
+
+---
+
 ## [1.1.0] - 2026-02-27
 
 ### Added
