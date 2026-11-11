@@ -4,11 +4,13 @@
 
 MECP is a structured text encoding that lets people who share no common spoken language exchange meaningful information over bandwidth-constrained radio links. It works like a multilingual phrasebook that happens to be machine-parseable.
 
-A user in Scotland composes a message by tapping through a menu in English. The app generates a compact ASCII string like `MECP/0/M01 M07 2pax P05 56.68,-5.02`. That string travels over LoRa mesh radio. A recipient in Slovakia sees each code rendered in Slovak. No internet. No translation API. Just a lookup table shipped with the app.
+A user in Scotland composes a message by tapping through a menu in English. The client generates a compact ASCII string like `MECP/0/M01 M07 2pax P05 56.68,-5.02`. That string travels over LoRa mesh radio. A recipient in Slovakia sees each code rendered in Slovak. No internet. No translation API. Just a lookup table shipped with the app.
+
+This repository is the **protocol home**: message format, code table, and official language packs.
+
+**Implementations** (TypeScript engine, web PWA, Expo app, examples) live in **[mecp-org/mecp-app](https://github.com/mecp-org/mecp-app)**.
 
 ## Quick Start
-
-**Web Tool** — Open `web/index.html` in any browser. No installation needed. Works offline.
 
 **Decode a message:**
 ```
@@ -16,7 +18,7 @@ MECP/0/M01 M07 2pax P05 48.6520,20.1305
 ```
 = MAYDAY: Injury, Fracture/immobile, 2 people, at GPS 48.6520, 20.1305
 
-**Compose a message:** Severity > Category > Codes > Freetext > Copy
+Try the offline web tool or mobile app in [mecp-app](https://github.com/mecp-org/mecp-app).
 
 ## Message Format
 
@@ -66,15 +68,12 @@ MECP/2/B03                                   Cancel beacon — I am OK
 ## Project Structure
 
 ```
-engine/     TypeScript MECP encoder/decoder (npm package)
-languages/  Translation files (JSON, one per language)
-web/        Self-contained web encoder/decoder (single HTML file)
-examples/   Reference implementations (Python, Arduino, Shell)
-docs/       Developer brief, design plan, guides
-cards/      Printable reference card generator
+languages/                   Official translation packs (JSON, one per language)
+MECP_Comprehensive_Brief.md  Protocol narrative and design rationale
+scripts/validate-languages.mjs
 ```
 
-**Mobile app:** [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app) (separate repo; consumes this protocol via git submodule)
+Clients and reference code: [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app).
 
 ## Why This Exists
 
@@ -92,15 +91,18 @@ Emergency-only protocols fail because nobody learns them until the emergency. GM
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). The highest-impact contribution is adding a verified language translation.
 
+```bash
+npm run validate-languages
+```
+
 ## Licenses
 
 | Component | License |
 |-----------|---------|
 | Protocol specification | CC0 1.0 (public domain) |
-| App source code | GPLv3 |
 | Language files | CC BY 4.0 |
 
-The protocol is free forever. Anyone may implement MECP without restriction.
+The protocol is free forever. Anyone may implement MECP without restriction. App and engine code in [mecp-app](https://github.com/mecp-org/mecp-app) is GPLv3.
 
 ## Supported Languages (20)
 
