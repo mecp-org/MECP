@@ -67,13 +67,14 @@ MECP/2/B03                                   Cancel beacon — I am OK
 
 ```
 engine/     TypeScript MECP encoder/decoder (npm package)
-app/        React Native mobile app (Expo, Meshtastic AIDL)
 languages/  Translation files (JSON, one per language)
 web/        Self-contained web encoder/decoder (single HTML file)
 examples/   Reference implementations (Python, Arduino, Shell)
 docs/       Developer brief, design plan, guides
 cards/      Printable reference card generator
 ```
+
+**Mobile app:** [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app) (separate repo; consumes this protocol via git submodule)
 
 ## Why This Exists
 

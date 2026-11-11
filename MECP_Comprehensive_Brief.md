@@ -635,9 +635,10 @@ Three reference implementations showing how to integrate MECP into different pla
 
 ### 9.5 React Native Mobile App (In Development)
 
-**Location:** `app/` directory
+**Repository:** [github.com/mecp-org/mecp-app](https://github.com/mecp-org/mecp-app) (separate from this protocol repo)
 **Framework:** Expo 52, expo-router, expo-sqlite, Zustand
 **Status:** Scaffolded with 39+ source files, core UI and beacon system complete, Meshtastic integration in progress
+**Protocol dependency:** Git submodule of this repository at `vendor/mecp` (engine + language packs)
 
 The mobile app is designed to be the primary user interface for MECP on Meshtastic networks. It pairs with a Meshtastic radio via Bluetooth and provides a purpose-built compose-and-receive interface for MECP messages.
 
@@ -655,7 +656,8 @@ The mobile app is designed to be the primary user interface for MECP on Meshtast
 
 ### 9.6 Project Infrastructure
 
-- **Monorepo:** Root `package.json` with npm workspaces (`engine` + `app`)
+- **Protocol package:** Root `package.json` with npm workspace for `engine`
+- **Mobile app:** [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app) — separate repo; submodules this protocol repository
 - **GitHub repository:** [github.com/mecp-org/MECP](https://github.com/mecp-org/MECP) — public, open-source
 - **CI workflows:** Automated testing on push
 - **Issue templates:** Bug reports, new code proposals, translation reviews

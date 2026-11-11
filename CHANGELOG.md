@@ -12,6 +12,7 @@ All notable changes to MECP will be documented in this file.
 
 ### Infrastructure
 - Added `engine/tests/validate-languages.ts` so the Validate Language Files CI workflow can run against `languages/*.json`
+- Mobile app moved to [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app) (consumes this repo via git submodule)
 
 ---
 
