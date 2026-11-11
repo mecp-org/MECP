@@ -11,8 +11,8 @@ All notable changes to MECP will be documented in this file.
 - Code table now: **12 categories, 109 codes** (was 108 codes)
 
 ### Infrastructure
-- Added `engine/tests/validate-languages.ts` so the Validate Language Files CI workflow can run against `languages/*.json`
-- Mobile app moved to [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app) (consumes this repo via git submodule)
+- This repository is now **protocol + language packs only**; engine, web tool, examples, and mobile app live in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app)
+- Language validation is a standalone script: `scripts/validate-languages.mjs` (`npm run validate-languages`)
 
 ---
 

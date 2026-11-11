@@ -2,9 +2,9 @@ name: Validate Language Files
 
 on:
   push:
-    paths: ['languages/**']
+    paths: ['languages/**', 'scripts/validate-languages.mjs']
   pull_request:
-    paths: ['languages/**']
+    paths: ['languages/**', 'scripts/validate-languages.mjs']
 
 jobs:
   validate:
@@ -14,5 +14,4 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: cd engine && npm ci
-      - run: cd engine && npm run validate-languages
+      - run: node scripts/validate-languages.mjs

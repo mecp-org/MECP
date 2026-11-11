@@ -3,9 +3,10 @@
 
 **Version:** 1.1
 **Date:** February 2026
-**Repository:** [github.com/mecp-org/MECP](https://github.com/mecp-org/MECP) (public, open-source)
-**License:** GPLv3 (code) | CC0 (protocol) | CC BY 4.0 (translations)
-**Status:** Engine complete, web tool live, mobile app in development
+**Repository:** [github.com/mecp-org/MECP](https://github.com/mecp-org/MECP) (protocol + languages)
+**Implementations:** [github.com/mecp-org/mecp-app](https://github.com/mecp-org/mecp-app) (engine, web, Expo app, examples)
+**License:** CC0 (protocol) | CC BY 4.0 (translations) | GPLv3 (implementations in mecp-app)
+**Status:** Protocol and 20 language packs published; clients in mecp-app
 
 ---
 
@@ -334,13 +335,7 @@ MECP/3/D01 M01 M09 5pax This is a training exercise @en
 
 ### 6.3 The Encoder and Decoder
 
-The MECP engine (written in TypeScript) provides two core functions:
-
-**`encode(severity, codes, freetext?)`** — Takes structured input and produces a valid MECP message string. Validates all codes, enforces the 200-byte limit, and warns if the message is too long.
-
-**`decode(input)`** — Takes a raw string and parses it into a structured object containing: severity level, array of codes (each with category and number), whether it's a drill (D01 or D02 present), and extracted freetext fields (GPS, timestamp, person count, language, callsign, references).
-
-The engine also exports helper functions: `isMECP()` (checks if a string is a valid MECP message), `getCategory()` (returns the category for a given code), `isBeacon()` (checks for B01 distress beacon), `isBeaconAck()` (checks for B02 acknowledgement), and `isBeaconCancel()` (checks for B03 cancellation).
+Reference encoder/decoder implementations (TypeScript `@mecp/engine`, Python, Arduino, shell) live in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app). They provide `encode` / `decode` helpers, drill and beacon detection, and the 200-byte limit — but the **wire format documented in this brief is authoritative**. Anyone may reimplement MECP from this specification alone (CC0).
 
 ---
 
@@ -550,29 +545,9 @@ This is not frivolity. It is deliberate UX strategy borrowed from emergency serv
 
 ## 9. What We've Built So Far
 
-### 9.1 The MECP Engine (TypeScript)
+### 9.1 Language Files (20 Languages)
 
-**Location:** `engine/` directory
-**Package:** `@mecp/engine` (v1.0.0)
-**Tests:** 65/65 passing
-**Licence:** GPLv3
-
-A pure TypeScript library with zero dependencies. Provides:
-
-- `encode()` — Builds a valid MECP message string from structured input
-- `decode()` — Parses a raw MECP string into a structured object
-- `isMECP()` — Checks if a string is a valid MECP message
-- `getCategory()` — Returns category metadata for a code
-- `isBeacon()` — Checks if codes contain B01 (distress beacon active)
-- `isBeaconAck()` — Checks if codes contain B02 (beacon acknowledged)
-- `isBeaconCancel()` — Checks if codes contain B03 (cancel beacon)
-- Full type definitions for Severity, CategoryLetter, ParsedMessage, EncodeResult, ValidationResult, and LanguageFile
-
-The engine enforces the 200-byte maximum, validates code formats, detects drill messages, and extracts all freetext conventions (GPS, timestamp, person count, language hint, callsign, references).
-
-### 9.2 Language Files (20 Languages)
-
-**Location:** `languages/` directory
+**Location:** `languages/` directory (this repository)
 **Licence:** CC BY 4.0
 
 Every MECP code, severity level, category name, and UI string has been translated into 20 languages:
@@ -602,66 +577,24 @@ Every MECP code, severity level, category name, and UI string has been translate
 
 Each language file is a JSON document containing: localised severity labels, all 12 category names, all 109 code descriptions, and 40+ UI strings for the application interface (including 14 beacon-specific UI keys).
 
-### 9.3 Web Tool (PWA)
+### 9.2 Implementations ([mecp-org/mecp-app](https://github.com/mecp-org/mecp-app))
 
-**Location:** `web/index.html`
-**Size:** ~181 KB (self-contained, no external dependencies)
-**Status:** Fully functional, offline-capable, installable as a Progressive Web App
+All client code lives in a separate repository:
 
-The web tool is a single HTML file that embeds all 20 language files and provides a complete MECP compose and decode interface. It works entirely offline -- open the file in any browser and it functions immediately with no server, no internet, and no installation beyond opening the file.
+- **TypeScript engine** (`@mecp/engine`) — encode/decode, beacon helpers, tests
+- **Web tool (PWA)** — offline compose/decode HTML tool
+- **Expo / React Native app** — Meshtastic AIDL client (compose, inbox, beacon)
+- **Examples** — Python, Arduino/ESP32, shell
+- **Design plan** — product/UX design notes
 
-**Features:**
+That repo submodules this protocol repository for language packs (`vendor/mecp`).
 
-- **Compose flow:** Severity selection (with shape-coded buttons: octagon for MAYDAY, diamond for URGENT, triangle for SAFETY, rectangle for ROUTINE) → Category selection → Code selection with removable chips → Freetext, person count, preview → Copy to clipboard
-- **Real-time byte budget:** Shows exactly how many bytes remain, accounting for GPS (22 bytes), timestamp (6 bytes), language hint (4 bytes), and person count (7 bytes) overhead
-- **Auto-insert:** GPS coordinates (severity 0-1), timestamp, and language hint are automatically appended to reduce compose friction
-- **Decode view:** Paste any MECP message to see it decoded with full localised descriptions, category icons, and severity badge
-- **Bilingual reference card:** Shows all 109 codes in two languages side-by-side
-- **Language selector:** Dropdown with all 20 languages
-- **Message history:** With export capability
-- **Dark theme:** Designed for outdoor/low-light readability
+### 9.3 Project Infrastructure (this repository)
 
-**How to use it:** Download `web/index.html` from the repository. Open it in any web browser. That's it. No build step, no npm install, no server. It works on phones, tablets, and desktops. It works offline. It can be installed as a PWA (Add to Home Screen) for app-like access.
-
-### 9.4 Reference Implementations (Examples)
-
-**Location:** `examples/` directory
-
-Three reference implementations showing how to integrate MECP into different platforms:
-
-- **Python** (`examples/python/mecp.py`) — A standalone Python encoder/decoder. Can be imported as a module or run from the command line. Useful for scripting, server-side integration, or Raspberry Pi deployments.
-- **Arduino/ESP32** (`examples/arduino/mecp_decoder.ino`) — An Arduino sketch for decoding MECP messages on microcontrollers. Designed for direct integration with LoRa radio modules -- the device receives a raw LoRa packet, decodes the MECP message, and displays the structured fields on a screen or serial output.
-- **Shell script** (`examples/shell/mecp_encode.sh`) — A bash script for encoding MECP messages from the command line. Useful for piping MECP messages into other tools or radio transmission scripts.
-
-### 9.5 React Native Mobile App (In Development)
-
-**Repository:** [github.com/mecp-org/mecp-app](https://github.com/mecp-org/mecp-app) (separate from this protocol repo)
-**Framework:** Expo 52, expo-router, expo-sqlite, Zustand
-**Status:** Scaffolded with 39+ source files, core UI and beacon system complete, Meshtastic integration in progress
-**Protocol dependency:** Git submodule of this repository at `vendor/mecp` (engine + language packs)
-
-The mobile app is designed to be the primary user interface for MECP on Meshtastic networks. It pairs with a Meshtastic radio via Bluetooth and provides a purpose-built compose-and-receive interface for MECP messages.
-
-**Architecture:**
-
-- **4-tab interface:** Compose, Inbox, Reference, Settings
-- **4-step compose flow:** Severity → Category → Codes → Preview & Send
-- **Components:** SeverityButton (shape-coded, colour-coded), CategoryGrid (12 categories with icons), CodeChecklist (multi-select codes), MessageCard (decoded message display), MaydayButton (1-second long-press hold-to-send for severity 0), DrillBanner (red banner when drill detected), DeviceStatus (radio connection indicator), SeverityBadge, BeaconCard (received beacon display with acknowledge button)
-- **Beacon system:** Dedicated beacon activation from MAYDAY compose screen, background GPS transmission service (expo-location foreground service), beacon status screen with position history and ACK tracking, rate decay (5min → 15min → 30min), drill beacon auto-stop after 3 transmissions
-- **Transport layer:** Abstract MeshTransport interface with a Meshtastic AIDL adapter (Kotlin native module) for Android. The AIDL adapter binds to the official Meshtastic Android app's service to send and receive messages through the user's existing Meshtastic radio.
-- **Offline queue:** Messages composed without a connected radio are queued locally (SQLite) and automatically sent when the radio reconnects.
-- **Deduplication:** 10-minute sliding window filters duplicate messages from the mesh.
-- **GPS integration:** Uses expo-location for automatic coordinate insertion.
-- **All 20 languages bundled:** Language files are statically imported -- no network fetch required.
-
-### 9.6 Project Infrastructure
-
-- **Protocol package:** Root `package.json` with npm workspace for `engine`
-- **Mobile app:** [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app) — separate repo; submodules this protocol repository
+- **Languages:** `languages/*.json` with CI via `scripts/validate-languages.mjs`
 - **GitHub repository:** [github.com/mecp-org/MECP](https://github.com/mecp-org/MECP) — public, open-source
-- **CI workflows:** Automated testing on push
 - **Issue templates:** Bug reports, new code proposals, translation reviews
-- **Contributing guide:** Detailed process for translations and code contributions
+- **Contributing guide:** Translation and code-proposal process
 - **Code of Conduct:** Contributor Covenant
 - **Changelog:** Maintained
 
@@ -673,7 +606,7 @@ The mobile app is designed to be the primary user interface for MECP on Meshtast
 
 **Right now, today:**
 
-1. Open `web/index.html` in your phone's browser (download it from the [GitHub repo](https://github.com/mecp-org/MECP/blob/master/web/index.html) or clone the repo).
+1. Open the web tool from [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app) (`web/index.html`) in your phone's browser.
 2. Compose an MECP message using the visual interface.
 3. Copy the resulting message string to your clipboard.
 4. Paste it into the Meshtastic app as a text message and send.
@@ -687,12 +620,11 @@ The React Native app will integrate directly with the Meshtastic Android app via
 
 ### For Firmware Developers
 
-The MECP engine is a pure TypeScript library with zero dependencies. You can:
+Reference implementations are in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app). You can:
 
-- Import `@mecp/engine` into any JavaScript/TypeScript project
-- Use the Python reference implementation for server-side or Raspberry Pi integration
-- Use the Arduino reference implementation for direct microcontroller integration
-- Implement your own encoder/decoder in any language using the protocol specification (CC0, public domain -- no permission needed)
+- Import `@mecp/engine` from that repository into any JavaScript/TypeScript project
+- Use the Python / Arduino / shell examples there
+- Implement your own encoder/decoder in any language using this protocol brief (CC0, public domain -- no permission needed)
 
 The protocol is intentionally simple to implement. The decoder is roughly 80 lines of code. The encoder is similarly compact. Any developer who can parse a comma-separated string can implement MECP.
 

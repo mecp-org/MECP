@@ -1,21 +1,32 @@
 /**
  * Validate language JSON files against the English reference schema.
- * Used by CI via `npm run validate-languages`.
+ * Standalone — no dependency on @mecp/engine.
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-  CATEGORIES,
-  CODE_REGEX,
-  VALID_SEVERITIES,
-  type LanguageFile,
-} from '../src/types';
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const LANGUAGES_DIR = join(ROOT, 'languages');
 const REFERENCE = 'en.json';
 const TEMPLATE = '_template.json';
+
+const CODE_REGEX = /^[A-Z]\d{2}$/;
+const VALID_SEVERITIES = ['0', '1', '2', '3'];
+const CATEGORY_ICONS = {
+  M: 'medical',
+  T: 'terrain',
+  W: 'weather',
+  S: 'supplies',
+  P: 'position',
+  C: 'coordination',
+  R: 'response',
+  D: 'drill',
+  L: 'leisure',
+  X: 'threat',
+  H: 'resources',
+  B: 'beacon',
+};
 
 const REQUIRED_STRING_FIELDS = [
   'language',
@@ -23,7 +34,7 @@ const REQUIRED_STRING_FIELDS = [
   'language_name_en',
   'language_name_latin',
   'flag_emoji',
-] as const;
+];
 
 const REQUIRED_OBJECT_FIELDS = [
   'severities',
@@ -31,28 +42,26 @@ const REQUIRED_OBJECT_FIELDS = [
   'codes',
   'ui',
   'deprecations',
-] as const;
+];
 
-type JsonObject = Record<string, unknown>;
-
-function isObject(value: unknown): value is JsonObject {
+function isObject(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-function loadJson(filename: string): unknown {
+function loadJson(filename) {
   const path = join(LANGUAGES_DIR, filename);
   try {
     return JSON.parse(readFileSync(path, 'utf8'));
   } catch (err) {
-    throw new Error(`${filename}: invalid JSON (${(err as Error).message})`);
+    throw new Error(`${filename}: invalid JSON (${err.message})`);
   }
 }
 
-function sortedKeys(obj: JsonObject): string[] {
+function sortedKeys(obj) {
   return Object.keys(obj).sort();
 }
 
-function diffKeys(expected: string[], actual: string[]): { missing: string[]; extra: string[] } {
+function diffKeys(expected, actual) {
   const expectedSet = new Set(expected);
   const actualSet = new Set(actual);
   return {
@@ -61,13 +70,8 @@ function diffKeys(expected: string[], actual: string[]): { missing: string[]; ex
   };
 }
 
-function validateLanguageFile(
-  filename: string,
-  data: unknown,
-  reference: LanguageFile,
-  options: { requireFilenameMatch: boolean; allowTodoPlaceholders: boolean },
-): string[] {
-  const errors: string[] = [];
+function validateLanguageFile(filename, data, reference, options) {
+  const errors = [];
   const prefix = filename;
 
   if (!isObject(data)) {
@@ -96,28 +100,24 @@ function validateLanguageFile(
     return errors;
   }
 
-  const file = data as unknown as LanguageFile;
-
   if (options.requireFilenameMatch) {
     const stem = filename.replace(/\.json$/, '');
-    if (file.language !== stem) {
+    if (data.language !== stem) {
       errors.push(
-        `${prefix}: language field "${file.language}" must match filename stem "${stem}"`,
+        `${prefix}: language field "${data.language}" must match filename stem "${stem}"`,
       );
     }
   }
 
-  // Severities
-  const expectedSev = VALID_SEVERITIES.map(String);
   const { missing: missingSev, extra: extraSev } = diffKeys(
-    expectedSev,
-    sortedKeys(file.severities as unknown as JsonObject),
+    VALID_SEVERITIES,
+    sortedKeys(data.severities),
   );
   if (missingSev.length) errors.push(`${prefix}: missing severities: ${missingSev.join(', ')}`);
   if (extraSev.length) errors.push(`${prefix}: unexpected severities: ${extraSev.join(', ')}`);
 
-  for (const key of expectedSev) {
-    const sev = file.severities[key];
+  for (const key of VALID_SEVERITIES) {
+    const sev = data.severities[key];
     if (!sev) continue;
     if (typeof sev.local !== 'string' || sev.local.trim() === '') {
       errors.push(`${prefix}: severities.${key}.local must be a non-empty string`);
@@ -127,34 +127,30 @@ function validateLanguageFile(
     }
   }
 
-  // Categories
-  const expectedCats = Object.keys(CATEGORIES);
+  const expectedCats = Object.keys(CATEGORY_ICONS);
   const { missing: missingCats, extra: extraCats } = diffKeys(
     expectedCats,
-    sortedKeys(file.categories as unknown as JsonObject),
+    sortedKeys(data.categories),
   );
   if (missingCats.length) errors.push(`${prefix}: missing categories: ${missingCats.join(', ')}`);
   if (extraCats.length) errors.push(`${prefix}: unexpected categories: ${extraCats.join(', ')}`);
 
   for (const key of expectedCats) {
-    const cat = file.categories[key];
+    const cat = data.categories[key];
     if (!cat) continue;
     if (typeof cat.name !== 'string' || cat.name.trim() === '') {
       errors.push(`${prefix}: categories.${key}.name must be a non-empty string`);
     }
     if (typeof cat.icon !== 'string' || cat.icon.trim() === '') {
       errors.push(`${prefix}: categories.${key}.icon must be a non-empty string`);
-    } else if (CATEGORIES[key as keyof typeof CATEGORIES].icon !== cat.icon) {
-      errors.push(
-        `${prefix}: categories.${key}.icon must be "${CATEGORIES[key as keyof typeof CATEGORIES].icon}"`,
-      );
+    } else if (CATEGORY_ICONS[key] !== cat.icon) {
+      errors.push(`${prefix}: categories.${key}.icon must be "${CATEGORY_ICONS[key]}"`);
     }
   }
 
-  // Codes — must match English key set exactly
   const { missing: missingCodes, extra: extraCodes } = diffKeys(
     sortedKeys(reference.codes),
-    sortedKeys(file.codes as unknown as JsonObject),
+    sortedKeys(data.codes),
   );
   if (missingCodes.length) {
     errors.push(`${prefix}: missing codes (${missingCodes.length}): ${missingCodes.join(', ')}`);
@@ -163,7 +159,7 @@ function validateLanguageFile(
     errors.push(`${prefix}: unexpected codes (${extraCodes.length}): ${extraCodes.join(', ')}`);
   }
 
-  for (const [code, text] of Object.entries(file.codes)) {
+  for (const [code, text] of Object.entries(data.codes)) {
     if (!CODE_REGEX.test(code)) {
       errors.push(`${prefix}: invalid code key "${code}" (expected ${CODE_REGEX})`);
     }
@@ -174,19 +170,22 @@ function validateLanguageFile(
     }
   }
 
-  // UI strings — must match English key set exactly
   const { missing: missingUi, extra: extraUi } = diffKeys(
     sortedKeys(reference.ui),
-    sortedKeys(file.ui as unknown as JsonObject),
+    sortedKeys(data.ui),
   );
   if (missingUi.length) {
-    errors.push(`${prefix}: missing ui keys (${missingUi.length}): ${missingUi.slice(0, 20).join(', ')}${missingUi.length > 20 ? ', ...' : ''}`);
+    errors.push(
+      `${prefix}: missing ui keys (${missingUi.length}): ${missingUi.slice(0, 20).join(', ')}${missingUi.length > 20 ? ', ...' : ''}`,
+    );
   }
   if (extraUi.length) {
-    errors.push(`${prefix}: unexpected ui keys (${extraUi.length}): ${extraUi.slice(0, 20).join(', ')}${extraUi.length > 20 ? ', ...' : ''}`);
+    errors.push(
+      `${prefix}: unexpected ui keys (${extraUi.length}): ${extraUi.slice(0, 20).join(', ')}${extraUi.length > 20 ? ', ...' : ''}`,
+    );
   }
 
-  for (const [key, text] of Object.entries(file.ui)) {
+  for (const [key, text] of Object.entries(data.ui)) {
     if (typeof text !== 'string' || text.trim() === '') {
       errors.push(`${prefix}: ui.${key} must be a non-empty string`);
     } else if (!options.allowTodoPlaceholders && text.startsWith('TODO:')) {
@@ -194,8 +193,7 @@ function validateLanguageFile(
     }
   }
 
-  // Deprecations must be an object of strings (may be empty)
-  for (const [code, note] of Object.entries(file.deprecations)) {
+  for (const [code, note] of Object.entries(data.deprecations)) {
     if (!CODE_REGEX.test(code)) {
       errors.push(`${prefix}: deprecations key "${code}" is not a valid code`);
     }
@@ -207,7 +205,7 @@ function validateLanguageFile(
   return errors;
 }
 
-function main(): void {
+function main() {
   const files = readdirSync(LANGUAGES_DIR)
     .filter((name) => name.endsWith('.json'))
     .sort();
@@ -217,10 +215,9 @@ function main(): void {
     process.exit(1);
   }
 
-  const reference = loadJson(REFERENCE) as LanguageFile;
-  const allErrors: string[] = [];
+  const reference = loadJson(REFERENCE);
+  const allErrors = [];
 
-  // Validate English against schema first
   allErrors.push(
     ...validateLanguageFile(REFERENCE, reference, reference, {
       requireFilenameMatch: true,
@@ -230,7 +227,6 @@ function main(): void {
 
   for (const filename of files) {
     if (filename === REFERENCE) continue;
-
     const data = loadJson(filename);
     const isTemplate = filename === TEMPLATE;
     allErrors.push(

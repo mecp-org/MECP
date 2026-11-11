@@ -2,6 +2,8 @@
 
 Thank you for your interest in MECP. This project saves lives by enabling cross-language communication over mesh networks. Every contribution matters.
 
+This repository holds the **protocol** and **language packs**. Client implementations live in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app).
+
 ## How to Contribute
 
 ### Translations (Most Needed)
@@ -11,7 +13,7 @@ The highest-impact contribution is adding or verifying a language translation.
 1. Copy `languages/_template.json` to `languages/XX.json` (ISO 639-1 code)
 2. Translate every code and UI string
 3. Use the English file (`languages/en.json`) as the reference for context on each code
-4. Validate the file schema: `cd engine && npm run validate-languages`
+4. Validate the file schema: `npm run validate-languages`
 5. Submit a pull request with the title: `lang: Add [Language Name] translation`
 6. A native speaker must review before merge
 
@@ -26,14 +28,6 @@ MECP codes are permanent. A code once assigned never changes meaning. This is by
 3. Community discussion period (minimum 7 days)
 4. Codes are only appended, never renumbered or redefined
 
-### Code Contributions
-
-1. Fork the repository
-2. Create a feature branch
-3. Write tests for any engine changes
-4. Ensure all existing tests pass
-5. Submit a pull request
-
 ### Bug Reports
 
 Use the "Bug Report" issue template. Include:
@@ -42,17 +36,12 @@ Use the "Bug Report" issue template. Include:
 - The exact MECP string that caused the issue (if applicable)
 - Your browser/device/OS
 
-## Development Setup
+For engine, web, or mobile app bugs, open the issue against [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app).
+
+## Validation
 
 ```bash
-# Engine development
-cd engine
-npm install
-npm test
 npm run validate-languages
-
-# Web tool
-# Just open web/index.html in a browser. No build step needed.
 ```
 
 ## Code of Conduct
@@ -61,6 +50,5 @@ This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md). Be kind. Th
 
 ## License
 
-- App code: GPLv3
 - Protocol specification: CC0 (public domain)
 - Language files: CC BY 4.0

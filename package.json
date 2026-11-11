@@ -1,4 +1,8 @@
 {
+  "name": "mecp",
   "private": true,
-  "workspaces": ["engine"]
+  "description": "MECP protocol specification and language packs",
+  "scripts": {
+    "validate-languages": "node scripts/validate-languages.mjs"
+  }
 }
