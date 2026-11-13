@@ -299,7 +299,7 @@ MECP/<severity>/<code1> <code2> ... [optional freetext]
 | Timestamp | `@HHMM` | `@1430` | Time: 14:30 |
 | Language hint | `@xx` | `@en` | Message language: English |
 | Callsign | `~CALLSIGN` | `~OK1ABC` | Radio callsign |
-| Reference | `#tag` | `#basecamp` | Reference tag |
+| Reference | `#.{1,4}` | `#base` | Reference tag |
 
 ### 6.2 Example Messages
 
