@@ -290,16 +290,19 @@ MECP/<severity>/<code1> <code2> ... [optional freetext]
 
 **Codes:** One or more codes from the MECP code table, separated by spaces. Each code is a letter (category) followed by two digits: `M01`, `T04`, `C01`, `L01`, etc.
 
-**Freetext:** Optional. Everything after the codes, separated by a space. May include structured conventions:
+**Freetext:** Optional. Everything after the codes, separated by a space. May include structured conventions. Each pattern is searched for in the freetext, and only its first match is used.
+The regular expression format below is accepted by
+JavaScript, Python, Go, Rust and other common regex engines.
 
-| Convention | Format | Example | Meaning |
-|-----------|--------|---------|---------|
-| Person count | `<number>pax` | `3pax` | 3 people affected |
-| GPS coordinates | `lat,lon` | `48.8566,2.3522` | Location |
-| Timestamp | `@HHMM` | `@1430` | Time: 14:30 |
-| Language hint | `@xx` | `@en` | Message language: English |
-| Callsign | `~CALLSIGN` | `~OK1ABC` | Radio callsign |
-| Reference | `#tag` | `#basecamp` | Reference tag |
+| Convention | Pattern | Example | Meaning |
+|-----------|---------|---------|---------|
+| Person count | `([0-9]+)pax` | `3pax` | 3 people affected |
+| GPS coordinates | `(-?[0-9]+\.[0-9]+),(-?[0-9]+\.[0-9]+)` | `48.8566,2.3522` | Location (latitude -90 to 90, longitude -180 to 180) |
+| Timestamp | `@([01][0-9]\|2[0-3])([0-5][0-9])(?:[ \n]\|$)` | `@1430` | Time: 14:30 |
+| Language hint | `@([a-z]{2,3})(?:[ \n]\|$)` | `@en` | Message language: English |
+| Callsign | `~([A-Za-z0-9]{1,9})(?:[ \n]\|$)` | `~OK1ABC` | Radio callsign |
+| Reference | `#([A-Za-z0-9]+)` | `#basecamp` | Reference tag |
+| ETA | `(?:^\|[ \n])ETA ([0-9]+)` | `ETA 45 min` | ETA: 45 minutes |
 
 ### 6.2 Example Messages
 
