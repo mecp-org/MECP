@@ -268,6 +268,8 @@ A recipient -- or their device -- can decode every field immediately, regardless
 ---
 
 ## 6. How MECP Works
+Patterns use regular expression syntax from the [Google RE2 engine](https://github.com/google/re2) (no lookaround or backreferences).
+This deliberately limited regular expression syntax is compatible across many languages and libraries.
 
 ### 6.1 Message Format
 
@@ -277,9 +279,20 @@ Every MECP message follows this structure:
 MECP/<severity>/<code1> <code2> ... [optional freetext]
 ```
 
-**Prefix:** `MECP/` — identifies this as an MECP-formatted message (5 bytes).
+A message matches this pattern:
 
-**Severity:** A single digit 0-3:
+```
+^MECP/([0-3])/([A-Z][0-9]{2}(?: [A-Z][0-9]{2})*)(?: ([\s\S]*))?$
+```
+1. Severity
+2. Codes
+3. Optional Freetext
+
+#### `MECP/`
+Identifies this as an MECP-formatted message (5 bytes).
+
+#### Severity
+A single digit 0-3:
 
 | Level | Name | Meaning | Colour |
 |-------|------|---------|--------|
@@ -288,50 +301,127 @@ MECP/<severity>/<code1> <code2> ... [optional freetext]
 | 2 | SAFETY | Important safety information | Amber |
 | 3 | ROUTINE | Normal/non-emergency communication | Blue |
 
-**Codes:** One or more codes from the MECP code table, separated by spaces. Each code is a letter (category) followed by two digits: `M01`, `T04`, `C01`, `L01`, etc.
+#### Codes
+1. One or more codes from the MECP code table, separated by spaces.
+2. Each code is a letter (category) followed by two digits: `M01`, `T04`, `C01`, `L01`, etc.
+3. Note that any non-code text ends the code section. All remaining text is freetext.
 
-**Freetext:** Optional. Everything after the codes, separated by a space. May include structured conventions:
+#### Optional Freetext
+1. May include structured conventions.
+2. Each convention has an **encoding** pattern and a **decoding** pattern. Encoders MUST emit text that matches the encoding pattern. Decoders SHOULD accept anything that matches the decoding pattern. Every encoded value also matches its decoding pattern.
+3. Encoding patterns can be assumed to be prefixed with `(?:^| )` and suffixed with `(?: |$)`: conventions are separated by a single ASCII space.
+4. Decoding patterns can be assumed to be prefixed with `(?:^|[\t\n\f\r ])` and suffixed with `(?:[\t\n\f\r ,.;:]|$)`.
+5. Decoders search the freetext for each decoding pattern, and only its first match by position is used. `^` and `$` refer to the start and end of the freetext.
+6. Decoding patterns spell out case-insensitivity with character classes such as `[Pp][Aa][Xx]`, since an inline `(?i)` flag is not portable.
+7. Note that Unicode whitespace (NBSP, U+2000–U+200A, U+3000, U+FEFF, etc.) is handled inconsistently by different languages and systems, and should therefore be avoided.
+8. Successful matches should be substituted in place when rendering free text.
 
-| Convention | Format | Example | Meaning |
-|-----------|--------|---------|---------|
-| Person count | `<number>pax` | `3pax` | 3 people affected |
-| GPS coordinates | `lat,lon` | `48.8566,2.3522` | Location |
-| Timestamp | `@HHMM` | `@1430` | Time: 14:30 |
-| Language hint | `@xx` | `@en` | Message language: English |
-| Callsign | `~CALLSIGN` | `~OK1ABC` | Radio callsign |
-| Reference | `#tag` | `#basecamp` | Reference tag |
+#### Person count
+
+- **Encode:** `([1-9][0-9]*)pax`
+- **Decode:** `([0-9]+) ?[Pp][Aa][Xx]`
+- **Example:** `MECP/1/S01 4pax`
+- **Also decoded:** `4 pax`, `4PAX`, `4Pax.`
+- **Meaning:** "URGENT, 4 people need water"
+
+#### GPS coordinates
+
+- **Encode:** `(-?(?:0|[1-9][0-9]{0,2})\.[0-9]{1,6}),(-?(?:0|[1-9][0-9]{0,2})\.[0-9]{1,6})`
+- **Decode:** `([+-]?[0-9]+\.[0-9]+), ?([+-]?[0-9]+\.[0-9]+)`
+- **Example:** `MECP/0/M04 P05 -41.2865,174.7762`
+- **Also decoded:** `+48.8566, 2.3522`, `48.85661234,2.35221234`
+- **Meaning:** "MAYDAY, cardiac emergency at GPS coordinates -41.2865,174.7762"
+- **Additional Validation:**
+    - -90 ≤ group 1 ≤ 90
+    - -180 ≤ group 2 ≤ 180
+    - Decode accepts `0,0`, but encode does not.
+
+#### Timestamp
+
+- **Encode:** `@((?:[01][0-9]|2[0-3])[0-5][0-9])`
+- **Decode:** `@([01]?[0-9]|2[0-3]):?([0-5][0-9])` (group 1 is the hour, group 2 the minute)
+- **Example:** `MECP/2/T01 @0630`
+- **Also decoded:** `@630`, `@6:30`, `@06:30`
+- **Meaning:** "SAFETY, road / trail blocked as of 06:30"
+
+#### Language hint
+
+- **Encode:** `@([a-z]{2,3}(?:-[a-z]{2})?)`
+- **Decode:** `@([A-Za-z]{2,3}(?:[-_][A-Za-z]{2})?)` (normalise to lowercase and `-`)
+- **Example:** `MECP/3/L04 Gipfel erreicht @de`
+- **Also decoded:** `@DE`, `@zh_CN`, `@zh-TW`
+- **Meaning:** "ROUTINE, summit reached: 'Gipfel erreicht' (German)"
+
+#### Callsign
+
+- **Encode:** `~([A-Z0-9]+(?:/[A-Z0-9]+)*)`
+- **Decode:** `~([A-Za-z0-9/]+)` (normalise to uppercase)
+- **Example:** `MECP/3/L20 ~VK2/OK1ABC/P`
+- **Also decoded:** `~vk2/ok1abc/p`
+- **Meaning:** "ROUTINE, node test from VK2/OK1ABC/P"
+- **Additional Validation:** when encoding, group 1 is at most 12 characters.
+
+#### Reference
+
+- **Encode:** `#([A-Za-z0-9]+)`
+- **Decode:** `#([A-Za-z0-9_-]+)`
+- **Example:** `MECP/2/C08 #basecamp`
+- **Also decoded:** `#base-camp`, `#base_camp`
+- **Meaning:** "SAFETY, rendezvous at basecamp"
+
+#### ETA
+
+- **Encode:** `ETA ([1-9][0-9]*)min`
+- **Decode:** `[Ee][Tt][Aa] ?([0-9]+)(?: ?[Mm][Ii][Nn](?:[Ss]|[Uu][Tt][Ee][Ss])?)?` (group 1 is the amount in minutes)
+- **Example:** `MECP/1/R02 ETA 20min`
+- **Also decoded:** `ETA 20`, `eta 20 min`, `ETA20`, `ETA 20 minutes`, `ETA 20 mins`
+- **Meaning:** "URGENT, help is coming, arriving in 20 minutes"
 
 ### 6.2 Example Messages
 
-**Life-threatening emergency:**
-```
-MECP/0/M01 M07 P01 2pax 47.3769,12.1048 @0845 @de
-```
-*"MAYDAY: Injury reported, fracture/immobile person, group is stranded. 2 people affected. Location: 47.3769,12.1048. Time: 08:45. Language: German."*
+Each example below exercises something the single-convention examples in 6.1 do not.
 
-**Urgent weather warning:**
+**Codes only, no freetext:**
 ```
-MECP/1/W01 T04 P03 15pax @1200 @sk
+MECP/1/T05
 ```
-*"URGENT: Storm approaching, flooding, sheltering in place. 15 people. Time: 12:00. Language: Slovak."*
+*"URGENT: Landslide / rockfall."*
 
-**Safety coordination:**
+**Life-threatening emergency, several conventions together:**
 ```
-MECP/2/C01 R03 ETA 45min @en
+MECP/0/M01 M07 P01 2pax 47.3769,12.1048 @0845 ~OE7ABC @de
 ```
-*"SAFETY: Send rescue team. Help coming, ETA 45 minutes."*
+*"MAYDAY: Injury reported, fracture/immobile person, group is stranded. 2 people affected. Location: 47.3769,12.1048. Time: 08:45. From OE7ABC. Language: German."*
 
-**Routine social message:**
+**Response, in a different convention order:**
 ```
-MECP/3/L02 L10 Great view from the ridge! @en
+MECP/1/R02 C08 ETA 40min #hut2 ~OE7XYZ @de
 ```
-*"ROUTINE: Coffee available, beautiful view. 'Great view from the ridge!'"*
+*"URGENT: Help is coming, rendezvous at hut2. ETA 40 minutes. From OE7XYZ. Language: German."*
+
+**Loosely formatted sender, conventions inside prose:**
+```
+MECP/2/T05 Rockfall near #base-camp, 3 PAX turned back @6:30.
+```
+*"SAFETY: Landslide / rockfall. 'Rockfall near base-camp, 3 people turned back at 06:30.'"* Not a valid encoding, but decoders accept the reference, person count and timestamp despite the hyphen, case, missing leading zero, colon and trailing punctuation.
+
+**Invalid values and first match:**
+```
+MECP/3/L06 @2460 @1400 @1530
+```
+*"ROUTINE: Running late. Time: 14:00."* `@2460` is not a timestamp, so the first match is `@1400`; `@1530` is ignored.
+
+**Look-alikes that are not conventions:**
+```
+MECP/3/L02 L10 Great view 2,5 km past the hut! @en
+```
+*"ROUTINE: Coffee available, beautiful view. 'Great view 2,5 km past the hut!' Language: English."* `2,5` has no decimal point, so it is not GPS.
 
 **Drill message:**
 ```
-MECP/3/D01 M01 M09 5pax This is a training exercise @en
+MECP/3/D01 M01 M09 5pax This is a training exercise
 ```
-*"ROUTINE: This is a drill. Simulated injury, simulated multiple casualties. 5 pax. 'This is a training exercise.'"*
+*"ROUTINE: This is a drill. Simulated injury, simulated multiple casualties. 5 people. 'This is a training exercise.'"*
 
 ### 6.3 The Encoder and Decoder
 
