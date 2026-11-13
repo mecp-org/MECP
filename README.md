@@ -107,3 +107,12 @@ The protocol is free forever. Anyone may implement MECP without restriction. App
 ## Supported Languages (20)
 
 Czech, Dutch, English, Farsi, French, German, Italian, Japanese, Norwegian, Polish, Portuguese, Russian, Serbian (Cyrillic), Simplified Chinese, Slovak, Spanish, Swedish, Traditional Chinese, Turkish, Ukrainian
+
+## Third Party Implementations
+Below is a partial list of 3rd party implementations of the standard,
+provided for reference to future implementers.
+
+- https://colorado-mesh.github.io/mesh-client/emcomm/
+- https://github.com/Colorado-Mesh/meshcore-tak-bridge/blob/main/docs/DESIGN.md#mecp-messages
+- https://www.wadamesh.com/apps.html#mecp
+- https://github.com/FreeTAKTeam/reticulum_mobile_emergency_management#events-and-mecp
