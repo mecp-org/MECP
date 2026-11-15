@@ -327,6 +327,7 @@ A single digit 0-3:
 - **Example:** `MECP/1/S01 4pax`
 - **Also decoded:** `4 pax`, `4PAX`, `4Pax.`, `04pax`
 - **Meaning:** "URGENT, 4 people need water"
+- **Protocol keyword:** `pax` is a protocol keyword, not an English word. It is never translated on the wire and is not affected by the language hint; a localised form (`4人`, `4 Personen`) is ordinary freetext.
 
 #### GPS coordinates
 
