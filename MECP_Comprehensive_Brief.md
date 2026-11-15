@@ -323,7 +323,7 @@ A single digit 0-3:
 - **Encode:** `([1-9][0-9]*)pax`
 - **Decode:** `0*([1-9][0-9]*) ?[Pp][Aa][Xx]`
 - **Example:** `MECP/1/S01 4pax`
-- **Also decoded:** `4 pax`, `4PAX`, `4Pax.`
+- **Also decoded:** `4 pax`, `4PAX`, `4Pax.`, `04pax`
 - **Meaning:** "URGENT, 4 people need water"
 
 #### GPS coordinates
