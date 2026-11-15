@@ -282,7 +282,7 @@ MECP/<severity>/<code1> <code2> ... [optional freetext]
 A message matches this pattern:
 
 ```
-^MECP/([0-3])/([A-Z][0-9]{2}(?: [A-Z][0-9]{2})*)(?: ([\s\S]*))?$
+^MECP/([0-3])/([A-Z][0-9]{2}(?: [A-Z][0-9]{2})*)(?: ([^ \t\n\f\r](?:.*[^ \t\n\f\r])?))?$
 ```
 1. Severity
 2. Codes
