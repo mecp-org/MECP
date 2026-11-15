@@ -361,7 +361,7 @@ A single digit 0-3:
 - **Example:** `MECP/3/L20 ~VK2/OK1ABC/P`
 - **Also decoded:** `~vk2/ok1abc/p`
 - **Meaning:** "ROUTINE, node test from VK2/OK1ABC/P"
-- **Additional Validation:** when encoding, group 1 is at most 12 characters.
+- **Additional Validation:** group 1 is at most 12 characters, in both directions.
 
 #### Reference
 
