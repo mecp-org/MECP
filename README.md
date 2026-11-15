@@ -114,9 +114,9 @@ npm run validate-languages
 
 The protocol is free forever. Anyone may implement MECP without restriction. App and engine code in [mecp-app](https://github.com/mecp-org/mecp-app) is GPLv3.
 
-## Supported Languages (20)
+## Supported Languages (21)
 
-Czech, Dutch, English, Farsi, French, German, Italian, Japanese, Norwegian, Polish, Portuguese, Russian, Serbian (Cyrillic), Simplified Chinese, Slovak, Spanish, Swedish, Traditional Chinese, Turkish, Ukrainian
+Czech, Dutch, English, Farsi, French, German, Italian, Japanese, Norwegian, Polish, Portuguese, Russian, Serbian (Cyrillic), Simplified Chinese, Slovak, Spanish, Swedish, Traditional Chinese, Turkish, Ukrainian, Greek
 
 ## Implementations (per-form decode behaviour, dated snapshot)
 
