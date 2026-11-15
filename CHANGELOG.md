@@ -16,6 +16,7 @@ All notable changes to MECP will be documented in this file.
 ### Infrastructure
 - This repository is now **protocol + language packs only**; engine, web tool, examples, and mobile app live in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app)
 - Language validation is a standalone script: `scripts/validate-languages.mjs` (`npm run validate-languages`)
+- Freetext conformance harness: `freetext/patterns.json` + `freetext/tests.json` + `scripts/check-freetext.mjs` (`npm run test-freetext`) — asserts patterns appear verbatim in the brief and runs decode cases
 
 ---
 

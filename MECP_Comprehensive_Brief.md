@@ -406,7 +406,7 @@ A single digit 0-3:
   3. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Mm][Ii][Nn]` — minutes (`45min`, `ETA 45min`, `ETA45min`)
   4. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Dd]` — days
   5. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Ss]` — seconds
-  6. Bare number (decode-only, **first freetext token only**): `^(?:[Ee][Tt][Aa] ?)?([0-9]+)(?:B|$)` — read as minutes. `MECP/2/R03 45` is 45 minutes; `MECP/2/C01 R03 P05 45` is not a duration (the trailing `45` is prose).
+  6. Bare number (decode-only, **first freetext token only**): `^(?:[Ee][Tt][Aa] ?)?([0-9]+)(?:B|$)` — read as minutes. `MECP/2/R03 45` is 45 minutes; `MECP/2/C01 R03 1pax 45` is not (the trailing `45` is not the first freetext token).
 - **Example:** `MECP/2/C01 R03 45min @en`
 - **Also decoded:** `R03 45`, `R03 ETA 45`, `R03 ETA 45min`, `R03 ETA45min`, `R03 45 min`, `R03 1h30min`, `R03 1h 30min`, `R03 2h`
 - **Meaning:** "SAFETY, send rescue team, help coming in 45 minutes, English"
