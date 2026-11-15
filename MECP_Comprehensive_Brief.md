@@ -333,6 +333,7 @@ A single digit 0-3:
 6. Additional Validation is normative. Before using a match, a decoder MUST apply the validation for that convention. If the match fails, the decoder MUST ignore it and resume searching from the end of the failed match. A convention that fails Additional Validation MUST NOT invalidate the message, and its text MUST be left in the freetext unchanged. An encoder MUST apply the same validation and MUST NOT emit a value that fails it.
 7. When rendering, a decoder replaces the matched **token** — the match excluding the one-code-point boundary on each side, where present — with its human-readable form, then re-emits the boundary characters. Boundaries are separators and MUST be preserved. Decoders SHOULD also expose each extracted value structurally.
 8. Unicode whitespace (NBSP, U+2000–U+200A, U+3000, U+FEFF, etc.) is handled inconsistently across languages and platforms. Encoders MUST NOT emit it.
+9. A convention MAY be scoped to a code: its patterns apply only when that code is present in the code section, and its value MUST NOT be decoded otherwise. Duration is scoped to `R03`; every other convention in this section is unscoped.
 
 #### Person count
 
@@ -390,6 +391,27 @@ A single digit 0-3:
 - **Also decoded:** `#base-camp`, `#base_camp`
 - **Meaning:** "SAFETY, rendezvous at basecamp"
 
+#### Duration (R03 only)
+
+`R03` already means ETA, so a duration is its value. This convention is **scoped to `R03`** (rule 9): if the code section does not contain `R03`, a duration-like token is ordinary freetext and MUST NOT be decoded. Position is otherwise free for unit-bearing forms — `MECP/2/C01 R03 P05 47.3769,12.1048 45min` and `MECP/2/R03 45min` are equally valid. See [#21](https://github.com/mecp-org/MECP/issues/21).
+
+- **Encode** (SI symbols only; a bare number is not encodable):
+  - `([1-9][0-9]*) ?min` — total minutes (canonical: `45min`)
+  - `([1-9][0-9]*) ?h(?: ?([0-5]?[0-9]) ?min)?` — hours with optional minutes (`2h`, `1h30min`, `1h 30min`)
+  - `([1-9][0-9]*) ?d` — days
+  - `([1-9][0-9]*) ?s` — seconds
+- **Decode** (try in this order; group values convert to a total in minutes):
+  1. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Hh] ?([0-9]+) ?[Mm][Ii][Nn]` — hours and minutes (`1h 30min`, `ETA 1h30min`)
+  2. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Hh]` — hours only
+  3. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Mm][Ii][Nn]` — minutes (`45min`, `ETA 45min`, `ETA45min`)
+  4. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Dd]` — days
+  5. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Ss]` — seconds
+  6. Bare number (decode-only, **first freetext token only**): `^(?:[Ee][Tt][Aa] ?)?([0-9]+)(?:B|$)` — read as minutes. `MECP/2/R03 45` is 45 minutes; `MECP/2/C01 R03 P05 45` is not a duration (the trailing `45` is prose).
+- **Example:** `MECP/2/C01 R03 45min @en`
+- **Also decoded:** `R03 45`, `R03 ETA 45`, `R03 ETA 45min`, `R03 ETA45min`, `R03 45 min`, `R03 1h30min`, `R03 1h 30min`, `R03 2h`
+- **Meaning:** "SAFETY, send rescue team, help coming in 45 minutes, English"
+- **Additional Validation:** convert the match to a total in minutes; require 1 ≤ total ≤ 1440. If the value fails, ignore the match and leave the text as freetext. Localised unit words (`分`, `dakika`, `minutos`) are not part of these patterns — they remain freetext unless a client recognises them as a local alias.
+
 ### 6.2 Protocol Vocabulary
 
 The tokens above, the severity words, the sigils and the unit symbols form a **closed vocabulary**. Adding a token or a unit is a spec change, not a client detail, and requires an ADR.
@@ -426,11 +448,11 @@ MECP/1/R02 C08 #hut2 ~OE7XYZ @de
 ```
 *"URGENT: Help is coming, rendezvous at hut2. From OE7XYZ. Language: German."*
 
-**Safety coordination:**
+**Safety coordination (Duration scoped to R03):**
 ```
 MECP/2/C01 R03 45min @en
 ```
-*"SAFETY: Send rescue team. Help coming, ETA 45 minutes, English."*
+*"SAFETY: Send rescue team. Help coming, ETA 45 minutes, English."* `45min` is the Duration convention (canonical encode). `MECP/3/L06 45min` without `R03` leaves `45min` as ordinary freetext.
 
 **Loosely formatted sender, conventions inside prose:**
 ```

@@ -67,7 +67,7 @@ See `languages/en.json` for the complete code table, or [MECP_Comprehensive_Brie
 ```
 MECP/0/M01 M07 2pax P05 48.6520,20.1305   Emergency: injury + fracture, 2 people, GPS
 MECP/2/T04 T01 P02 Poprad                   Warning: flooding, road blocked, evacuating
-MECP/3/L01 L06 30min                         Social: beer, running late, 30 minutes
+MECP/3/L01 L06 running late                  Social: beer, running late (no R03 → minutes in prose are not Duration)
 MECP/0/D01 M01 M07 2pax P05 48.65,20.13     Drill: realistic practice, no real response
 MECP/2/H03 H07 5pax P05 48.65,20.13         Offering: medical supplies + shelter for 5
 MECP/0/B01 M01 P05 48.65,20.13 @1430        Beacon: automated distress signal with GPS
