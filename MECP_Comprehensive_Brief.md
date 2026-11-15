@@ -1,7 +1,7 @@
 # MECP: Mesh Emergency Communication Protocol
 ## A Comprehensive Briefing Document
 
-**Version:** 1.2.0
+**Version:** 1.2.1
 **Date:** November 2026
 **Repository:** [github.com/mecp-org/MECP](https://github.com/mecp-org/MECP) (protocol + languages)
 **Implementations:** [github.com/mecp-org/mecp-app](https://github.com/mecp-org/mecp-app) (engine, web, Expo app, examples)

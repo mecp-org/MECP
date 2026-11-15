@@ -4,6 +4,10 @@ All notable changes to MECP will be documented in this file.
 
 ## [Unreleased]
 
+---
+
+## [1.2.1] - 2026-11-15
+
 ### Protocol
 - R03 duration no longer caps at 1440 minutes ([#28](https://github.com/mecp-org/MECP/issues/28)): any positive total is valid in any SI time unit (`2d`, `48h`, `2880min`).
 
