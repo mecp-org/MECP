@@ -20,4 +20,3 @@ Brief description of changes.
 - [ ] No existing code meanings have been changed
 - [ ] Translations have been verified by a native speaker (if applicable)
 - [ ] Protocol vocabulary is ASCII and closed — no new tokens without an ADR (see ADR 0003)
-- [ ] CI passes

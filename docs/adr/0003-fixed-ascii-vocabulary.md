@@ -22,16 +22,11 @@ localised input appears on a separate channel (NAVTEX 490 kHz) or as freetext.
 MECP follows that pattern: codes, sigils, and keywords are ASCII; localised
 forms are ordinary freetext.
 
-Consequences:
-
-- Tokens such as `pax`, `ETA`, `min`, `#`, `~` are not translated.
-- Unit vocabulary is a handful of SI symbols rather than twenty languages' worth
-  of words, so the standard does not change when a translation does.
-- The rendering layer replaces tokens with localised forms.
-
 ## Consequences
 
-- `pax` is a protocol keyword; `45分` is freetext.
+- Tokens such as `pax`, `ETA`, `min`, `#`, `~` are not translated; `45分` is
+  freetext.
+- The rendering layer replaces tokens with localised forms.
 - Unit vocabulary is a handful of SI symbols rather than twenty languages' worth
   of words, so the standard does not change when a translation does.
 - The encoding of a duration never depends on the language packs.

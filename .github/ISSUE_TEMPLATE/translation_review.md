@@ -13,7 +13,6 @@ assignees: ''
 ## Type
 - [ ] New translation (needs full review)
 - [ ] Correction to existing translation
-- [ ] Partial translation (some codes missing)
 
 ## Reviewer Requirements
 - Native speaker of the target language

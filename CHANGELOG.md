@@ -4,8 +4,17 @@ All notable changes to MECP will be documented in this file.
 
 ## [Unreleased]
 
+### Protocol
+- R03 duration encoding is strict: no space between number and unit (`45min`, `2h`, `1h30min`). Decoders still accept spaced forms (`45 min`, `1h 30min`). Brief §6.1, Appendix A and ADRs 0002/0004 now agree.
+
 ### Docs
 - README implementation snapshot refreshed for mesh-client MECP 1.2.1 adherence ([Colorado-Mesh/mesh-client#1472](https://github.com/Colorado-Mesh/mesh-client/pull/1472))
+- Brief §7 lists codes only; `languages/en.json` is the single source of truth for code text
+- Removed content duplicated across README, the brief and CONTRIBUTING; fixed stale file layout and roadmap
+
+### Infrastructure
+- `validate-spec` checks every code in brief examples against `en.json`, uses the §6.1 message pattern, and checks §7 lists exactly the `en.json` codes
+- `validate-languages` rejects `TODO:` placeholders in any string field, not only codes and UI strings
 
 ---
 

@@ -36,7 +36,8 @@ them; a duration or distance is always encoded with an SI symbol.
 
 ## Consequences
 
-- `45min`, `45 min`, `1h30min`, `2h`, `1d` are encodable forms.
+- `45min`, `1h30min`, `2h`, `1d` are encodable forms: no space between number
+  and unit. Spaced forms (`45 min`, `1h 30min`) are decode-only.
 - `45m` is rejected — `m` is metre, not minute.
 - `45 minutes`, `45分`, `45 دقیقه` are never encodable. They are freetext.
 - A bare number (`45`) is decode-only, read as minutes, and only valid as the

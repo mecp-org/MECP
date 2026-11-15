@@ -51,7 +51,6 @@ Use the "Bug Report" issue template. Include:
 - What you expected to happen
 - What actually happened
 - The exact MECP string that caused the issue (if applicable)
-- Your browser/device/OS
 - MECP version (e.g. `1.2.1` or tag `v1.2.1`)
 
 For engine, web, or mobile app bugs, open the issue against [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app).
