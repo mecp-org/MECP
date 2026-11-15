@@ -17,5 +17,8 @@
   "devDependencies": {
     "markdownlint-cli2": "^0.24.1",
     "simple-git-hooks": "^2.14.0"
+  },
+  "overrides": {
+    "katex": "0.19.1"
   }
 }
