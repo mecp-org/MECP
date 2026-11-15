@@ -365,8 +365,9 @@ A single digit 0-3:
 
 #### Reference
 
-- **Encode:** `#([A-Za-z0-9]+)`
+- **Encode:** `#([a-z0-9]+(?:-[a-z0-9]+)*)`
 - **Decode:** `#([A-Za-z0-9_-]+)`
+- **Identity:** case-insensitive; `_` normalises to `-`; a missing separator is a distinct tag (`#basecamp` is not `#base-camp`). Encoders SHOULD emit lowercase letters, digits and `-` only.
 - **Example:** `MECP/2/C08 #basecamp`
 - **Also decoded:** `#base-camp`, `#base_camp`
 - **Meaning:** "SAFETY, rendezvous at basecamp"
