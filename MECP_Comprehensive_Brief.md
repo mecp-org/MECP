@@ -400,7 +400,7 @@ MECP/1/R02 C08 #hut2 ~OE7XYZ @de
 ```
 MECP/2/C01 R03 45min @en
 ```
-*"SAFETY: Send rescue team. Help coming, ETA 45 minutes."*
+*"SAFETY: Send rescue team. Help coming, ETA 45 minutes, English."*
 
 **Loosely formatted sender, conventions inside prose:**
 ```
