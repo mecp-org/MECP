@@ -8,7 +8,17 @@ A user in Scotland composes a message by tapping through a menu in English. The 
 
 This repository is the **protocol home**: message format, code table, and official language packs.
 
-**Implementations** (TypeScript engine, web PWA, Expo app, examples) live in **[mecp-org/mecp-app](https://github.com/mecp-org/mecp-app)**.
+## Implementations
+
+Reference implementations live in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app):
+
+- **TypeScript engine** (`@mecp/engine`) — encode/decode, beacon helpers, tests
+- **Web tool (PWA)** — offline compose/decode HTML tool
+- **Expo / React Native app** — Meshtastic AIDL client (compose, inbox, beacon)
+- **Examples** — Python, Arduino/ESP32, shell
+- **Design plan** — product/UX design notes
+
+That repo submodules this protocol repository for language packs (`vendor/mecp`). Third-party implementations are listed in the section below.
 
 ## Quick Start
 
@@ -104,11 +114,35 @@ npm run validate-languages
 
 The protocol is free forever. Anyone may implement MECP without restriction. App and engine code in [mecp-app](https://github.com/mecp-org/mecp-app) is GPLv3.
 
-## Supported Languages (20)
+## Supported Languages (21)
 
-Czech, Dutch, English, Farsi, French, German, Italian, Japanese, Norwegian, Polish, Portuguese, Russian, Serbian (Cyrillic), Simplified Chinese, Slovak, Spanish, Swedish, Traditional Chinese, Turkish, Ukrainian
+Czech, Dutch, English, Farsi, French, German, Italian, Japanese, Norwegian, Polish, Portuguese, Russian, Serbian (Cyrillic), Simplified Chinese, Slovak, Spanish, Swedish, Traditional Chinese, Turkish, Ukrainian, Greek
+
+## Implementations (per-form decode behaviour, dated snapshot)
+
+Per-form decode behaviour as observed on 2026-11-15 is recorded in
+[#21](https://github.com/mecp-org/MECP/issues/21#client-inventory-informational).
+That is a dated snapshot, not a conformance claim.
+
+| Message | mecp-app | mesh-client | TAK bridge | REM | Wadamesh |
+|---|---|---|---|---|---|
+| `R03 45` | 45 | 45 | 45 | 45 | — |
+| `R03 45min` | — | — | — | 45 | — |
+| `R03 ETA 45min` | — | — | — | 45 | — |
+| `C01 R03 1pax @0845 45min` | — | — | — | 45 | — |
+| `C01 R03 P05 47.3769,12.1048 45min` | — | — | — | 45 | — |
+| `R03 12345` | 12345 | 12345 | 12345 | — | — |
+
+| Known implementations |
+|---|
+| **mecp-app** — [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app). Reference demonstrator, originally built by Xiang: Expo / React Native client, offline web PWA, and `@mecp/engine` (TypeScript encode/decode). Its composer prepends `pax`, GPS and `@HHMM`, which is why rows 4 and 5 are never the first token. |
+| **mesh-client** — [Colorado-Mesh/mesh-client](https://github.com/Colorado-Mesh/mesh-client). Colorado Mesh's cross-platform Electron client for Meshtastic, MeshCore and Reticulum. Vendors the MECP engine at `src/renderer/lib/mecp/engine/`. |
+| **TAK bridge** — [Colorado-Mesh/meshcore-tak-bridge](https://github.com/Colorado-Mesh/meshcore-tak-bridge). Decodes a space-separated integer anywhere in the freetext, with no upper bound (`12345` decodes). |
+| **REM** — [FreeTAKTeam/reticulum_mobile_emergency_management](https://github.com/FreeTAKTeam/reticulum_mobile_emergency_management). Handles every form above except the unbounded integer. |
+| **Wadamesh** — [wadamesh.com/apps.html#mecp](https://www.wadamesh.com/apps.html#mecp). Composer emits `C01 R03 P05 <gps> 45min`; no duration decoding observed. |
 
 ## Third Party Implementations
+
 Below is a partial list of 3rd party implementations of the standard,
 provided for reference to future implementers.
 
