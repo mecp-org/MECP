@@ -310,13 +310,13 @@ A single digit 0-3:
 
 #### Optional Freetext
 1. May include structured conventions.
-2. Each convention has an **encoding** pattern and a **decoding** pattern. Encoders MUST emit text that matches the encoding pattern. Decoders SHOULD accept anything that matches the decoding pattern. Every encoded value also matches its decoding pattern.
+2. Each convention has an **encoding** pattern and a **decoding** pattern. Each encoded convention value MUST match its encoding pattern; decoders SHOULD accept anything that matches the decoding pattern. Every encoded value also matches its decoding pattern.
 3. Encoding patterns can be assumed to be prefixed with `(?:^| )` and suffixed with `(?: |$)`: conventions are separated by a single ASCII space.
-4. Decoding patterns can be assumed to be prefixed with `(?:^|[\t\n\f\r ])` and suffixed with `(?:[\t\n\f\r ,.;:]|$)`.
-5. Decoders search the freetext for each decoding pattern, and only its first match by position is used. `^` and `$` refer to the start and end of the freetext.
-6. Decoding patterns spell out case-insensitivity with character classes such as `[Pp][Aa][Xx]`, since an inline `(?i)` flag is not portable.
-7. Note that Unicode whitespace (NBSP, U+2000–U+200A, U+3000, U+FEFF, etc.) is handled inconsistently by different languages and systems, and should therefore be avoided.
-8. Successful matches should be substituted in place when rendering free text.
+4. Decoding patterns can be assumed to be prefixed with `(?:^|B)` and suffixed with `(?:B|$)`, where `B` is `\t`, `\n`, `\f`, `\r`, a space, or one of ` , . ; : ! ? ' " ( ) [ ] { }`. The sigils `@ # ~ +` and the characters `- _` are not boundaries. A boundary is never more than one character wide.
+5. Decoders search the freetext for each decoding pattern. Only the first match by position is used; matching is case-sensitive except where a pattern spells out character classes such as `[Pp][Aa][Xx]`. `^` and `$` refer to the start and end of the freetext.
+6. Additional Validation is normative. Before using a match, a decoder MUST apply the validation for that convention. If the match fails, the decoder MUST ignore it and resume searching from the end of the failed match. A convention that fails Additional Validation MUST NOT invalidate the message, and its text MUST be left in the freetext unchanged.
+7. When rendering, a decoder replaces the matched **token** — the match excluding the one-character boundary on each side, where present — with its human-readable form, then re-emits the boundary characters. Boundaries are separators and MUST be preserved. Decoders SHOULD also expose each extracted value structurally.
+8. Unicode whitespace (NBSP, U+2000–U+200A, U+3000, U+FEFF, etc.) is handled inconsistently across languages and platforms. Encoders MUST NOT emit it.
 
 #### Person count
 
