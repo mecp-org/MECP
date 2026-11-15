@@ -1,6 +1,5 @@
 /**
  * Validate language JSON files against the English reference schema.
- * Standalone — no dependency on @mecp/engine.
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -57,10 +56,6 @@ function loadJson(filename) {
   }
 }
 
-function sortedKeys(obj) {
-  return Object.keys(obj).sort();
-}
-
 function diffKeys(expected, actual) {
   const expectedSet = new Set(expected);
   const actualSet = new Set(actual);
@@ -111,7 +106,7 @@ function validateLanguageFile(filename, data, reference, options) {
 
   const { missing: missingSev, extra: extraSev } = diffKeys(
     VALID_SEVERITIES,
-    sortedKeys(data.severities),
+    Object.keys(data.severities),
   );
   if (missingSev.length) errors.push(`${prefix}: missing severities: ${missingSev.join(', ')}`);
   if (extraSev.length) errors.push(`${prefix}: unexpected severities: ${extraSev.join(', ')}`);
@@ -130,7 +125,7 @@ function validateLanguageFile(filename, data, reference, options) {
   const expectedCats = Object.keys(CATEGORY_ICONS);
   const { missing: missingCats, extra: extraCats } = diffKeys(
     expectedCats,
-    sortedKeys(data.categories),
+    Object.keys(data.categories),
   );
   if (missingCats.length) errors.push(`${prefix}: missing categories: ${missingCats.join(', ')}`);
   if (extraCats.length) errors.push(`${prefix}: unexpected categories: ${extraCats.join(', ')}`);
@@ -149,8 +144,8 @@ function validateLanguageFile(filename, data, reference, options) {
   }
 
   const { missing: missingCodes, extra: extraCodes } = diffKeys(
-    sortedKeys(reference.codes),
-    sortedKeys(data.codes),
+    Object.keys(reference.codes),
+    Object.keys(data.codes),
   );
   if (missingCodes.length) {
     errors.push(`${prefix}: missing codes (${missingCodes.length}): ${missingCodes.join(', ')}`);
@@ -165,14 +160,12 @@ function validateLanguageFile(filename, data, reference, options) {
     }
     if (typeof text !== 'string' || text.trim() === '') {
       errors.push(`${prefix}: codes.${code} must be a non-empty string`);
-    } else if (!options.allowTodoPlaceholders && text.startsWith('TODO:')) {
-      errors.push(`${prefix}: codes.${code} still has a TODO placeholder`);
     }
   }
 
   const { missing: missingUi, extra: extraUi } = diffKeys(
-    sortedKeys(reference.ui),
-    sortedKeys(data.ui),
+    Object.keys(reference.ui),
+    Object.keys(data.ui),
   );
   if (missingUi.length) {
     errors.push(
@@ -188,8 +181,6 @@ function validateLanguageFile(filename, data, reference, options) {
   for (const [key, text] of Object.entries(data.ui)) {
     if (typeof text !== 'string' || text.trim() === '') {
       errors.push(`${prefix}: ui.${key} must be a non-empty string`);
-    } else if (!options.allowTodoPlaceholders && text.startsWith('TODO:')) {
-      errors.push(`${prefix}: ui.${key} still has a TODO placeholder`);
     }
   }
 
@@ -202,7 +193,19 @@ function validateLanguageFile(filename, data, reference, options) {
     }
   }
 
+  if (!options.allowTodoPlaceholders) {
+    for (const [path, text] of stringLeaves(data)) {
+      if (text.includes('TODO:')) errors.push(`${prefix}: ${path} still has a TODO placeholder`);
+    }
+  }
+
   return errors;
+}
+
+function stringLeaves(value, path = '') {
+  if (typeof value === 'string') return [[path, value]];
+  if (!isObject(value)) return [];
+  return Object.entries(value).flatMap(([k, v]) => stringLeaves(v, path ? `${path}.${k}` : k));
 }
 
 function main() {

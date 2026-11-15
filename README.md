@@ -83,10 +83,10 @@ MECP/2/B03                                   Cancel beacon — I am OK
 
 ```
 languages/                   Official translation packs (JSON, one per language)
+freetext/                    §6.1 convention patterns and decode test cases
 docs/adr/                    Architecture decision records
+scripts/                     Validators run by `npm run validate`
 MECP_Comprehensive_Brief.md  Protocol narrative and design rationale
-scripts/validate-languages.mjs
-scripts/validate-spec.mjs
 ```
 
 Clients and reference code: [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app).
@@ -106,10 +106,6 @@ Emergency-only protocols fail because nobody learns them until the emergency. GM
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). The highest-impact contribution is adding a verified language translation.
-
-```bash
-npm run validate-languages
-```
 
 ## Licenses
 
@@ -144,13 +140,3 @@ The table below is the **living** per-form decode snapshot (observed 2026-11-15 
 | **TAK bridge** — [Colorado-Mesh/meshcore-tak-bridge](https://github.com/Colorado-Mesh/meshcore-tak-bridge). Decodes a space-separated integer anywhere in the freetext, with no upper bound (`12345` decodes). |
 | **REM** — [FreeTAKTeam/reticulum_mobile_emergency_management](https://github.com/FreeTAKTeam/reticulum_mobile_emergency_management). Handles every form above except the unbounded integer. |
 | **Wadamesh** — [wadamesh.com/apps.html#mecp](https://www.wadamesh.com/apps.html#mecp). Composer emits `C01 R03 P05 <gps> 45min`; no duration decoding observed. |
-
-## Third Party Implementations
-
-Below is a partial list of 3rd party implementations of the standard,
-provided for reference to future implementers.
-
-- https://colorado-mesh.github.io/mesh-client/emcomm/
-- https://github.com/Colorado-Mesh/meshcore-tak-bridge/blob/main/docs/DESIGN.md#mecp-messages
-- https://www.wadamesh.com/apps.html#mecp
-- https://github.com/FreeTAKTeam/reticulum_mobile_emergency_management#events-and-mecp

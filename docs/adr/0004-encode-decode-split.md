@@ -23,7 +23,8 @@ MECP has a canonical encoding and a permissive decode.
 - **Decode** — MUST accept every canonical form and MAY accept bounded
   variants:
   - `ETA 45min`, `ETA45min`, `ETA 45` are accepted as aliases for `R03 45min`.
-  - `45 min` and `1h30min` are accepted as forms of `45min`.
+  - `45 min` and `1h 30min` are accepted as spaced forms of `45min` and
+    `1h30min`.
   - A bare number is accepted only as the first freetext token after `R03`.
   - Localised words (`分`, `dakika`) may be accepted as local aliases, but they
     are not part of the protocol.

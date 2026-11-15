@@ -395,11 +395,11 @@ A single digit 0-3:
 
 `R03` already means ETA, so a duration is its value. This convention is **scoped to `R03`** (rule 9): if the code section does not contain `R03`, a duration-like token is ordinary freetext and MUST NOT be decoded. Position is otherwise free for unit-bearing forms — `MECP/2/C01 R03 P05 47.3769,12.1048 45min` and `MECP/2/R03 45min` are equally valid. See [#21](https://github.com/mecp-org/MECP/issues/21).
 
-- **Encode** (SI symbols only; a bare number is not encodable):
-  - `([1-9][0-9]*) ?min` — total minutes (canonical: `45min`)
-  - `([1-9][0-9]*) ?h(?: ?([0-5]?[0-9]) ?min)?` — hours with optional minutes (`2h`, `1h30min`, `1h 30min`)
-  - `([1-9][0-9]*) ?d` — days
-  - `([1-9][0-9]*) ?s` — seconds
+- **Encode** (SI symbols only, no space between number and unit; a bare number is not encodable):
+  - `([1-9][0-9]*)min` — total minutes (canonical: `45min`)
+  - `([1-9][0-9]*)h(?:([0-5]?[0-9])min)?` — hours with optional minutes (`2h`, `1h30min`)
+  - `([1-9][0-9]*)d` — days
+  - `([1-9][0-9]*)s` — seconds
 - **Decode** (try in this order; group values convert to a total in minutes):
   1. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Hh] ?([0-9]+) ?[Mm][Ii][Nn]` — hours and minutes (`1h 30min`, `ETA 1h30min`)
   2. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Hh]` — hours only
@@ -486,164 +486,43 @@ Reference encoder/decoder implementations (TypeScript `@mecp/engine`, Python, Ar
 
 ## 7. The Full Code Table
 
-MECP defines **109 codes** across **12 categories**. Each code is a single letter (category) plus two digits.
+MECP defines **109 codes** across **12 categories**. Each code is a single letter (category) plus two digits. The English text of each code is in [`languages/en.json`](languages/en.json), the single source of truth.
 
 ### M — Medical (16 codes)
-| Code | Meaning |
-|------|---------|
-| M01 | Injury (general) |
-| M02 | Person unconscious |
-| M03 | Breathing difficulty |
-| M04 | Cardiac emergency |
-| M05 | Hypothermia / exposure |
-| M06 | Severe bleeding |
-| M07 | Fracture / immobile |
-| M08 | Burns |
-| M09 | Multiple casualties |
-| M10 | Deceased |
-| M11 | Animal bite / sting |
-| M12 | Allergic reaction |
-| M13 | Poisoning / ingestion |
-| M14 | Person(s) located alive |
-| M15 | Area searched — no find |
-| M16 | Medical supply drop needed |
+`M01` `M02` `M03` `M04` `M05` `M06` `M07` `M08` `M09` `M10` `M11` `M12` `M13` `M14` `M15` `M16`
 
 ### T — Terrain / Infrastructure (17 codes)
-| Code | Meaning |
-|------|---------|
-| T01 | Road / trail blocked |
-| T02 | Bridge out / impassable |
-| T03 | Building / structure collapsed |
-| T04 | Flooding |
-| T05 | Landslide / rockfall |
-| T06 | Power outage |
-| T07 | Fire (structure or wildfire) |
-| T08 | Avalanche |
-| T09 | Path impassable (general) |
-| T10 | Shelter available |
-| T11 | Drowning risk / water rescue |
-| T12 | Water contamination |
-| T13 | Earthquake damage |
-| T14 | Gas leak |
-| T15 | Chemical spill / hazmat |
-| T16 | Vehicle accident |
-| T17 | Vehicle fire |
+`T01` `T02` `T03` `T04` `T05` `T06` `T07` `T08` `T09` `T10` `T11` `T12` `T13` `T14` `T15` `T16` `T17`
 
 ### W — Weather / Environment (6 codes)
-| Code | Meaning |
-|------|---------|
-| W01 | Storm / severe weather |
-| W02 | Visibility zero / whiteout |
-| W03 | Extreme cold |
-| W04 | Extreme heat |
-| W05 | Air quality danger |
-| W06 | Tsunami warning |
+`W01` `W02` `W03` `W04` `W05` `W06`
 
 ### S — Supplies (6 codes)
-| Code | Meaning |
-|------|---------|
-| S01 | Need water |
-| S02 | Need food |
-| S03 | Need medication |
-| S04 | Need battery / power |
-| S05 | Need fuel |
-| S06 | Need tools / equipment |
+`S01` `S02` `S03` `S04` `S05` `S06`
 
 ### P — Position / Movement (7 codes)
-| Code | Meaning |
-|------|---------|
-| P01 | Stranded / cannot move |
-| P02 | Evacuating |
-| P03 | Sheltering in place |
-| P04 | En route to location |
-| P05 | At GPS coordinates |
-| P06 | Lost / disoriented |
-| P07 | Group separated |
+`P01` `P02` `P03` `P04` `P05` `P06` `P07`
 
 ### C — Coordination (8 codes)
-| Code | Meaning |
-|------|---------|
-| C01 | Send rescue / assistance |
-| C02 | Need transport / vehicle |
-| C03 | Relay this message |
-| C04 | Confirm received |
-| C05 | How many people? |
-| C06 | What is your status? |
-| C07 | Can you reach location? |
-| C08 | Rendezvous at location |
+`C01` `C02` `C03` `C04` `C05` `C06` `C07` `C08`
 
 ### R — Response (7 codes)
-| Code | Meaning |
-|------|---------|
-| R01 | Acknowledged |
-| R02 | Help is coming |
-| R03 | ETA (estimated time of arrival) |
-| R04 | Cannot assist |
-| R05 | Redirecting to other resource |
-| R06 | Stand by |
-| R07 | Situation resolved |
+`R01` `R02` `R03` `R04` `R05` `R06` `R07`
 
 ### D — Drill / Test (4 codes)
-| Code | Meaning |
-|------|---------|
-| D01 | This is a drill |
-| D02 | This is a test |
-| D03 | End of drill / exercise |
-| D04 | Ignore previous — sent in error |
+`D01` `D02` `D03` `D04`
 
 ### L — Life / Leisure (20 codes)
-| Code | Meaning |
-|------|---------|
-| L01 | Beer / drinks available |
-| L02 | Coffee available |
-| L03 | Food ready / meal time |
-| L04 | Summit reached |
-| L05 | Camp set up |
-| L06 | Running late |
-| L07 | Good signal here |
-| L08 | Photo opportunity |
-| L09 | Wildlife spotted |
-| L10 | Beautiful view |
-| L11 | Trail conditions good |
-| L12 | Trail conditions bad |
-| L13 | Need a break |
-| L14 | Heading home |
-| L15 | Good morning |
-| L16 | Good night |
-| L17 | Thank you |
-| L18 | Having fun |
-| L19 | Festival / event |
-| L20 | Node test |
+`L01` `L02` `L03` `L04` `L05` `L06` `L07` `L08` `L09` `L10` `L11` `L12` `L13` `L14` `L15` `L16` `L17` `L18` `L19` `L20`
 
 ### X — Threat / Security (7 codes)
-| Code | Meaning |
-|------|---------|
-| X01 | Dangerous person nearby |
-| X02 | Area unsafe |
-| X03 | Gunfire heard |
-| X04 | Civil unrest |
-| X05 | Theft / robbery |
-| X06 | Authorities present |
-| X07 | Checkpoint |
+`X01` `X02` `X03` `X04` `X05` `X06` `X07`
 
 ### H — Have / Offer Resources (8 codes)
-| Code | Meaning |
-|------|---------|
-| H01 | Have water |
-| H02 | Have food |
-| H03 | Have medical supplies |
-| H04 | Have power / charging |
-| H05 | Have fuel |
-| H06 | Have tools |
-| H07 | Have shelter for [N] pax |
-| H08 | Have transport |
+`H01` `H02` `H03` `H04` `H05` `H06` `H07` `H08`
 
 ### B — Beacon (3 codes)
-| Code | Meaning |
-|------|---------|
-| B01 | Automated distress beacon active — sender may be unresponsive |
-| B02 | Beacon acknowledged — reduce transmission rate |
-| B03 | Cancel beacon — I am OK |
+`B01` `B02` `B03`
 
 The Beacon category provides a PLB-style (Personal Locator Beacon) distress mechanism for mesh networks. When activated, B01 automatically retransmits the sender's GPS position at decaying intervals (every 5 minutes initially, slowing to 15 minutes after 6 hours, and 30 minutes after 24 hours). This ensures that even if the sender becomes unconscious, their position continues broadcasting. B02 allows responders to acknowledge the beacon (which reduces the sender's transmission rate to conserve battery), and B03 lets the sender cancel when they are safe. Combined with D01 (drill), beacon can be practised safely with automatic shutdown after 3 transmissions.
 
@@ -726,19 +605,11 @@ Each language file is a JSON document containing: localised severity labels, all
 
 ### 9.2 Implementations
 
-Reference implementations live in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app):
-
-- **TypeScript engine** (`@mecp/engine`) — encode/decode, beacon helpers, tests
-- **Web tool (PWA)** — offline compose/decode HTML tool
-- **Expo / React Native app** — Meshtastic AIDL client (compose, inbox, beacon)
-- **Examples** — Python, Arduino/ESP32, shell
-- **Design plan** — product/UX design notes
-
-That repo submodules this protocol repository for language packs (`vendor/mecp`). Third-party implementations are listed in the README; per-form decode behaviour is recorded in issue #21.
+Reference implementations live in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app). The [README](README.md#implementations) lists them along with third-party clients and their per-form decode behaviour.
 
 ### 9.3 Project Infrastructure (this repository)
 
-- **Languages:** `languages/*.json` with CI via `scripts/validate-languages.mjs`
+- **Validation:** `npm run validate` (language packs, brief invariants, freetext conformance, markdownlint) on pre-commit and in CI
 - **GitHub repository:** [github.com/mecp-org/MECP](https://github.com/mecp-org/MECP) — public, open-source
 - **Issue templates:** Bug reports, new code proposals, translation reviews
 - **Contributing guide:** Translation and code-proposal process
@@ -777,13 +648,7 @@ The protocol is intentionally simple to implement. The decoder is roughly 80 lin
 
 ### For Translation Contributors
 
-The language files are CC BY 4.0 licensed. To add a new language:
-
-1. Copy `languages/_template.json`
-2. Translate all 109 code descriptions, 4 severity labels, 12 category names, and UI strings
-3. Submit a pull request
-
-The project has GitHub issue templates specifically for translation reviews.
+The language files are CC BY 4.0 licensed. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add or review a language.
 
 ### For Emergency Response Organisations
 
@@ -798,7 +663,6 @@ The 109-code table covers the scenarios most commonly encountered in disaster re
 The project roadmap includes:
 
 - **Mobile app completion:** Finalising the Meshtastic Bluetooth integration, iOS support, and app store distribution
-- **Formal protocol specification:** Publishing `spec/mecp-protocol-v1.0.md` as a standalone, implementer-ready document
 - **Community feedback:** The code table (109 codes, 12 categories) is open for community review and proposals via GitHub issues
 - **Additional language support:** The template system makes adding new languages straightforward -- community contributions welcome
 - **Cross-platform adoption:** Encouraging other mesh networking platforms (Reticulum/Sideband, etc.) to support MECP message encoding/decoding
@@ -888,4 +752,4 @@ The only maritime exceptions are **speed and distance** (knots, nautical miles, 
 
 A decoder MUST accept SI symbols. A decoder MAY accept localised unit words as local aliases (e.g. `分`, `dakika`, `minutos`), but those are freetext by default — not part of the protocol, not enumerated here, and never required. The rendering layer replaces tokens with localised forms.
 
-**The unit vocabulary is closed.** `45m` is rejected — `m` is metre, not minute. `45m`, `45 minutes`, `45分`, `45 h` are never encodable and never part of a conforming message. A bare number (`R03 45`) is decode-only, read as minutes, and only valid as the first freetext token when `R03` is present; a unit-bearing value (`45min`) may appear anywhere in the freetext.
+**The unit vocabulary is closed.** `45m` is rejected — `m` is metre, not minute. `45m`, `45 minutes` and `45分` are never encodable and never part of a conforming message. Spaced forms (`45 min`, `1h 30min`) are decode-only; encoders emit `45min`, `1h30min`. A bare number (`R03 45`) is decode-only, read as minutes, and only valid as the first freetext token when `R03` is present; a unit-bearing value (`45min`) may appear anywhere in the freetext.

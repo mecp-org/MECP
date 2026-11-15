@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a bug in the MECP protocol, code table, or language packs (implementer bugs → mecp-app)
+about: Report a bug in the MECP protocol, code table, or language packs (app/engine bugs → mecp-app)
 title: "[BUG] "
 labels: bug
 assignees: ''
@@ -20,13 +20,7 @@ What you expected to happen.
 ## Actual Behavior
 What actually happened.
 
-## Steps to Reproduce
-1. Go to '...'
-2. Click on '...'
-3. See error
-
-## Environment
-- Browser/Device:
-- OS:
+## Context
 - MECP version: (e.g. 1.2.1 / v1.2.1)
-- Language selected:
+- Language pack (if applicable):
+- Where it is wrong: (brief section, `languages/xx.json` key, or validation script)
