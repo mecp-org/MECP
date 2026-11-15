@@ -28,6 +28,23 @@ MECP codes are permanent. A code once assigned never changes meaning. This is by
 3. Community discussion period (minimum 7 days)
 4. Codes are only appended, never renumbered or redefined
 
+### Changing the Protocol
+
+The protocol lives in [`MECP_Comprehensive_Brief.md`](MECP_Comprehensive_Brief.md). Changes to it require:
+
+1. **New vocabulary MUST be ASCII** and either inherited from GMDSS/SMCP or justified in a new ADR under [`docs/adr/`](docs/adr/).
+2. **No localised token may appear in normative text.** Localised input is freetext; recognition is a local alias, not the protocol.
+3. **Quantities use SI symbols.** New units require a new ADR under [`docs/adr/`](docs/adr/).
+4. **Every convention needs Encode, Decode, Additional Validation, and Scope** (which code it attaches to).
+5. **Patterns use `[0-9]`, never `\d`; ASCII-only case folding; RE2 subset only.**
+6. **The encoder must be able to emit it, and every deployed decoder's input must still decode.**
+
+When proposing a change:
+
+1. Open an issue first (e.g. "Add …") — never silently edit normative text in a feature PR.
+2. Link the issue and the ADR that governs the decision.
+3. Include the before/after message strings that must keep working.
+
 ### Bug Reports
 
 Use the "Bug Report" issue template. Include:
@@ -43,6 +60,8 @@ For engine, web, or mobile app bugs, open the issue against [mecp-org/mecp-app](
 ```bash
 npm run validate-languages
 ```
+
+Future PRs adding spec checks will run `npm run validate-spec` (see PR C).
 
 ## Code of Conduct
 
