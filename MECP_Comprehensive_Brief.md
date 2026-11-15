@@ -321,7 +321,7 @@ A single digit 0-3:
 #### Person count
 
 - **Encode:** `([1-9][0-9]*)pax`
-- **Decode:** `([0-9]+) ?[Pp][Aa][Xx]`
+- **Decode:** `0*([1-9][0-9]*) ?[Pp][Aa][Xx]`
 - **Example:** `MECP/1/S01 4pax`
 - **Also decoded:** `4 pax`, `4PAX`, `4Pax.`
 - **Meaning:** "URGENT, 4 people need water"
