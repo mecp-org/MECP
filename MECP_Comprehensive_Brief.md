@@ -306,7 +306,9 @@ A single digit 0-3:
 #### Codes
 1. One or more codes from the MECP code table, separated by spaces.
 2. Each code is a letter (category) followed by two digits: `M01`, `T04`, `C01`, `L01`, etc.
-3. Note that any non-code text ends the code section. All remaining text is freetext.
+3. The code section ends at the first space-delimited token that does not match the code pattern. Codes are case-sensitive: a lowercase token is not a code and therefore ends the code section.
+4. The match is greedy, so `MECP/1/T05 T05 damaged` contains two `T05` codes and the freetext `damaged`.
+5. A well-formed code that is not in the code table is still a code. Decoders MUST preserve and display it, and MUST NOT treat it as freetext.
 
 #### Optional Freetext
 1. May include structured conventions.
