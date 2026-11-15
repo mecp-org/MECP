@@ -351,8 +351,9 @@ A single digit 0-3:
 
 #### Language hint
 
-- **Encode:** `@([a-z]{2,3}(?:-[a-z]{2})?)`
-- **Decode:** `@([A-Za-z]{2,3}(?:[-_][A-Za-z]{2})?)` (normalise to lowercase and `-`)
+- **Encode:** `@([a-z]{2,3}(?:-[a-z0-9]{2,8})*)`
+- **Decode:** `@([A-Za-z]{2,3}(?:[-_][A-Za-z0-9]{2,8})*)` (normalise to lowercase and `-`, ASCII only)
+- **Resolving:** match the exact tag first, then the primary subtag; `zh-Hans` resolves to `zh-cn`, `zh-Hant` to `zh-tw`. An unknown hint is preserved and displayed but matches no language pack. Encoders SHOULD emit the pack code (`en`, `de`, `zh-cn`), not the raw device locale.
 - **Example:** `MECP/3/L04 Gipfel erreicht @de`
 - **Also decoded:** `@DE`, `@zh_CN`, `@zh-TW`
 - **Meaning:** "ROUTINE, summit reached: 'Gipfel erreicht' (German)"
