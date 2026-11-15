@@ -9,6 +9,8 @@ All notable changes to MECP will be documented in this file.
 
 ### Protocol
 - Code table now: **12 categories, 109 codes** (was 108 codes)
+- Freetext conventions are now specified by regular expression with separate encoding and decoding patterns ([#18](https://github.com/mecp-org/MECP/pull/18)). Decoding rules are normative: Additional Validation failures are ignored, never fatal, and freetext is preserved verbatim. Input is a single UTF-8 line with a 200-byte limit.
+- **Breaking for existing implementations:** mecp-app's `#tag` truncation, Wadamesh's missing timestamp range check, and REM's unbounded callsigns are now non-conformant.
 
 ### Infrastructure
 - This repository is now **protocol + language packs only**; engine, web tool, examples, and mobile app live in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app)
