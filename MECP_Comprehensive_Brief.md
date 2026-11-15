@@ -268,8 +268,8 @@ A recipient -- or their device -- can decode every field immediately, regardless
 ---
 
 ## 6. How MECP Works
-Patterns use regular expression syntax from the [Google RE2 engine](https://github.com/google/re2) (no lookaround or backreferences).
-This deliberately limited regular expression syntax is compatible across many languages and libraries.
+
+Patterns use the [RE2](https://github.com/google/re2)-compatible regular expression syntax subset — no lookaround, no backreferences — which is portable across many languages and libraries.
 
 ### 6.1 Message Format
 
