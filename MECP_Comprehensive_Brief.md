@@ -267,6 +267,20 @@ A recipient -- or their device -- can decode every field immediately, regardless
 
 ---
 
+### 5.3 Lineage: GMDSS
+
+MECP is a descendant of the maritime distress system, not a new invention. Its severity ladder follows the GMDSS/ITU priority order — distress, urgency, safety, routine — and its conventions reuse vocabulary from the Global Maritime Distress and Safety System (GMDSS) and the IMO Standard Marine Communication Phrases (SMCP). The point of that inheritance is to reuse a vocabulary that has already survived international negotiation instead of inventing one.
+
+Three dispositions come with it:
+
+1. **Fixed, language-neutral vocabulary on the wire.** GMDSS does not translate its signal words: SMCP is English by design (IMO Resolution A.918(22)), DSC carries preformatted codes, NAVTEX broadcasts English on 518 kHz and other languages on a separate 490 kHz channel, and AIS text is 6-bit ASCII. CAP, the closest civil analogue, types its language as BCP-47 with a default of `en-US` and represents other languages as separate `<info>` blocks rather than translated fields. MECP follows: codes, sigils and convention keywords are ASCII tokens. A localised form (`4人`, `45分`) is ordinary freetext, not part of the protocol; a client MAY recognise local equivalents, but their meaning is then a local convention, not MECP.
+2. **SI units.** IMO Resolution A.351(IX) (1975) made SI the unit system of SOLAS and later instruments. SI symbols are the same in every language, so `45min` is not an English word but the symbol a Japanese or Farsi reader also expects. Convention values use SI symbols and are never translated.
+3. **Localisation at the edges.** The structure carries the meaning; the reader's device supplies the language. A decoder looks a code up in its own language file and renders it, and the same applies to convention values.
+
+GMDSS can assume trained, English-licensed operators; MECP cannot. That is why the protocol carries structure rather than prose, and why freetext may stay in any language.
+
+---
+
 ## 6. How MECP Works
 
 Patterns use the [RE2](https://github.com/google/re2)-compatible regular expression syntax subset — no lookaround, no backreferences — which is portable across many languages and libraries.
