@@ -4,6 +4,10 @@ All notable changes to MECP will be documented in this file.
 
 ## [Unreleased]
 
+---
+
+## [1.3.0] - 2026-11-15
+
 ### Protocol
 - R03 duration encoding is strict: no space between number and unit (`45min`, `2h`, `1h30min`). Decoders still accept spaced forms (`45 min`, `1h 30min`). Brief §6.1, Appendix A and ADRs 0002/0004 now agree.
 

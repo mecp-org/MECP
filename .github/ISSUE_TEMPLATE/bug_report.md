@@ -21,6 +21,6 @@ What you expected to happen.
 What actually happened.
 
 ## Context
-- MECP version: (e.g. 1.2.1 / v1.2.1)
+- MECP version: (e.g. 1.3.0 / v1.3.0)
 - Language pack (if applicable):
 - Where it is wrong: (brief section, `languages/xx.json` key, or validation script)

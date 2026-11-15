@@ -10,7 +10,7 @@ This repository is the **protocol home**: message format, code table, and offici
 
 ## Protocol version
 
-The current protocol release is **MECP 1.2.1**. Clients claim adherence by that version string (also the git tag `v1.2.1`, the GitHub Release, and the `version` field in `package.json`). The normative wire format lives in [MECP_Comprehensive_Brief.md](MECP_Comprehensive_Brief.md).
+The current protocol release is **MECP 1.3.0**. Clients claim adherence by that version string (also the git tag `v1.3.0`, the GitHub Release, and the `version` field in `package.json`). The normative wire format lives in [MECP_Comprehensive_Brief.md](MECP_Comprehensive_Brief.md).
 
 ## Implementations
 
