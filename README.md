@@ -79,8 +79,10 @@ MECP/2/B03                                   Cancel beacon — I am OK
 
 ```
 languages/                   Official translation packs (JSON, one per language)
+docs/adr/                    Architecture decision records
 MECP_Comprehensive_Brief.md  Protocol narrative and design rationale
 scripts/validate-languages.mjs
+scripts/validate-spec.mjs
 ```
 
 Clients and reference code: [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app).
@@ -121,7 +123,7 @@ Czech, Dutch, English, Farsi, French, German, Italian, Japanese, Norwegian, Poli
 ## Implementations (per-form decode behaviour, dated snapshot)
 
 Per-form decode behaviour as observed on 2026-11-15 is recorded in
-[#21](https://github.com/mecp-org/MECP/issues/21#client-inventory-informational).
+[#21](https://github.com/mecp-org/MECP/issues/21).
 That is a dated snapshot, not a conformance claim.
 
 | Message | mecp-app | mesh-client | TAK bridge | REM | Wadamesh |

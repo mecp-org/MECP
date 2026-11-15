@@ -11,11 +11,8 @@ Brief description of changes.
 - [ ] ADR / validation PR
 
 ## Testing
-- [ ] All existing engine tests pass
-- [ ] New tests added (if applicable)
-- [ ] Web tool tested in browser
-- [ ] Language file validates against schema
-- [ ] Spec validation passes (if applicable)
+- [ ] `npm run validate-languages` passes
+- [ ] Spec validation passes (if applicable; `node scripts/validate-spec.mjs`)
 - [ ] CI passes
 
 ## Checklist
@@ -23,9 +20,5 @@ Brief description of changes.
 - [ ] My changes do not break existing MECP message parsing
 - [ ] No existing code meanings have been changed
 - [ ] Translations have been verified by a native speaker (if applicable)
-- [ ] Protocol vocabulary is ASCII and closed (no new tokens added)
-- [ ] Protocol vocabulary includes a Source column (ADR 0003)
-- [ ] Protocol vocabulary is closed — no new tokens without an ADR
-- [ ] Protocol vocabulary is listed in the spec and referenced in the checklist
-- [ ] Validation passes (if applicable)
+- [ ] Protocol vocabulary is ASCII and closed — no new tokens without an ADR (see ADR 0003)
 - [ ] CI passes

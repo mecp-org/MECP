@@ -6,7 +6,7 @@
 **Repository:** [github.com/mecp-org/MECP](https://github.com/mecp-org/MECP) (protocol + languages)
 **Implementations:** [github.com/mecp-org/mecp-app](https://github.com/mecp-org/mecp-app) (engine, web, Expo app, examples)
 **License:** CC0 (protocol) | CC BY 4.0 (translations) | GPLv3 (implementations in mecp-app)
-**Status:** Protocol and 20 language packs published; clients in mecp-app
+**Status:** Protocol and 21 language packs published; clients in mecp-app
 
 ---
 
@@ -257,7 +257,7 @@ A recipient -- or their device -- can decode every field immediately, regardless
 
 **Human-readable and machine-parseable.** An MECP message can be read and roughly understood by a person looking at raw text on a screen, and it can be fully decoded by software into structured data with severity levels, incident types, GPS coordinates, timestamps, and affected person counts.
 
-**Language-independent codes.** The code table (M01, T04, C01, etc.) is universal. Each code maps to a localised description in 20 languages. The protocol itself is language-neutral -- the same message means the same thing whether decoded in Japanese, Farsi, or Norwegian.
+**Language-independent codes.** The code table (M01, T04, C01, etc.) is universal. Each code maps to a localised description in 21 languages. The protocol itself is language-neutral -- the same message means the same thing whether decoded in Japanese, Farsi, or Norwegian.
 
 **Graduated severity.** Four severity levels (0-3) provide immediate triage capability. A device can colour-code, sort, or alert differently based on severity before a human even reads the message content.
 
@@ -371,7 +371,7 @@ Reference encoder/decoder implementations (TypeScript `@mecp/engine`, Python, Ar
 
 MECP defines **109 codes** across **12 categories**. Each code is a single letter (category) plus two digits.
 
-### M — Medical (15 codes)
+### M — Medical (16 codes)
 | Code | Meaning |
 |------|---------|
 | M01 | Injury (general) |
@@ -389,6 +389,7 @@ MECP defines **109 codes** across **12 categories**. Each code is a single lette
 | M13 | Poisoning / ingestion |
 | M14 | Person(s) located alive |
 | M15 | Area searched — no find |
+| M16 | Medical supply drop needed |
 
 ### T — Terrain / Infrastructure (17 codes)
 | Code | Meaning |
@@ -573,12 +574,12 @@ This is not frivolity. It is deliberate UX strategy borrowed from emergency serv
 
 ## 9. What We've Built So Far
 
-### 9.1 Language Files (20 Languages)
+### 9.1 Language Files (21 Languages)
 
 **Location:** `languages/` directory (this repository)
 **Licence:** CC BY 4.0
 
-Every MECP code, severity level, category name, and UI string has been translated into 20 languages:
+Every MECP code, severity level, category name, and UI string has been translated into 21 languages:
 
 | Language | Code | Script | Direction |
 |----------|------|--------|-----------|
@@ -595,6 +596,7 @@ Every MECP code, severity level, category name, and UI string has been translate
 | Norwegian | no | Latin | LTR |
 | Swedish | sv | Latin | LTR |
 | Turkish | tr | Latin | LTR |
+| Greek | el | Greek | LTR |
 | Serbian | sr | Cyrillic | LTR |
 | Ukrainian | uk | Cyrillic | LTR |
 | Russian | ru | Cyrillic | LTR |
@@ -603,7 +605,7 @@ Every MECP code, severity level, category name, and UI string has been translate
 | Traditional Chinese | zh-tw | CJK | LTR |
 | Farsi (Persian) | fa | Arabic | **RTL** |
 
-Each language file is a JSON document containing: localised severity labels, all 12 category names, all 109 code descriptions, and 40+ UI strings for the application interface (including 14 beacon-specific UI keys).
+Each language file is a JSON document containing: localised severity labels, all 12 category names, all 109 code descriptions, and 124 UI strings for the application interface (including 14 beacon-specific UI keys).
 
 ### 9.2 Implementations
 

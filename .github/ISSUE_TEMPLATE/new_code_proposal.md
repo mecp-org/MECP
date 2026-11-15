@@ -7,7 +7,7 @@ assignees: ''
 ---
 
 ## Proposed Code
-- **Code:** (e.g., M16)
+- **Code:** (e.g., M17)
 - **Category:** (e.g., M — Medical)
 - **English text:** (e.g., "Heat stroke")
 
@@ -22,7 +22,7 @@ Why does this code belong in the proposed category rather than another?
 
 ## Example Usage
 ```
-MECP/1/M16 P05 48.6520,20.1305
+MECP/1/M17 P05 48.6520,20.1305
 ```
 
 ## Notes
