@@ -7,16 +7,18 @@ Brief description of changes.
 - [ ] Translation (new or update)
 - [ ] New code proposal
 - [ ] Documentation
-- [ ] Other
+- [ ] Protocol vocabulary change
+- [ ] ADR / validation PR
 
 ## Testing
-- [ ] All existing engine tests pass
-- [ ] New tests added (if applicable)
-- [ ] Web tool tested in browser
-- [ ] Language file validates against schema
+- [ ] `npm run validate-languages` passes
+- [ ] Spec validation passes (if applicable; `node scripts/validate-spec.mjs`)
+- [ ] CI passes
 
 ## Checklist
 - [ ] I have read CONTRIBUTING.md
 - [ ] My changes do not break existing MECP message parsing
 - [ ] No existing code meanings have been changed
 - [ ] Translations have been verified by a native speaker (if applicable)
+- [ ] Protocol vocabulary is ASCII and closed — no new tokens without an ADR (see ADR 0003)
+- [ ] CI passes

@@ -2,9 +2,8 @@ name: Validate Language Files
 
 on:
   push:
-    paths: ['languages/**', 'scripts/validate-languages.mjs']
+    branches: [master]
   pull_request:
-    paths: ['languages/**', 'scripts/validate-languages.mjs']
 
 permissions:
   contents: read
