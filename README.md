@@ -126,23 +126,21 @@ Czech, Dutch, English, Farsi, French, German, Italian, Japanese, Norwegian, Poli
 
 ## Implementations (per-form decode behaviour, dated snapshot)
 
-Per-form decode behaviour as observed on 2026-11-15 is recorded in
-[#21](https://github.com/mecp-org/MECP/issues/21).
-That is a dated snapshot, not a conformance claim.
+The table below is the **living** per-form decode snapshot (observed 2026-11-15 after [Colorado-Mesh/mesh-client#1472](https://github.com/Colorado-Mesh/mesh-client/pull/1472)). It is not a conformance claim. The decision-time inventory that grounded the R03 Duration rules is frozen in [#21](https://github.com/mecp-org/MECP/issues/21) and is not updated when clients change.
 
 | Message | mecp-app | mesh-client | TAK bridge | REM | Wadamesh |
 |---|---|---|---|---|---|
 | `R03 45` | 45 | 45 | 45 | 45 | — |
-| `R03 45min` | — | — | — | 45 | — |
-| `R03 ETA 45min` | — | — | — | 45 | — |
-| `C01 R03 1pax @0845 45min` | — | — | — | 45 | — |
-| `C01 R03 P05 47.3769,12.1048 45min` | — | — | — | 45 | — |
+| `R03 45min` | — | 45 | — | 45 | — |
+| `R03 ETA 45min` | — | 45 | — | 45 | — |
+| `C01 R03 1pax @0845 45min` | — | 45 | — | 45 | — |
+| `C01 R03 P05 47.3769,12.1048 45min` | — | 45 | — | 45 | — |
 | `R03 12345` | 12345 | 12345 | 12345 | — | — |
 
 | Known implementations |
 |---|
 | **mecp-app** — [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app). Reference demonstrator, originally built by Xiang: Expo / React Native client, offline web PWA, and `@mecp/engine` (TypeScript encode/decode). Its composer prepends `pax`, GPS and `@HHMM`, which is why rows 4 and 5 are never the first token. |
-| **mesh-client** — [Colorado-Mesh/mesh-client](https://github.com/Colorado-Mesh/mesh-client). Colorado Mesh's cross-platform Electron client for Meshtastic, MeshCore and Reticulum. Vendors the MECP engine at `src/renderer/lib/mecp/engine/`. |
+| **mesh-client** — [Colorado-Mesh/mesh-client](https://github.com/Colorado-Mesh/mesh-client). Colorado Mesh's cross-platform Electron client for Meshtastic, MeshCore and Reticulum. Claims **MECP 1.2.1** adherence ([#1472](https://github.com/Colorado-Mesh/mesh-client/pull/1472)); implements §6.1 Duration and related freetext in the vendored engine at `src/renderer/lib/mecp/engine/`. |
 | **TAK bridge** — [Colorado-Mesh/meshcore-tak-bridge](https://github.com/Colorado-Mesh/meshcore-tak-bridge). Decodes a space-separated integer anywhere in the freetext, with no upper bound (`12345` decodes). |
 | **REM** — [FreeTAKTeam/reticulum_mobile_emergency_management](https://github.com/FreeTAKTeam/reticulum_mobile_emergency_management). Handles every form above except the unbounded integer. |
 | **Wadamesh** — [wadamesh.com/apps.html#mecp](https://www.wadamesh.com/apps.html#mecp). Composer emits `C01 R03 P05 <gps> 45min`; no duration decoding observed. |
