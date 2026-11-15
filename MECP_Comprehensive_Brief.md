@@ -1,8 +1,8 @@
 # MECP: Mesh Emergency Communication Protocol
 ## A Comprehensive Briefing Document
 
-**Version:** 1.1
-**Date:** February 2026
+**Version:** 1.2
+**Date:** November 2026
 **Repository:** [github.com/mecp-org/MECP](https://github.com/mecp-org/MECP) (protocol + languages)
 **Implementations:** [github.com/mecp-org/mecp-app](https://github.com/mecp-org/mecp-app) (engine, web, Expo app, examples)
 **License:** CC0 (protocol) | CC BY 4.0 (translations) | GPLv3 (implementations in mecp-app)
@@ -281,20 +281,6 @@ GMDSS can assume trained, English-licensed operators; MECP cannot. That is why t
 
 ---
 
-### 5.3 Lineage: GMDSS
-
-MECP is a descendant of the maritime distress system, not a new invention. Its severity ladder follows the GMDSS/ITU priority order — distress, urgency, safety, routine — and its conventions reuse vocabulary from the Global Maritime Distress and Safety System (GMDSS) and the IMO Standard Marine Communication Phrases (SMCP). The point of that inheritance is to reuse a vocabulary that has already survived international negotiation instead of inventing one.
-
-Three dispositions come with it:
-
-1. **Fixed, language-neutral vocabulary on the wire.** GMDSS does not translate its signal words: SMCP is English by design (IMO Resolution A.918(22)), DSC carries preformatted codes, NAVTEX broadcasts English on 518 kHz and other languages on a separate 490 kHz channel, and AIS text is 6-bit ASCII. CAP, the closest civil analogue, types its language as BCP-47 with a default of `en-US` and represents other languages as separate `<info>` blocks rather than translated fields. MECP follows: codes, sigils and convention keywords are ASCII tokens. A localised form (`4人`, `45分`) is ordinary freetext, not part of the protocol; a client MAY recognise local equivalents, but their meaning is then a local convention, not MECP.
-2. **SI units.** IMO Resolution A.351(IX) (1975) made SI the unit system of SOLAS and later instruments. SI symbols are the same in every language, so `45min` is not an English word but the symbol a Japanese or Farsi reader also expects. Convention values use SI symbols and are never translated.
-3. **Localisation at the edges.** The structure carries the meaning; the reader's device supplies the language. A decoder looks a code up in its own language file and renders it, and the same applies to convention values.
-
-GMDSS can assume trained, English-licensed operators; MECP cannot. That is why the protocol carries structure rather than prose, and why freetext may stay in any language.
-
----
-
 ## 6. How MECP Works
 
 Patterns use the [RE2](https://github.com/google/re2)-compatible regular expression syntax subset — no lookaround, no backreferences — which is portable across many languages and libraries.
@@ -316,7 +302,7 @@ A message matches this pattern:
 2. Codes
 3. Optional Freetext
 
-Input is a single message line: remove at most one trailing CR/LF before matching, and a message MUST NOT contain `\r` or `\n`. A message MUST NOT exceed 200 bytes. When present, freetext MUST be non-empty and MUST NOT begin or end with a space.
+Input is a single message line: remove at most one trailing CR/LF before matching, and a message MUST NOT contain `\r`, `\n`, U+0085, U+2028 or U+2029. A message MUST NOT exceed 200 bytes of UTF-8: the limit counts bytes, not characters, so a 200-character Japanese or Chinese message is about 600 bytes and does not fit. Encoders MUST count bytes and MUST NOT split a UTF-8 sequence or a grapheme cluster when truncating, and MUST NOT emit a byte-order mark. Decoders SHOULD replace an invalid sequence with U+FFFD rather than rejecting the message. When present, freetext MUST be non-empty and MUST NOT begin or end with a space.
 
 #### Prefix
 Identifies this as an MECP-formatted message (5 bytes).
@@ -345,7 +331,7 @@ A single digit 0-3:
 4. Decoding patterns can be assumed to be prefixed with `(?:^|B)` and suffixed with `(?:B|$)`. `B` is ASCII whitespace or ASCII punctuation, except the sigils `@ # ~ +` and the characters `- _`, plus these code points: U+00A0, U+1680, U+2000–U+200A, U+202F, U+205F, U+3000; U+060C, U+061B, U+061F, U+06D4; U+00AB, U+00BB, U+2013, U+2014, U+2018–U+201D, U+2026; U+3001, U+3002, U+300C–U+300F, U+3010, U+3011; U+FF01, U+FF08, U+FF09, U+FF0C, U+FF0E, U+FF1A, U+FF1B, U+FF1F. Decoders MAY also treat any other Unicode space or punctuation code point as a boundary. A boundary is never more than one code point wide.
 5. Decoders search the freetext for each decoding pattern. Only the first match by position is used; matching is case-sensitive except where a pattern spells out character classes such as `[Pp][Aa][Xx]`. `^` and `$` refer to the start and end of the freetext. Patterns MUST use `[0-9]`, never `\d`: `\d` is ASCII-only in Go and JavaScript but matches Arabic-Indic and fullwidth digits in Python and Rust, so `@١٤٣٠` would decode on one client and not on another. Case folding MUST be ASCII-only and locale-independent (`A`–`Z` ↔ `a`–`z`); implementations MUST NOT use locale-sensitive APIs such as JavaScript `toLocaleLowerCase()`, Java `toLowerCase()` without `Locale.ROOT`, or C# `ToLower()` without `CultureInfo.InvariantCulture`, because in a Turkish locale `IT` folds to `ıt` and `izmir` uppercases to `İZMİR`.
 6. Additional Validation is normative. Before using a match, a decoder MUST apply the validation for that convention. If the match fails, the decoder MUST ignore it and resume searching from the end of the failed match. A convention that fails Additional Validation MUST NOT invalidate the message, and its text MUST be left in the freetext unchanged. An encoder MUST apply the same validation and MUST NOT emit a value that fails it.
-7. When rendering, a decoder replaces the matched **token** — the match excluding the one-character boundary on each side, where present — with its human-readable form, then re-emits the boundary characters. Boundaries are separators and MUST be preserved. Decoders SHOULD also expose each extracted value structurally.
+7. When rendering, a decoder replaces the matched **token** — the match excluding the one-code-point boundary on each side, where present — with its human-readable form, then re-emits the boundary characters. Boundaries are separators and MUST be preserved. Decoders SHOULD also expose each extracted value structurally.
 8. Unicode whitespace (NBSP, U+2000–U+200A, U+3000, U+FEFF, etc.) is handled inconsistently across languages and platforms. Encoders MUST NOT emit it.
 
 #### Person count
@@ -383,7 +369,7 @@ A single digit 0-3:
 - **Decode:** `@([A-Za-z]{2,3}(?:[-_][A-Za-z0-9]{2,8})*)` (normalise to lowercase and `-`, ASCII only)
 - **Resolving:** match the exact tag first, then the primary subtag; `zh-Hans` resolves to `zh-cn`, `zh-Hant` to `zh-tw`. An unknown hint is preserved and displayed but matches no language pack. Encoders SHOULD emit the pack code (`en`, `de`, `zh-cn`), not the raw device locale.
 - **Example:** `MECP/3/L04 Gipfel erreicht @de`
-- **Also decoded:** `@DE`, `@zh_CN`, `@zh-TW`
+- **Also decoded:** `@DE`, `@zh_CN`, `@zh-TW`, `@zh-Hans-CN`, `@sr-Latn-RS`
 - **Meaning:** "ROUTINE, summit reached: 'Gipfel erreicht' (German)"
 
 #### Callsign
