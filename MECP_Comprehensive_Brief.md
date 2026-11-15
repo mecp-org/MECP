@@ -374,14 +374,6 @@ A single digit 0-3:
 - **Also decoded:** `#base-camp`, `#base_camp`
 - **Meaning:** "SAFETY, rendezvous at basecamp"
 
-#### ETA
-
-- **Encode:** `ETA ([1-9][0-9]*)min`
-- **Decode:** `[Ee][Tt][Aa] ?([0-9]+)(?: ?[Mm][Ii][Nn](?:[Ss]|[Uu][Tt][Ee][Ss])?)?` (group 1 is the amount in minutes)
-- **Example:** `MECP/1/R02 ETA 20min`
-- **Also decoded:** `ETA 20`, `eta 20 min`, `ETA20`, `ETA 20 minutes`, `ETA 20 mins`
-- **Meaning:** "URGENT, help is coming, arriving in 20 minutes"
-
 ### 6.2 Example Messages
 
 Each example below exercises something the single-convention examples in 6.1 do not.
@@ -400,9 +392,15 @@ MECP/0/M01 M07 P01 2pax 47.3769,12.1048 @0845 ~OE7ABC @de
 
 **Response, in a different convention order:**
 ```
-MECP/1/R02 C08 ETA 40min #hut2 ~OE7XYZ @de
+MECP/1/R02 C08 #hut2 ~OE7XYZ @de
 ```
-*"URGENT: Help is coming, rendezvous at hut2. ETA 40 minutes. From OE7XYZ. Language: German."*
+*"URGENT: Help is coming, rendezvous at hut2. From OE7XYZ. Language: German."*
+
+**Safety coordination:**
+```
+MECP/2/C01 R03 ETA 45min @en
+```
+*"SAFETY: Send rescue team. Help coming, ETA 45 minutes."*
 
 **Loosely formatted sender, conventions inside prose:**
 ```
