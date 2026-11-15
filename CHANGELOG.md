@@ -4,6 +4,9 @@ All notable changes to MECP will be documented in this file.
 
 ## [Unreleased]
 
+### Docs
+- README implementation snapshot refreshed for mesh-client MECP 1.2.1 adherence ([Colorado-Mesh/mesh-client#1472](https://github.com/Colorado-Mesh/mesh-client/pull/1472))
+
 ---
 
 ## [1.2.1] - 2026-11-15
