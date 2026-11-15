@@ -369,7 +369,7 @@ A single digit 0-3:
 
 - **Encode:** `#([a-z0-9]+(?:-[a-z0-9]+)*)`
 - **Decode:** `#([A-Za-z0-9_-]+)`
-- **Identity:** case-insensitive; `_` normalises to `-`; a missing separator is a distinct tag (`#basecamp` is not `#base-camp`). Encoders SHOULD emit lowercase letters, digits and `-` only.
+- **Identity:** case-insensitive; `_` normalises to `-`; a missing separator is a distinct tag (`#basecamp` is not `#base-camp`). Encoders SHOULD emit lowercase letters, digits and `-` only. Tags are ASCII identifiers: `#避難所`, `#база` and `#café` are not references and MUST be left as freetext.
 - **Example:** `MECP/2/C08 #basecamp`
 - **Also decoded:** `#base-camp`, `#base_camp`
 - **Meaning:** "SAFETY, rendezvous at basecamp"
