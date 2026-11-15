@@ -11,8 +11,7 @@ Brief description of changes.
 - [ ] ADR / validation PR
 
 ## Testing
-- [ ] `npm run validate-languages` passes
-- [ ] Spec validation passes (if applicable; `node scripts/validate-spec.mjs`)
+- [ ] `npm run validate` passes
 - [ ] CI passes
 
 ## Checklist

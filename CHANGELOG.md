@@ -4,6 +4,10 @@ All notable changes to MECP will be documented in this file.
 
 ## [Unreleased]
 
+---
+
+## [1.2.0] - 2026-11-15
+
 ### Added
 - **M16** Medical supply drop needed (Medical category) — requested by mesh-client user [@rneese1969](https://github.com/rneese1969) via [Colorado-Mesh/mesh-client#1073](https://github.com/Colorado-Mesh/mesh-client/issues/1073); proposal [xiang-dev-1/MECP#4](https://github.com/xiang-dev-1/MECP/issues/4)
 
@@ -15,8 +19,13 @@ All notable changes to MECP will be documented in this file.
 
 ### Infrastructure
 - This repository is now **protocol + language packs only**; engine, web tool, examples, and mobile app live in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app)
+- Canonical protocol version **1.2.0** (`package.json` version, brief header, git tag `v1.2.0`, GitHub Release) for client adherence claims
+- Default branch renamed from `master` to `main`
+- Unified validation: `npm run validate` (languages, spec, freetext, markdownlint) on git pre-commit and in CI
 - Language validation is a standalone script: `scripts/validate-languages.mjs` (`npm run validate-languages`)
+- Spec validation: `scripts/validate-spec.mjs` (`npm run validate-spec`)
 - Freetext conformance harness: `freetext/patterns.json` + `freetext/tests.json` + `scripts/check-freetext.mjs` (`npm run test-freetext`) — asserts patterns appear verbatim in the brief and runs decode cases
+- Markdown lint: `markdownlint-cli2` (`npm run lint:md`)
 
 ---
 

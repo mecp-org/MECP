@@ -52,16 +52,19 @@ Use the "Bug Report" issue template. Include:
 - What actually happened
 - The exact MECP string that caused the issue (if applicable)
 - Your browser/device/OS
+- MECP version (e.g. `1.2.0` or tag `v1.2.0`)
 
 For engine, web, or mobile app bugs, open the issue against [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app).
 
 ## Validation
 
+Run the full suite before opening a PR (also runs on git pre-commit and in CI):
+
 ```bash
-npm run validate-languages
+npm run validate
 ```
 
-Future PRs adding spec checks will run `npm run validate-spec` (see PR C).
+That runs language-pack checks, brief/spec invariants, freetext conformance, and markdownlint.
 
 ## Code of Conduct
 

@@ -1,8 +1,8 @@
-name: Validate Language Files
+name: Validate
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
 
 permissions:
@@ -16,4 +16,6 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: '26'
-      - run: node scripts/validate-languages.mjs
+          cache: npm
+      - run: npm ci
+      - run: npm run validate

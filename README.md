@@ -8,6 +8,10 @@ A user in Scotland composes a message by tapping through a menu in English. The 
 
 This repository is the **protocol home**: message format, code table, and official language packs.
 
+## Protocol version
+
+The current protocol release is **MECP 1.2.0**. Clients claim adherence by that version string (also the git tag `v1.2.0`, the GitHub Release, and the `version` field in `package.json`). The normative wire format lives in [MECP_Comprehensive_Brief.md](MECP_Comprehensive_Brief.md).
+
 ## Implementations
 
 Reference implementations live in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app):

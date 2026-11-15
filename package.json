@@ -1,9 +1,21 @@
 {
   "name": "mecp",
+  "version": "1.2.0",
   "private": true,
   "description": "MECP protocol specification and language packs",
   "scripts": {
+    "prepare": "simple-git-hooks",
     "validate-languages": "node scripts/validate-languages.mjs",
-    "test-freetext": "node scripts/check-freetext.mjs"
+    "validate-spec": "node scripts/validate-spec.mjs",
+    "test-freetext": "node scripts/check-freetext.mjs",
+    "lint:md": "markdownlint-cli2",
+    "validate": "npm run validate-languages && npm run validate-spec && npm run test-freetext && npm run lint:md"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npm run validate"
+  },
+  "devDependencies": {
+    "markdownlint-cli2": "^0.24.1",
+    "simple-git-hooks": "^2.14.0"
   }
 }

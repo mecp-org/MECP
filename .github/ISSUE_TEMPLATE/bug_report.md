@@ -28,5 +28,5 @@ What actually happened.
 ## Environment
 - Browser/Device:
 - OS:
-- MECP version:
+- MECP version: (e.g. 1.2.0 / v1.2.0)
 - Language selected:

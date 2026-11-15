@@ -38,8 +38,8 @@ function main() {
 
   const errors = [];
 
-  // 1. Envelope example check
-  const examples = extractFencedMecpBlocks(brief);
+  // 1. Envelope example check (skip format templates with <placeholders>)
+  const examples = extractFencedMecpBlocks(brief).filter(({ text }) => !text.includes('<'));
   for (const { text } of examples) {
     const m = text.match(ENVELOPE_RE);
     if (!m) {
@@ -82,10 +82,14 @@ function main() {
     errors.push('Brief must include "### 6.2 Protocol Vocabulary"');
   }
 
-  // 3. Closed unit tokens in patterns (SI only: min h d s)
-  // Check prose mentions of units that should be SI only
-  for (const m of brief.matchAll(/\b(\d+)\s*(minute|minutes|hour|hours|day|days)\b/gi)) {
-    errors.push(`Found English unit "${m[1]} ${m[2]}" — SI symbols only on the wire (min h d s)`);
+  // 3. Closed unit tokens on the wire (SI only: min h d s)
+  // Flag English unit words only inside concrete fenced MECP examples
+  for (const { text } of examples) {
+    for (const m of text.matchAll(/\b(\d+)\s*(minute|minutes|hour|hours|day|days)\b/gi)) {
+      errors.push(
+        `Example uses English unit "${m[1]} ${m[2]}" — SI symbols only on the wire (min h d s): ${text}`,
+      );
+    }
   }
 
   if (errors.length > 0) {
