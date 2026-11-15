@@ -106,12 +106,12 @@ function decodeConvention(name, freetext, codes) {
         const m = freetext.match(re);
         if (!m) continue;
         const mins = toMinutes('bare', m);
-        if (mins >= 1 && mins <= 1440) return { duration: mins };
+        if (mins >= 1) return { duration: mins };
         continue;
       }
       const m = firstValidMatch(pat, freetext, (mm) => {
         const mins = toMinutes(kind, mm);
-        return mins >= 1 && mins <= 1440;
+        return mins >= 1;
       });
       if (m) return { duration: toMinutes(kind, m) };
     }

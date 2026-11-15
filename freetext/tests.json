@@ -81,6 +81,21 @@
   },
   {
     "convention": "duration",
+    "input": "MECP/2/R03 2d",
+    "expect": { "duration": 2880 }
+  },
+  {
+    "convention": "duration",
+    "input": "MECP/2/R03 48h",
+    "expect": { "duration": 2880 }
+  },
+  {
+    "convention": "duration",
+    "input": "MECP/2/R03 2880min",
+    "expect": { "duration": 2880 }
+  },
+  {
+    "convention": "duration",
     "input": "MECP/2/R03 ETA 45min",
     "expect": { "duration": 45 }
   },
