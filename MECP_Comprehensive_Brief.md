@@ -343,7 +343,7 @@ A single digit 0-3:
 - **Encode:** `@((?:[01][0-9]|2[0-3])[0-5][0-9])`
 - **Decode:** `@([01]?[0-9]|2[0-3]):?([0-5][0-9])` (group 1 is the hour, group 2 the minute)
 - **Example:** `MECP/2/T01 @0630`
-- **Also decoded:** `@630`, `@6:30`, `@06:30`
+- **Also decoded:** `@630`, `@6:30`, `@06:30`, `@123` (read as 01:23 — three digits are HMM)
 - **Meaning:** "SAFETY, road / trail blocked as of 06:30"
 
 #### Language hint
