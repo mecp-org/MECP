@@ -408,9 +408,9 @@ A single digit 0-3:
   5. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Ss]` — seconds
   6. Bare number (decode-only, **first freetext token only**): `^(?:[Ee][Tt][Aa] ?)?([0-9]+)(?:B|$)` — read as minutes. `MECP/2/R03 45` is 45 minutes; `MECP/2/C01 R03 1pax 45` is not (the trailing `45` is not the first freetext token).
 - **Example:** `MECP/2/C01 R03 45min @en`
-- **Also decoded:** `R03 45`, `R03 ETA 45`, `R03 ETA 45min`, `R03 ETA45min`, `R03 45 min`, `R03 1h30min`, `R03 1h 30min`, `R03 2h`
+- **Also decoded:** `R03 45`, `R03 ETA 45`, `R03 ETA 45min`, `R03 ETA45min`, `R03 45 min`, `R03 1h30min`, `R03 1h 30min`, `R03 2h`, `R03 2d`
 - **Meaning:** "SAFETY, send rescue team, help coming in 45 minutes, English"
-- **Additional Validation:** convert the match to a total in minutes; require 1 ≤ total ≤ 1440. If the value fails, ignore the match and leave the text as freetext. Localised unit words (`分`, `dakika`, `minutos`) are not part of these patterns — they remain freetext unless a client recognises them as a local alias.
+- **Additional Validation:** convert the match to a total in minutes; require total ≥ 1. There is no upper bound — any SI time unit (`s`, `min`, `h`, `d`) is valid for any positive duration (`2d`, `2880min`, and `48h` are equivalent). If the value fails, ignore the match and leave the text as freetext. Localised unit words (`分`, `dakika`, `minutos`) are not part of these patterns — they remain freetext unless a client recognises them as a local alias.
 
 ### 6.2 Protocol Vocabulary
 
