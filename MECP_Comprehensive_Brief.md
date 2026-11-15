@@ -290,7 +290,7 @@ A message matches this pattern:
 
 Input is a single message line: remove at most one trailing CR/LF before matching, and a message MUST NOT contain `\r` or `\n`. A message MUST NOT exceed 200 bytes. When present, freetext MUST be non-empty and MUST NOT begin or end with a space.
 
-#### `MECP/`
+#### Prefix
 Identifies this as an MECP-formatted message (5 bytes).
 
 #### Severity
