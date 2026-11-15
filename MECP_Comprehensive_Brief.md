@@ -338,7 +338,7 @@ A single digit 0-3:
 - **Additional Validation:**
     - -90 ≤ group 1 ≤ 90
     - -180 ≤ group 2 ≤ 180
-    - Decode accepts `0,0`, but encode does not.
+    - Both groups MUST contain a decimal point, so `0,0` and `2,5` are not GPS.
 
 #### Timestamp
 
