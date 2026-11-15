@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a bug in the MECP encoder, decoder, or web tool
+about: Report a bug in the MECP protocol, code table, or language packs (implementer bugs → mecp-app)
 title: "[BUG] "
 labels: bug
 assignees: ''

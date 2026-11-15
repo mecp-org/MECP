@@ -6,7 +6,7 @@
 **Repository:** [github.com/mecp-org/MECP](https://github.com/mecp-org/MECP) (protocol + languages)
 **Implementations:** [github.com/mecp-org/mecp-app](https://github.com/mecp-org/mecp-app) (engine, web, Expo app, examples)
 **License:** CC0 (protocol) | CC BY 4.0 (translations) | GPLv3 (implementations in mecp-app)
-**Status:** Protocol and 20 language packs published; clients in mecp-app
+**Status:** Protocol and 21 language packs published; clients in mecp-app
 
 ---
 
@@ -257,13 +257,27 @@ A recipient -- or their device -- can decode every field immediately, regardless
 
 **Human-readable and machine-parseable.** An MECP message can be read and roughly understood by a person looking at raw text on a screen, and it can be fully decoded by software into structured data with severity levels, incident types, GPS coordinates, timestamps, and affected person counts.
 
-**Language-independent codes.** The code table (M01, T04, C01, etc.) is universal. Each code maps to a localised description in 20 languages. The protocol itself is language-neutral -- the same message means the same thing whether decoded in Japanese, Farsi, or Norwegian.
+**Language-independent codes.** The code table (M01, T04, C01, etc.) is universal. Each code maps to a localised description in 21 languages. The protocol itself is language-neutral -- the same message means the same thing whether decoded in Japanese, Farsi, or Norwegian.
 
 **Graduated severity.** Four severity levels (0-3) provide immediate triage capability. A device can colour-code, sort, or alert differently based on severity before a human even reads the message content.
 
 **Free-text fallback.** After the structured codes, any remaining byte budget can be used for free-form text. The protocol does not force users into codes-only communication -- it structures the critical information and leaves room for human context.
 
 **Protocol is public domain.** The MECP protocol specification, message format, and code table are released under **CC0 (Creative Commons Zero)** -- public domain. Anyone can implement MECP in any software or firmware, on any platform, without restriction, permission, or licence fees. This is a deliberate choice to maximise adoption. The goal is not to own the protocol but to establish a shared standard.
+
+### 5.3 Lineage: GMDSS
+
+MECP is a descendant of the maritime distress system, not a new invention. Its severity ladder follows the GMDSS/ITU priority order — distress, urgency, safety, routine — and its conventions reuse vocabulary from the Global Maritime Distress and Safety System (GMDSS) and the IMO Standard Marine Communication Phrases (SMCP). The point of that inheritance is to reuse a vocabulary that has already survived international negotiation instead of inventing one.
+
+Three dispositions come with it:
+
+1. **Fixed, language-neutral vocabulary on the wire.** GMDSS does not translate its signal words: SMCP is English by design (IMO Resolution A.918(22)), DSC carries preformatted codes, NAVTEX broadcasts English on 518 kHz and other languages on a separate 490 kHz channel, and AIS text is 6-bit ASCII. CAP, the closest civil analogue, types its language as BCP-47 with a default of `en-US` and represents other languages as separate `<info>` blocks rather than translated fields. MECP follows: codes, sigils and convention keywords are ASCII tokens. A localised form (`4人`, `45分`) is ordinary freetext, not part of the protocol; a client MAY recognise local equivalents, but their meaning is then a local convention, not MECP.
+
+2. **SI units.** IMO Resolution A.351(IX) (1975) made SI the unit system of SOLAS and later instruments. SI symbols are the same in every language, so `45min` is not an English word but the symbol a Japanese or Farsi reader also expects. Convention values use SI symbols and are never translated.
+
+3. **Localisation at the edges.** The structure carries the meaning; the reader's device supplies the language. A decoder looks a code up in its own language file and renders it, and the same applies to convention values.
+
+GMDSS can assume trained, English-licensed operators; MECP cannot. That is why the protocol carries structure rather than prose, and why freetext may stay in any language.
 
 ---
 
@@ -301,7 +315,21 @@ MECP/<severity>/<code1> <code2> ... [optional freetext]
 | Callsign | `~CALLSIGN` | `~OK1ABC` | Radio callsign |
 | Reference | `#tag` | `#basecamp` | Reference tag |
 
-### 6.2 Example Messages
+### 6.2 Protocol Vocabulary
+
+The tokens above, the severity words, the sigils and the unit symbols form a **closed vocabulary**. Adding a token or a unit is a spec change, not a client detail, and requires an ADR.
+
+| Token | Meaning | Source |
+|---|---|---|
+| `MAYDAY` / `PAN-PAN` / `SECURITE` | severity words | GMDSS, ITU RR |
+| `pax` | person count | MECP (recorded decision, #18) |
+| `ETA` | decode alias for `R03` | IMO SMCP |
+| `min`, `h`, `d`, `s` | duration units | SI Brochure / NIST SP 330 |
+| `@`, `#`, `~` | sigils | MECP |
+
+Every token in this table is an ASCII token, identical in every language. A localised form (`4人`, `45分`, `45 دقیقه`) is ordinary freetext; a decoder MAY recognise local equivalents as aliases, but those aliases are not part of the protocol and are not enumerated by this standard. See §5.3.
+
+### 6.3 Example Messages
 
 **Life-threatening emergency:**
 ```
@@ -333,7 +361,7 @@ MECP/3/D01 M01 M09 5pax This is a training exercise @en
 ```
 *"ROUTINE: This is a drill. Simulated injury, simulated multiple casualties. 5 pax. 'This is a training exercise.'"*
 
-### 6.3 The Encoder and Decoder
+### 6.4 The Encoder and Decoder
 
 Reference encoder/decoder implementations (TypeScript `@mecp/engine`, Python, Arduino, shell) live in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app). They provide `encode` / `decode` helpers, drill and beacon detection, and the 200-byte limit — but the **wire format documented in this brief is authoritative**. Anyone may reimplement MECP from this specification alone (CC0).
 
@@ -343,7 +371,7 @@ Reference encoder/decoder implementations (TypeScript `@mecp/engine`, Python, Ar
 
 MECP defines **109 codes** across **12 categories**. Each code is a single letter (category) plus two digits.
 
-### M — Medical (15 codes)
+### M — Medical (16 codes)
 | Code | Meaning |
 |------|---------|
 | M01 | Injury (general) |
@@ -361,6 +389,7 @@ MECP defines **109 codes** across **12 categories**. Each code is a single lette
 | M13 | Poisoning / ingestion |
 | M14 | Person(s) located alive |
 | M15 | Area searched — no find |
+| M16 | Medical supply drop needed |
 
 ### T — Terrain / Infrastructure (17 codes)
 | Code | Meaning |
@@ -545,12 +574,12 @@ This is not frivolity. It is deliberate UX strategy borrowed from emergency serv
 
 ## 9. What We've Built So Far
 
-### 9.1 Language Files (20 Languages)
+### 9.1 Language Files (21 Languages)
 
 **Location:** `languages/` directory (this repository)
 **Licence:** CC BY 4.0
 
-Every MECP code, severity level, category name, and UI string has been translated into 20 languages:
+Every MECP code, severity level, category name, and UI string has been translated into 21 languages:
 
 | Language | Code | Script | Direction |
 |----------|------|--------|-----------|
@@ -567,6 +596,7 @@ Every MECP code, severity level, category name, and UI string has been translate
 | Norwegian | no | Latin | LTR |
 | Swedish | sv | Latin | LTR |
 | Turkish | tr | Latin | LTR |
+| Greek | el | Greek | LTR |
 | Serbian | sr | Cyrillic | LTR |
 | Ukrainian | uk | Cyrillic | LTR |
 | Russian | ru | Cyrillic | LTR |
@@ -575,11 +605,11 @@ Every MECP code, severity level, category name, and UI string has been translate
 | Traditional Chinese | zh-tw | CJK | LTR |
 | Farsi (Persian) | fa | Arabic | **RTL** |
 
-Each language file is a JSON document containing: localised severity labels, all 12 category names, all 109 code descriptions, and 40+ UI strings for the application interface (including 14 beacon-specific UI keys).
+Each language file is a JSON document containing: localised severity labels, all 12 category names, all 109 code descriptions, and 124 UI strings for the application interface (including 14 beacon-specific UI keys).
 
-### 9.2 Implementations ([mecp-org/mecp-app](https://github.com/mecp-org/mecp-app))
+### 9.2 Implementations
 
-All client code lives in a separate repository:
+Reference implementations live in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app):
 
 - **TypeScript engine** (`@mecp/engine`) — encode/decode, beacon helpers, tests
 - **Web tool (PWA)** — offline compose/decode HTML tool
@@ -587,7 +617,7 @@ All client code lives in a separate repository:
 - **Examples** — Python, Arduino/ESP32, shell
 - **Design plan** — product/UX design notes
 
-That repo submodules this protocol repository for language packs (`vendor/mecp`).
+That repo submodules this protocol repository for language packs (`vendor/mecp`). Third-party implementations are listed in the README; per-form decode behaviour is recorded in issue #21.
 
 ### 9.3 Project Infrastructure (this repository)
 
@@ -721,3 +751,24 @@ The project roadmap includes:
 ---
 
 *This document is part of the MECP project. The protocol specification and code table are released under CC0 (public domain). This briefing document itself may be freely shared and adapted.*
+
+---
+
+## Appendix A. SI Units
+
+IMO Resolution A.351(IX) (1975) made SI the unit system of SOLAS and later IMO instruments. MECP therefore uses SI units for any convention value that is a quantity of time, distance, or similar.
+
+**The wire carries SI symbols only.** SI symbols are identical in every language: `45min` is not an English word, `分` is the translation of it. Convention values are never translated.
+
+| Quantity | SI symbols accepted | Notes |
+|---|---|---|
+| Time | `s`, `min`, `h`, `d` | seconds, minutes, hours, days |
+| Distance | `m`, `km` | metres, kilometres |
+| Weight | `g`, `kg` | grams, kilograms |
+| Volume | `l`, `ml` | litres, millilitres |
+
+The only maritime exceptions are **speed and distance** (knots, nautical miles, cables) — operational units for navigation, not SI. They are not used by MECP conventions; where a duration or distance is encoded, an SI symbol is required on the wire (`R03 45min`, never `R03 45` with an implied unit, never `R03 45 minutes`, never `R03 45分`).
+
+A decoder MUST accept SI symbols. A decoder MAY accept localised unit words as local aliases (e.g. `分`, `dakika`, `minutos`), but those are freetext by default — not part of the protocol, not enumerated here, and never required. The rendering layer replaces tokens with localised forms.
+
+**The unit vocabulary is closed.** `45m` is rejected — `m` is metre, not minute. `45m`, `45 minutes`, `45分`, `45 h` are never encodable and never part of a conforming message. A bare number (`R03 45`) is decode-only, read as minutes, and only valid as the first freetext token when `R03` is present; a unit-bearing value (`45min`) may appear anywhere in the freetext.
