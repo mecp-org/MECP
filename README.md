@@ -114,7 +114,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). The highest-impact contribution is addin
 | Protocol specification | CC0 1.0 (public domain) |
 | Language files | CC BY 4.0 |
 
-The protocol is free forever. Anyone may implement MECP without restriction. App and engine code in [mecp-app](https://github.com/mecp-org/mecp-app) is GPLv3.
+The protocol is free forever. Anyone may implement MECP without restriction. Xiang Wong's [original implementation code](LICENSE-ORIGINAL-APP-MIT.md) is also offered under MIT at the specified historical snapshot. The current combined [mecp-app](https://github.com/mecp-org/mecp-app) repository remains identified as GPLv3; MIT permission for later contributions has not yet been established.
 
 ## Supported Languages (21)
 
