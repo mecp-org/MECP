@@ -387,6 +387,7 @@ A single digit 0-3:
 - **Also decoded:** `~vk2/ok1abc/p`
 - **Meaning:** "ROUTINE, node test from VK2/OK1ABC/P"
 - **Additional Validation:** group 1 is at most 12 characters, in both directions.
+- **Not decoded:** `~W1AW-9`. An AX.25 or APRS SSID is outside the alphabet, and `-` is not a boundary (rule 4), so this is not a callsign and is not read as `~W1AW` either. It MUST be left as freetext, and the message is still valid.
 
 #### Reference
 

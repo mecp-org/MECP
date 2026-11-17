@@ -70,6 +70,16 @@
     "expect": { "callsign": "OK1ABC" }
   },
   {
+    "convention": "callsign",
+    "input": "MECP/3/L20 ~W1AW-9",
+    "expect": {}
+  },
+  {
+    "convention": "message",
+    "input": "MECP/3/L20 ~W1AW-9",
+    "expect": { "valid": true }
+  },
+  {
     "convention": "language",
     "input": "MECP/3/L04 @zh_CN",
     "expect": { "language": "zh-cn" }
