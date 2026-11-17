@@ -4,6 +4,9 @@ All notable changes to MECP will be documented in this file.
 
 ## [Unreleased]
 
+### Protocol
+- Callsign: an AX.25/APRS SSID is outside the alphabet, so `~W1AW-9` stays freetext and is not read as `~W1AW` ([#36](https://github.com/mecp-org/MECP/issues/36)). Patterns are unchanged; two conformance cases pin the behaviour.
+
 ---
 
 ## [1.3.0] - 2026-11-15
