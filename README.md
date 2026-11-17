@@ -4,7 +4,7 @@
 
 MECP is a structured text encoding that lets people who share no common spoken language exchange meaningful information over bandwidth-constrained radio links. It works like a multilingual phrasebook that happens to be machine-parseable.
 
-A user in Scotland composes a message by tapping through a menu in English. The client generates a compact ASCII string like `MECP/0/M01 M07 2pax P05 56.68,-5.02`. That string travels over LoRa mesh radio. A recipient in Slovakia sees each code rendered in Slovak. No internet. No translation API. Just a lookup table shipped with the app.
+A user in Scotland composes a message by tapping through a menu in English. The client generates a compact ASCII string like `MECP/0/M01 M07 P05 2pax 56.68,-5.02`. That string travels over LoRa mesh radio. A recipient in Slovakia sees each code rendered in Slovak. No internet. No translation API. Just a lookup table shipped with the app.
 
 This repository is the **protocol home**: message format, code table, and official language packs.
 
@@ -22,13 +22,13 @@ Reference implementations live in [mecp-org/mecp-app](https://github.com/mecp-or
 - **Examples** — Python, Arduino/ESP32, shell
 - **Design plan** — product/UX design notes
 
-That repo submodules this protocol repository for language packs (`vendor/mecp`). Third-party implementations are listed in the section below.
+That repo submodules this protocol repository for language packs (`vendor/mecp`). mecp-app was built against pre-release spec items and is not yet compliant with the current spec. Third-party implementations are listed in the section below.
 
 ## Quick Start
 
 **Decode a message:**
 ```
-MECP/0/M01 M07 2pax P05 48.6520,20.1305
+MECP/0/M01 M07 P05 2pax 48.6520,20.1305
 ```
 = MAYDAY: Injury, Fracture/immobile, 2 people, at GPS 48.6520, 20.1305
 
@@ -69,11 +69,11 @@ See `languages/en.json` for the complete code table, or [MECP_Comprehensive_Brie
 ## Examples
 
 ```
-MECP/0/M01 M07 2pax P05 48.6520,20.1305   Emergency: injury + fracture, 2 people, GPS
+MECP/0/M01 M07 P05 2pax 48.6520,20.1305   Emergency: injury + fracture, 2 people, GPS
 MECP/2/T04 T01 P02 Poprad                   Warning: flooding, road blocked, evacuating
-MECP/3/L01 L06 running late                  Social: beer, running late (no R03 → minutes in prose are not Duration)
-MECP/0/D01 M01 M07 2pax P05 48.65,20.13     Drill: realistic practice, no real response
-MECP/2/H03 H07 5pax P05 48.65,20.13         Offering: medical supplies + shelter for 5
+MECP/3/L01 L06 running late                  Social: beer, running late
+MECP/0/D01 M01 M07 P05 2pax 48.65,20.13     Drill: realistic practice, no real response
+MECP/2/H03 H07 P05 5pax 48.65,20.13         Offering: medical supplies + shelter for 5
 MECP/0/B01 M01 P05 48.65,20.13 @1430        Beacon: automated distress signal with GPS
 MECP/2/B02 R01                               Beacon acknowledged
 MECP/2/B03                                   Cancel beacon — I am OK
@@ -93,7 +93,7 @@ Clients and reference code: [mecp-org/mecp-app](https://github.com/mecp-org/mecp
 
 ## Why This Exists
 
-LoRa mesh networks are growing across Europe. Communities operate nationally — Slovakia runs MeshCore, Scotland runs Meshtastic, German groups run both. These networks carry only plain text (max 228 characters). There is no translation layer and no standardized vocabulary.
+LoRa mesh networks are growing across Europe. Communities operate nationally — Slovakia runs MeshCore, Scotland runs Meshtastic, German groups run both. These networks carry only plain text (about 230 bytes per message). There is no translation layer and no standardized vocabulary.
 
 The failure scenario: a traveller with a mesh device in a foreign country during a crisis. Mobile networks are down. No internet. No common language. The radio link exists but is useless.
 

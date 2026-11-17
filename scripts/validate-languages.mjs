@@ -12,20 +12,6 @@ const TEMPLATE = '_template.json';
 
 const CODE_REGEX = /^[A-Z]\d{2}$/;
 const VALID_SEVERITIES = ['0', '1', '2', '3'];
-const CATEGORY_ICONS = {
-  M: 'medical',
-  T: 'terrain',
-  W: 'weather',
-  S: 'supplies',
-  P: 'position',
-  C: 'coordination',
-  R: 'response',
-  D: 'drill',
-  L: 'leisure',
-  X: 'threat',
-  H: 'resources',
-  B: 'beacon',
-};
 
 const REQUIRED_STRING_FIELDS = [
   'language',
@@ -122,7 +108,7 @@ function validateLanguageFile(filename, data, reference, options) {
     }
   }
 
-  const expectedCats = Object.keys(CATEGORY_ICONS);
+  const expectedCats = Object.keys(reference.categories);
   const { missing: missingCats, extra: extraCats } = diffKeys(
     expectedCats,
     Object.keys(data.categories),
@@ -138,8 +124,8 @@ function validateLanguageFile(filename, data, reference, options) {
     }
     if (typeof cat.icon !== 'string' || cat.icon.trim() === '') {
       errors.push(`${prefix}: categories.${key}.icon must be a non-empty string`);
-    } else if (CATEGORY_ICONS[key] !== cat.icon) {
-      errors.push(`${prefix}: categories.${key}.icon must be "${CATEGORY_ICONS[key]}"`);
+    } else if (reference.categories[key].icon !== cat.icon) {
+      errors.push(`${prefix}: categories.${key}.icon must be "${reference.categories[key].icon}"`);
     }
   }
 

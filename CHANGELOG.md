@@ -8,9 +8,29 @@ All notable changes to MECP will be documented in this file.
 - Clarify §6.1 top-level message requirements ([#35](https://github.com/mecp-org/MECP/issues/35)): wire limits, decoder trailing CR/LF strip, encoder refuse-or-truncate-to-fit, decoder size leniency; forbid `\f` alongside other line breaks; message pattern excludes U+0085/U+2028/U+2029
 - Callsign: an AX.25/APRS SSID is outside the alphabet, so `~W1AW-9` stays freetext and is not read as `~W1AW` ([#36](https://github.com/mecp-org/MECP/issues/36)). Patterns are unchanged; two conformance cases pin the behaviour.
 - §6.1 rule 4: restore the explicit ASCII boundary list (whitespace plus `, . ; : ! ? ' " ( ) [ ] { }`) and limit the MAY clause to non-ASCII space/punctuation ([#38](https://github.com/mecp-org/MECP/issues/38)). Matches the harness; no decode behaviour change.
+- **Meaning change:** rule 2: decoders MUST accept every encoded (canonical) form and SHOULD accept anything matching the decoding pattern. Appendix A and ADRs 0002/0004 agree.
+- **Meaning change to a field already in use:** `@HHMM` timestamps are in the sender's local time. The language packs previously labelled them UTC, and mecp-app currently sends UTC. The message carries no zone, so a receiver cannot convert the time and displays it as sent.
+- **Meaning change:** R03 drops `s` (seconds) as a unit; `30s` is not a duration. R03's value is a duration in `min`, `h` or `d`, and must be greater than zero.
+- **Meaning change:** the R03 bare number must not be followed by a decimal part, so `R03 47.3769,12.1048` does not read the latitude as 47 minutes. A match that fails Additional Validation counts as no match.
+- **Meaning change:** with several R03 durations, the first by position wins; pattern order only breaks ties at the same position, and a bare number is used only when no unit-bearing value matches (`R03 2d 45min` is 2 days).
+- **Meaning change:** Appendix A and ADR 0002 drop the unused distance, weight and volume units; only the time units `min`, `h`, `d` remain.
+- **Meaning change:** R03 code text is `ETA [time]` (was `ETA [minutes]`) in every language pack, since hours and days are valid too. The bare-number pattern drops its redundant `(?:B|$)` suffix (rule 4 already implies it).
+- §6.2 no longer lists severity words (the wire carries digits 0–3); `+` is listed as a non-boundary character, not a sigil; `ETA` is described as a prefix on an R03 duration
+
+### Languages
+- R03 `ETA [time]` and the timestamp UI strings (`attach_timestamp`, `site_what_example_time`) say local time instead of UTC in all 21 packs and the template. **These translations need native-speaker review.**
+- `el.json` reformatted (LF line endings, no blank lines), content unchanged
+
+### Docs
+- Example glosses use the `en.json` code texts; README examples put `P05` before the person count so it is decoded as a code; one payload figure (Meshtastic's 233 bytes, §3.1); fixed the §5.1 byte count
+- Removed restated rules and counts from the brief (§6.1 GPS and Duration validation, §9.1 UI string count, §9.3 list); ADR 0004 names the MAY exceptions
+- README notes that mecp-app was built against pre-release spec items and is not yet compliant
 
 ### Infrastructure
 - `check-freetext` strips one trailing `\n` / `\r` / `\r\n` before matching; envelope tests cover trailing CR/LF, interior/forbidden breaks, and oversize decode
+- `check-freetext` reads the boundary set from §6.1 rule 4 instead of a hard-coded copy; new cases pin first-by-position, the bare-number fallback, the latitude case, `30s`, and one code point per non-ASCII group in rule 4
+- `validate-spec` checks inline and README examples, flags a code that lands in freetext, and checks the brief version and the §7 code/category counts
+- `validate-languages` takes category icons from `en.json`
 
 ---
 

@@ -20,9 +20,10 @@ MECP has a canonical encoding and a permissive decode.
 
 - **Encode** — canonical forms only. `R03 45min` (not `R03 45`), `pax` as a
   protocol keyword (not `pessoas` or `人`).
-- **Decode** — MUST accept every canonical form and MAY accept bounded
-  variants:
-  - `ETA 45min`, `ETA45min`, `ETA 45` are accepted as aliases for `R03 45min`.
+- **Decode** — MUST accept every canonical form and SHOULD accept the bounded
+  variants matched by the decoding patterns:
+  - After `R03`, `ETA 45min`, `ETA45min` and `ETA 45` are accepted as aliases
+    for `45min`.
   - `45 min` and `1h 30min` are accepted as spaced forms of `45min` and
     `1h30min`.
   - A bare number is accepted only as the first freetext token after `R03`.
@@ -33,6 +34,8 @@ The bounded leniency rules:
 
 1. **All decode aliases MUST be listed in the spec.** No silent aliases.
 2. **Position matters only where self-identification fails** (bare number).
+   When several values match, the first by position wins (§6.1 rule 5); a
+   bare number is used only when no unit-bearing value matches.
 3. **Validation is normative before a match is used** (6.1 rule 6).
 4. **Encoders emit canonical forms only**, so every conforming encoder
    interoperates with every conforming decoder without ambiguity.
@@ -42,7 +45,8 @@ The bounded leniency rules:
 - A decoder may be more permissive than an encoder, but not more permissive
   than the spec.
 - A client that accepts a form not listed in the spec is a non-conforming
-  decoder, and its behaviour is not portable.
+  decoder, and its behaviour is not portable. The only exceptions are the MAY
+  clauses in §6.1 rule 4 (non-ASCII boundaries) and Appendix A (local aliases).
 - The leniency policy prevents the drift that would occur if each client
   invented its own variants (e.g. one client accepts `1h 30m`, another
   accepts `90 minutes`).
@@ -51,7 +55,7 @@ The bounded leniency rules:
 
 - An encode pattern that accepts a non-canonical form (e.g. `R03 45` with a
   unit implied).
-- A decode pattern that is not listed in the spec (e.g. `ETA 45` silently
+- A decode pattern that is not listed in the spec (e.g. `1h 30m` silently
   accepted).
 - A position rule for a self-identifying form (e.g. requiring `45min` to be
   the first token).
