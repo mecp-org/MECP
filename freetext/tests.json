@@ -150,6 +150,46 @@
     "expect": {}
   },
   {
+    "convention": "duration",
+    "input": "MECP/2/R03 0s",
+    "expect": {}
+  },
+  {
+    "convention": "duration",
+    "input": "MECP/2/R03 30s",
+    "expect": {}
+  },
+  {
+    "convention": "duration",
+    "input": "MECP/2/R03 60s",
+    "expect": { "duration": 1 }
+  },
+  {
+    "convention": "duration",
+    "input": "MECP/2/R03 30s 45min",
+    "expect": { "duration": 45 }
+  },
+  {
+    "convention": "duration",
+    "input": "MECP/2/R03 2d 45min",
+    "expect": { "duration": 2880 }
+  },
+  {
+    "convention": "duration",
+    "input": "MECP/2/R03 45min 2h",
+    "expect": { "duration": 45 }
+  },
+  {
+    "convention": "duration",
+    "input": "MECP/2/R03 1h 30min",
+    "expect": { "duration": 90 }
+  },
+  {
+    "convention": "duration",
+    "input": "MECP/2/R03 2 h",
+    "expect": { "duration": 120 }
+  },
+  {
     "convention": "message",
     "input": "MECP/1/T05 ",
     "expect": { "valid": false }

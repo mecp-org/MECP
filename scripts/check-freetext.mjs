@@ -12,9 +12,17 @@ const BRIEF = readFileSync(join(ROOT, 'MECP_Comprehensive_Brief.md'), 'utf8');
 const patterns = JSON.parse(readFileSync(join(ROOT, 'freetext/patterns.json'), 'utf8'));
 const tests = JSON.parse(readFileSync(join(ROOT, 'freetext/tests.json'), 'utf8'));
 
-/** Boundary class B from §6.1 rule 4. */
-const B_CLASS =
-  '[\\t\\n\\f\\r ,.;:!?\'"()\\[\\]{}\\u00A0\\u1680\\u2000-\\u200A\\u202F\\u205F\\u3000\\u060C\\u061B\\u061F\\u06D4\\u00AB\\u00BB\\u2013\\u2014\\u2018-\\u201D\\u2026\\u3001\\u3002\\u300C-\\u300F\\u3010\\u3011\\uFF01\\uFF08\\uFF09\\uFF0C\\uFF0E\\uFF1A\\uFF1B\\uFF1F]';
+/** Boundary class B, read from §6.1 rule 4 so the harness cannot drift from the brief. */
+function boundaryClass() {
+  const rule = BRIEF.split('\n').find((line) => line.startsWith('4. Decoding patterns'));
+  const controls = [...rule.slice(0, rule.indexOf(', a space')).matchAll(/`(\\[tnfr])`/g)].map((m) => m[1]);
+  const ascii = rule.match(/one of `([^`]+)`/)[1].split(' ').map((c) => c.replace(/[\\[\]^-]/, '\\$&'));
+  const codePoints = [...rule.matchAll(/U\+([0-9A-F]{4})(?:–U\+([0-9A-F]{4}))?/g)].map(([, lo, hi]) =>
+    hi ? `\\u${lo}-\\u${hi}` : `\\u${lo}`,
+  );
+  return `[${controls.join('')} ${ascii.join('')}${codePoints.join('')}]`;
+}
+const B_CLASS = boundaryClass();
 const B_ONE = new RegExp(`^${B_CLASS}$`);
 const MESSAGE_RE = new RegExp(patterns.message.decode);
 
@@ -52,6 +60,7 @@ function firstValidMatch(pattern, freetext, validate) {
       pos = Math.max(abs + full.length - (usedRightB ? 1 : 0), abs + 1);
       continue;
     }
+    m.index = abs;
     return m;
   }
   return null;
@@ -81,7 +90,7 @@ function toMinutes(kind, m) {
     case 'd':
       return a * 1440;
     case 's':
-      return Math.max(1, Math.ceil(a / 60));
+      return a / 60;
     default:
       return NaN;
   }
@@ -94,23 +103,15 @@ function decodeConvention(name, freetext, codes) {
 
   if (name === 'duration') {
     const kinds = ['hm', 'h', 'min', 'd', 's', 'bare'];
-    for (let i = 0; i < spec.decode.length; i++) {
-      const kind = kinds[i];
-      const pat = spec.decode[i];
-      if (kind === 'bare') {
-        const m = freetext.match(new RegExp(pat.replace('(?:B|$)', `(?:${B_CLASS}|$)`)));
-        if (!m) continue;
-        const mins = toMinutes('bare', m);
-        if (mins >= 1) return { duration: mins };
-        continue;
-      }
-      const m = firstValidMatch(pat, freetext, (mm) => {
-        const mins = toMinutes(kind, mm);
-        return mins >= 1;
-      });
-      if (m) return { duration: toMinutes(kind, m) };
-    }
-    return null;
+    let best = null;
+    spec.decode.forEach((pat, i) => {
+      // The bare number (last) is a fallback, so `47` in `47.3769,12.1048 45min` never beats `45min`.
+      if (best && kinds[i] === 'bare') return;
+      const m = firstValidMatch(pat, freetext, (mm) => toMinutes(kinds[i], mm) >= 1);
+      // First by position; on a tie the earlier pattern (already in best) wins.
+      if (m && (!best || m.index < best.m.index)) best = { m, kind: kinds[i] };
+    });
+    return best ? { duration: toMinutes(best.kind, best.m) } : null;
   }
 
   const validate =

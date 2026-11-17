@@ -1,5 +1,5 @@
 /**
- * Validate MECP_Comprehensive_Brief.md for basic protocol invariants.
+ * Validate MECP_Comprehensive_Brief.md (and the README's examples) for basic protocol invariants.
  */
 import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -9,9 +9,16 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const readJson = (path) => JSON.parse(readFileSync(join(ROOT, path), 'utf8'));
 const MESSAGE_RE = new RegExp(readJson('freetext/patterns.json').message.decode);
 const EN_CODES = Object.keys(readJson('languages/en.json').codes);
+const VERSION = readJson('package.json').version;
 
-function extractFencedMecpBlocks(brief) {
-  return [...brief.matchAll(/^```\s*\n(MECP\/[^\n]+)\n```/gm)].map((m) => m[1]);
+/** Inline `MECP/...` spans and fenced lines; README fenced lines carry a gloss after 2+ spaces. */
+function extractMecpExamples(md) {
+  const inline = [...md.matchAll(/`(MECP\/[^`\n]+)`/g)].map((m) => m[1]);
+  const fenced = [...md.matchAll(/^```[^\n]*\n([\s\S]*?)^```/gm)]
+    .flatMap((m) => m[1].split('\n'))
+    .filter((line) => line.startsWith('MECP/'))
+    .map((line) => line.split(/ {2,}/)[0]);
+  return [...inline, ...fenced];
 }
 
 /** Codes listed in §7, one backticked line per category. */
@@ -34,8 +41,15 @@ function main() {
   if (extra.length) errors.push(`§7 lists codes not in en.json: ${extra.join(', ')}`);
   if (listedSet.size !== listed.length) errors.push('§7 lists a code more than once');
 
+  const categories = new Set(EN_CODES.map((c) => c[0]));
+  if (!brief.includes(`**${EN_CODES.length} codes** across **${categories.size} categories**`)) {
+    errors.push(`§7 must say "**${EN_CODES.length} codes** across **${categories.size} categories**"`);
+  }
+  if (!brief.includes(`**Version:** ${VERSION}\n`)) errors.push(`Brief version must match package.json (${VERSION})`);
+
+  const readme = readFileSync(join(ROOT, 'README.md'), 'utf8');
   // Skip format templates with <placeholders>
-  const examples = extractFencedMecpBlocks(brief).filter((text) => !text.includes('<'));
+  const examples = [...extractMecpExamples(brief), ...extractMecpExamples(readme)].filter((t) => !t.includes('<'));
   for (const text of examples) {
     const m = text.match(MESSAGE_RE);
     if (!m) {
@@ -44,6 +58,9 @@ function main() {
     }
     for (const code of m[2].split(' ')) {
       if (!EN_CODES.includes(code)) errors.push(`Example uses code ${code} which is not in en.json: ${text}`);
+    }
+    if (/(?:^| )[A-Z][0-9]{2}(?: |$)/.test(m[3] ?? '')) {
+      errors.push(`Example has a code after the freetext starts, so it is not decoded as a code (rule 3): ${text}`);
     }
     if (Buffer.byteLength(text, 'utf8') > 200) {
       errors.push(`Example exceeds 200 UTF-8 bytes: ${text}`);

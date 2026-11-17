@@ -216,7 +216,7 @@ There are established emergency messaging standards in the traditional telecommu
 - **CAP (Common Alerting Protocol):** An OASIS XML standard for emergency alerts. A minimal CAP message is several kilobytes -- roughly 10-50x larger than an entire LoRa packet.
 - **EDXL (Emergency Data Exchange Language):** An OASIS suite for emergency data exchange. Also XML-based, designed for high-bandwidth IP networks.
 
-Both are designed for systems with essentially unlimited bandwidth. They are architecturally incompatible with a 230-byte radio packet. You cannot shrink XML into a LoRa message. You need something designed from the ground up for extreme byte constraints.
+Both are designed for systems with essentially unlimited bandwidth. They are architecturally incompatible with a radio packet of about 230 bytes. You cannot shrink XML into a LoRa message. You need something designed from the ground up for extreme byte constraints.
 
 ---
 
@@ -238,12 +238,12 @@ For example:
 MECP/0/M01 M07 T04 3pax 48.8566,2.3522 @1430 @en
 ```
 
-This 53-byte message communicates:
+This 48-byte message communicates:
 
 - **MECP/0/** — This is a MAYDAY (life-threatening) severity message
-- **M01** — Injury reported
-- **M07** — Fracture, person immobile
-- **T04** — Flooding in the area
+- **M01** — Injury
+- **M07** — Fracture / immobile
+- **T04** — Flooding
 - **3pax** — 3 people affected
 - **48.8566,2.3522** — GPS coordinates (Paris, in this example)
 - **@1430** — Timestamp: 14:30
@@ -253,7 +253,7 @@ A recipient -- or their device -- can decode every field immediately, regardless
 
 ### 5.2 Design Principles
 
-**Compact by design.** MECP enforces a 200-byte maximum (leaving 30+ bytes of headroom below LoRa's ~233-byte payload limit for Meshtastic protocol overhead, encryption, and future metadata). Every element of the format is designed to minimise byte usage while maximising information density.
+**Compact by design.** MECP enforces a 200-byte maximum (leaving 30+ bytes of headroom below Meshtastic's 233-byte text payload, §3.1, for future metadata). Every element of the format is designed to minimise byte usage while maximising information density.
 
 **Human-readable and machine-parseable.** An MECP message can be read and roughly understood by a person looking at raw text on a screen, and it can be fully decoded by software into structured data with severity levels, incident types, GPS coordinates, timestamps, and affected person counts.
 
@@ -332,9 +332,9 @@ A single digit 0-3:
 
 #### Optional Freetext
 1. May include structured conventions.
-2. Each convention has an **encoding** pattern and a **decoding** pattern. Each encoded convention value MUST match its encoding pattern; decoders SHOULD accept anything that matches the decoding pattern. Every encoded value also matches its decoding pattern.
+2. Each convention has an **encoding** pattern and a **decoding** pattern. Each encoded convention value MUST match its encoding pattern; decoders MUST accept every encoded (canonical) form and SHOULD accept anything that matches the decoding pattern. Every encoded value also matches its decoding pattern.
 3. Encoding patterns can be assumed to be prefixed with `(?:^| )` and suffixed with `(?: |$)`: conventions are separated by a single ASCII space.
-4. Decoding patterns can be assumed to be prefixed with `(?:^|B)` and suffixed with `(?:B|$)`, where `B` is `\t`, `\n`, `\f`, `\r`, a space, or one of `, . ; : ! ? ' " ( ) [ ] { }`, plus these code points: U+00A0, U+1680, U+2000–U+200A, U+202F, U+205F, U+3000; U+060C, U+061B, U+061F, U+06D4; U+00AB, U+00BB, U+2013, U+2014, U+2018–U+201D, U+2026; U+3001, U+3002, U+300C–U+300F, U+3010, U+3011; U+FF01, U+FF08, U+FF09, U+FF0C, U+FF0E, U+FF1A, U+FF1B, U+FF1F. The sigils `@ # ~ +` and the characters `- _` are not boundaries. Decoders MAY also treat any other non-ASCII Unicode space or punctuation code point as a boundary. A boundary is never more than one code point wide.
+4. Decoding patterns can be assumed to be prefixed with `(?:^|B)` and suffixed with `(?:B|$)`, where `B` is `\t`, `\n`, `\f`, `\r`, a space, or one of `, . ; : ! ? ' " ( ) [ ] { }`, plus these code points: U+00A0, U+1680, U+2000–U+200A, U+202F, U+205F, U+3000; U+060C, U+061B, U+061F, U+06D4; U+00AB, U+00BB, U+2013, U+2014, U+2018–U+201D, U+2026; U+3001, U+3002, U+300C–U+300F, U+3010, U+3011; U+FF01, U+FF08, U+FF09, U+FF0C, U+FF0E, U+FF1A, U+FF1B, U+FF1F. The sigils `@ # ~` and the characters `+ - _` are not boundaries. Decoders MAY also treat any other non-ASCII Unicode space or punctuation code point as a boundary. A boundary is never more than one code point wide.
 5. Decoders search the freetext for each decoding pattern. Only the first match by position is used; matching is case-sensitive except where a pattern spells out character classes such as `[Pp][Aa][Xx]`. `^` and `$` refer to the start and end of the freetext. Patterns MUST use `[0-9]`, never `\d`: `\d` is ASCII-only in Go and JavaScript but matches Arabic-Indic and fullwidth digits in Python and Rust, so `@١٤٣٠` would decode on one client and not on another. Case folding MUST be ASCII-only and locale-independent (`A`–`Z` ↔ `a`–`z`); implementations MUST NOT use locale-sensitive APIs such as JavaScript `toLocaleLowerCase()`, Java `toLowerCase()` without `Locale.ROOT`, or C# `ToLower()` without `CultureInfo.InvariantCulture`, because in a Turkish locale `IT` folds to `ıt` and `izmir` uppercases to `İZMİR`.
 6. Additional Validation is normative. Before using a match, a decoder MUST apply the validation for that convention. If the match fails, the decoder MUST ignore it and resume searching from the end of the failed match. A convention that fails Additional Validation MUST NOT invalidate the message, and its text MUST be left in the freetext unchanged. An encoder MUST apply the same validation and MUST NOT emit a value that fails it.
 7. When rendering, a decoder replaces the matched **token** — the match excluding the one-code-point boundary on each side, where present — with its human-readable form, then re-emits the boundary characters. Boundaries are separators and MUST be preserved. Decoders SHOULD also expose each extracted value structurally.
@@ -356,11 +356,10 @@ A single digit 0-3:
 - **Decode:** `([+-]?[0-9]+\.[0-9]+), ?([+-]?[0-9]+\.[0-9]+)`
 - **Example:** `MECP/0/M04 P05 -41.2865,174.7762`
 - **Also decoded:** `+48.8566, 2.3522`, `48.85661234,2.35221234`
-- **Meaning:** "MAYDAY, cardiac emergency at GPS coordinates -41.2865,174.7762"
+- **Meaning:** "MAYDAY, cardiac event at GPS coordinates -41.2865,174.7762"
 - **Additional Validation:**
     - -90 ≤ group 1 ≤ 90
     - -180 ≤ group 2 ≤ 180
-    - Both groups MUST contain a decimal point, so `0,0` and `2,5` are not GPS.
 
 #### Timestamp
 
@@ -368,7 +367,8 @@ A single digit 0-3:
 - **Decode:** `@([01]?[0-9]|2[0-3]):?([0-5][0-9])` (group 1 is the hour, group 2 the minute)
 - **Example:** `MECP/2/T01 @0630`
 - **Also decoded:** `@630`, `@6:30`, `@06:30`, `@123` (read as 01:23 — three digits are HMM)
-- **Meaning:** "SAFETY, road / trail blocked as of 06:30"
+- **Time zone:** the sender's local time.
+- **Meaning:** "SAFETY, road blocked as of 06:30"
 
 #### Language hint
 
@@ -407,27 +407,26 @@ A single digit 0-3:
   - `([1-9][0-9]*)h(?:([0-5]?[0-9])min)?` — hours with optional minutes (`2h`, `1h30min`)
   - `([1-9][0-9]*)d` — days
   - `([1-9][0-9]*)s` — seconds
-- **Decode** (try in this order; group values convert to a total in minutes):
+- **Decode** (the first match by position among patterns 1–5 wins, per rule 5, and where two match at the same position the earlier one in this list wins; pattern 6 applies only when none of 1–5 matches; group values convert to a total in minutes):
   1. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Hh] ?([0-9]+) ?[Mm][Ii][Nn]` — hours and minutes (`1h 30min`, `ETA 1h30min`)
   2. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Hh]` — hours only
   3. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Mm][Ii][Nn]` — minutes (`45min`, `ETA 45min`, `ETA45min`)
   4. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Dd]` — days
   5. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Ss]` — seconds
-  6. Bare number (decode-only, **first freetext token only**): `^(?:[Ee][Tt][Aa] ?)?([0-9]+)(?:B|$)` — read as minutes. `MECP/2/R03 45` is 45 minutes; `MECP/2/C01 R03 1pax 45` is not (the trailing `45` is not the first freetext token).
+  6. Bare number (decode-only, **first freetext token only**): `^(?:[Ee][Tt][Aa] ?)?([0-9]+)` — read as minutes. `MECP/2/R03 45` is 45 minutes; `MECP/2/C01 R03 1pax 45` is not (the trailing `45` is not the first freetext token).
 - **Example:** `MECP/2/C01 R03 45min @en`
 - **Also decoded:** `R03 45`, `R03 ETA 45`, `R03 ETA 45min`, `R03 ETA45min`, `R03 45 min`, `R03 1h30min`, `R03 1h 30min`, `R03 2h`, `R03 2d`
-- **Meaning:** "SAFETY, send rescue team, help coming in 45 minutes, English"
-- **Additional Validation:** convert the match to a total in minutes; require total ≥ 1. There is no upper bound — any SI time unit (`s`, `min`, `h`, `d`) is valid for any positive duration (`2d`, `2880min`, and `48h` are equivalent). If the value fails, ignore the match and leave the text as freetext. Localised unit words (`分`, `dakika`, `minutos`) are not part of these patterns — they remain freetext unless a client recognises them as a local alias.
+- **Meaning:** "SAFETY, send rescue, ETA 45 minutes, English"
+- **Additional Validation:** convert the match to a total in minutes, without rounding; require total ≥ 1, so `30s` (0.5) is ignored and `60s` is 1. There is no upper bound — any SI time unit (`s`, `min`, `h`, `d`) is valid for any duration of at least one minute (`2d`, `2880min`, and `48h` are equivalent). Localised unit words (`分`, `dakika`, `minutos`) are not part of these patterns — they remain freetext unless a client recognises them as a local alias.
 
 ### 6.2 Protocol Vocabulary
 
-The tokens above, the severity words, the sigils and the unit symbols form a **closed vocabulary**. Adding a token or a unit is a spec change, not a client detail, and requires an ADR.
+The tokens above, the sigils and the unit symbols form a **closed vocabulary**. Adding a token or a unit is a spec change, not a client detail, and requires an ADR.
 
 | Token | Meaning | Source |
 |---|---|---|
-| `MAYDAY` / `PAN-PAN` / `SECURITE` | severity words | GMDSS, ITU RR |
 | `pax` | person count | MECP (recorded decision, #18) |
-| `ETA` | decode alias for `R03` | IMO SMCP |
+| `ETA` | decode-only prefix on an `R03` duration | IMO SMCP |
 | `min`, `h`, `d`, `s` | duration units | SI Brochure / NIST SP 330 |
 | `@`, `#`, `~` | sigils | MECP |
 
@@ -441,31 +440,31 @@ Each example below exercises something the single-convention examples in 6.1 do 
 ```
 MECP/1/T05
 ```
-*"URGENT: Landslide / rockfall."*
+*"URGENT: Landslide."*
 
 **Life-threatening emergency, several conventions together:**
 ```
 MECP/0/M01 M07 P01 2pax 47.3769,12.1048 @0845 ~OE7ABC @de
 ```
-*"MAYDAY: Injury reported, fracture/immobile person, group is stranded. 2 people affected. Location: 47.3769,12.1048. Time: 08:45. From OE7ABC. Language: German."*
+*"MAYDAY: Injury, fracture / immobile, stranded / stuck. 2 people affected. Location: 47.3769,12.1048. Time: 08:45. From OE7ABC. Language: German."*
 
 **Response, in a different convention order:**
 ```
 MECP/1/R02 C08 #hut2 ~OE7XYZ @de
 ```
-*"URGENT: Help is coming, rendezvous at hut2. From OE7XYZ. Language: German."*
+*"URGENT: Help coming, rendezvous at hut2. From OE7XYZ. Language: German."*
 
 **Safety coordination (Duration scoped to R03):**
 ```
 MECP/2/C01 R03 45min @en
 ```
-*"SAFETY: Send rescue team. Help coming, ETA 45 minutes, English."* `45min` is the Duration convention (canonical encode). `MECP/3/L06 45min` without `R03` leaves `45min` as ordinary freetext.
+*"SAFETY: Send rescue. ETA 45 minutes, English."* `45min` is the Duration convention (canonical encode). `MECP/3/L06 45min` without `R03` leaves `45min` as ordinary freetext.
 
 **Loosely formatted sender, conventions inside prose:**
 ```
 MECP/2/T05 Rockfall near #base-camp, 3 PAX turned back @6:30.
 ```
-*"SAFETY: Landslide / rockfall. 'Rockfall near base-camp, 3 people turned back at 06:30.'"* Not a valid encoding, but decoders accept the reference, person count and timestamp despite the hyphen, case, missing leading zero, colon and trailing punctuation.
+*"SAFETY: Landslide. 'Rockfall near base-camp, 3 people turned back at 06:30.'"* Not a valid encoding, but decoders accept the reference, person count and timestamp despite the hyphen, case, missing leading zero, colon and trailing punctuation.
 
 **Invalid values and first match:**
 ```
@@ -477,7 +476,7 @@ MECP/3/L06 @2460 @1400 @1530
 ```
 MECP/3/L02 L10 Great view 2,5 km past the hut! @en
 ```
-*"ROUTINE: Coffee available, beautiful view. 'Great view 2,5 km past the hut!' Language: English."* `2,5` has no decimal point, so it is not GPS.
+*"ROUTINE: Coffee, beautiful view. 'Great view 2,5 km past the hut!' Language: English."* `2,5` has no decimal point, so it is not GPS.
 
 **Drill message:**
 ```
@@ -561,13 +560,13 @@ The Leisure category gives people a reason to send MECP messages regularly:
 MECP/3/L02 L10 Ridge above camp @en
 ```
 
-*"Coffee available, beautiful view. Ridge above camp."*
+*"Coffee, beautiful view. Ridge above camp."*
 
 ```
 MECP/3/L01 L04 Summit! Beer tonight @en
 ```
 
-*"Beer available, summit reached. Beer tonight!"*
+*"Beer / drinks, summit reached. Beer tonight!"*
 
 These messages use the exact same format, the same compose flow, and the same encoding as an emergency message. Every social message sent is muscle memory built. When the emergency comes, the user already knows exactly how to compose a severity-0 MAYDAY with the right codes -- because they've been sending severity-3 coffee updates all week.
 
@@ -608,7 +607,7 @@ Every MECP code, severity level, category name, and UI string has been translate
 | Traditional Chinese | zh-tw | CJK | LTR |
 | Farsi (Persian) | fa | Arabic | **RTL** |
 
-Each language file is a JSON document containing: localised severity labels, all 12 category names, all 109 code descriptions, and 124 UI strings for the application interface (including 14 beacon-specific UI keys).
+Each language file is a JSON document containing: localised severity labels, all 12 category names, all 109 code descriptions, and UI strings for the application interface.
 
 ### 9.2 Implementations
 
@@ -616,12 +615,7 @@ Reference implementations live in [mecp-org/mecp-app](https://github.com/mecp-or
 
 ### 9.3 Project Infrastructure (this repository)
 
-- **Validation:** `npm run validate` (language packs, brief invariants, freetext conformance, markdownlint) on pre-commit and in CI
-- **GitHub repository:** [github.com/mecp-org/MECP](https://github.com/mecp-org/MECP) — public, open-source
-- **Issue templates:** Bug reports, new code proposals, translation reviews
-- **Contributing guide:** Translation and code-proposal process
-- **Code of Conduct:** Contributor Covenant
-- **Changelog:** Maintained
+`npm run validate` (language packs, brief invariants, freetext conformance, markdownlint) runs on pre-commit and in CI. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
@@ -744,19 +738,16 @@ The project roadmap includes:
 
 ## Appendix A. SI Units
 
-IMO Resolution A.351(IX) (1975) made SI the unit system of SOLAS and later IMO instruments. MECP therefore uses SI units for any convention value that is a quantity of time, distance, or similar.
+IMO Resolution A.351(IX) (1975) made SI the unit system of SOLAS and later IMO instruments. MECP therefore uses SI units for any convention value that is a quantity of time.
 
 **The wire carries SI symbols only.** SI symbols are identical in every language: `45min` is not an English word, `分` is the translation of it. Convention values are never translated.
 
 | Quantity | SI symbols accepted | Notes |
 |---|---|---|
 | Time | `s`, `min`, `h`, `d` | seconds, minutes, hours, days |
-| Distance | `m`, `km` | metres, kilometres |
-| Weight | `g`, `kg` | grams, kilograms |
-| Volume | `l`, `ml` | litres, millilitres |
 
-The only maritime exceptions are **speed and distance** (knots, nautical miles, cables) — operational units for navigation, not SI. They are not used by MECP conventions; where a duration or distance is encoded, an SI symbol is required on the wire (`R03 45min`, never `R03 45` with an implied unit, never `R03 45 minutes`, never `R03 45分`).
+The only maritime exceptions are **speed and distance** (knots, nautical miles, cables) — operational units for navigation, not SI. They are not used by MECP conventions; where a duration is encoded, an SI symbol is required on the wire (`R03 45min`, never `R03 45` with an implied unit, never `R03 45 minutes`, never `R03 45分`).
 
-A decoder MUST accept SI symbols. A decoder MAY accept localised unit words as local aliases (e.g. `分`, `dakika`, `minutos`), but those are freetext by default — not part of the protocol, not enumerated here, and never required. The rendering layer replaces tokens with localised forms.
+A decoder MUST accept every encoded form (§6.1 rule 2). A decoder MAY accept localised unit words as local aliases (e.g. `分`, `dakika`, `minutos`), but those are freetext by default — not part of the protocol, not enumerated here, and never required. The rendering layer replaces tokens with localised forms.
 
 **The unit vocabulary is closed.** `45m` is rejected — `m` is metre, not minute. `45m`, `45 minutes` and `45分` are never encodable and never part of a conforming message. Spaced forms (`45 min`, `1h 30min`) are decode-only; encoders emit `45min`, `1h30min`. A bare number (`R03 45`) is decode-only, read as minutes, and only valid as the first freetext token when `R03` is present; a unit-bearing value (`45min`) may appear anywhere in the freetext.
