@@ -296,13 +296,19 @@ MECP/<severity>/<code1> <code2> ... [optional freetext]
 A message matches this pattern:
 
 ```
-^MECP/([0-3])/([A-Z][0-9]{2}(?: [A-Z][0-9]{2})*)(?: ([^ \t\n\f\r](?:.*[^ \t\n\f\r])?))?$
+^MECP/([0-3])/([A-Z][0-9]{2}(?: [A-Z][0-9]{2})*)(?: ([^ \t\n\f\r\u0085\u2028\u2029](?:[^\n\f\r\u0085\u2028\u2029]*[^ \t\n\f\r\u0085\u2028\u2029])?))?$
 ```
 1. Severity
 2. Codes
 3. Optional Freetext
 
-Input is a single message line: remove at most one trailing CR/LF before matching, and a message MUST NOT contain `\r`, `\n`, U+0085, U+2028 or U+2029. A message MUST NOT exceed 200 bytes of UTF-8: the limit counts bytes, not characters, so a 200-character Japanese or Chinese message is about 600 bytes and does not fit. Encoders MUST count bytes and MUST NOT split a UTF-8 sequence or a grapheme cluster when truncating, and MUST NOT emit a byte-order mark. Decoders SHOULD replace an invalid sequence with U+FFFD rather than rejecting the message. When present, freetext MUST be non-empty and MUST NOT begin or end with a space.
+**Wire (conforming message).** A conforming MECP message is a single line of UTF-8. It MUST NOT contain `\r`, `\n`, `\f` (U+000C), U+0085, U+2028 or U+2029. It MUST NOT exceed 200 bytes of UTF-8: the limit counts bytes, not characters, so a 200-character Japanese or Chinese message is about 600 bytes and does not fit. When present, freetext MUST be non-empty and MUST NOT begin or end with a space.
+
+**Decoder preprocessing.** Before matching the message pattern, a decoder MUST remove at most one trailing line ending — `\n`, `\r`, or `\r\n`. After that strip, if any forbidden line-break character remains, the input is not a valid MECP message.
+
+**Encoders.** An encoder MUST NOT emit a non-conforming message: it MUST NOT emit forbidden line-break characters, a byte-order mark, or more than 200 UTF-8 bytes. Encoders MUST count bytes. If structured input would exceed 200 bytes, the encoder MUST refuse to produce a transmittable string, or MAY truncate freetext only; when truncating, it MUST NOT split a UTF-8 sequence or a grapheme cluster. Returning an oversized string with a warning is conforming only if that string is not transmitted.
+
+**Decoders.** Decoders MUST NOT reject a message solely because it exceeds 200 bytes. Decoders SHOULD replace an invalid UTF-8 sequence with U+FFFD rather than rejecting the message. Test vectors longer than 200 bytes are valid for encoder conformance; on decode, an otherwise well-formed oversize input SHOULD still parse.
 
 #### Prefix
 Identifies this as an MECP-formatted message (5 bytes).

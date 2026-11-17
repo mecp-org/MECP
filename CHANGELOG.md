@@ -4,6 +4,12 @@ All notable changes to MECP will be documented in this file.
 
 ## [Unreleased]
 
+### Protocol
+- Clarify §6.1 top-level message requirements ([#35](https://github.com/mecp-org/MECP/issues/35)): wire limits, decoder trailing CR/LF strip, encoder refuse-or-truncate-to-fit, decoder size leniency; forbid `\f` alongside other line breaks; message pattern excludes U+0085/U+2028/U+2029
+
+### Infrastructure
+- `check-freetext` strips one trailing `\n` / `\r` / `\r\n` before matching; envelope tests cover trailing CR/LF, interior/forbidden breaks, and oversize decode
+
 ---
 
 ## [1.3.0] - 2026-11-15
