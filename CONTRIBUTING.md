@@ -51,7 +51,7 @@ Use the "Bug Report" issue template. Include:
 - What you expected to happen
 - What actually happened
 - The exact MECP string that caused the issue (if applicable)
-- MECP version (e.g. `1.3.0` or tag `v1.3.0`)
+- MECP version (e.g. `1.4.0` or tag `v1.4.0`)
 
 For engine, web, or mobile app bugs, open the issue against [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app).
 
