@@ -35,8 +35,28 @@
     "expect": { "reference": "tag" }
   },
   {
+    "convention": "reference",
+    "input": "MECP/2/C08 #hut2/basecamp",
+    "expect": {}
+  },
+  {
+    "convention": "reference",
+    "input": "MECP/3/L06 see https://example.org/#notes",
+    "expect": {}
+  },
+  {
     "convention": "pax",
     "input": "MECP/1/S01 3paxmore",
+    "expect": {}
+  },
+  {
+    "convention": "pax",
+    "input": "MECP/1/S01 3pax*",
+    "expect": {}
+  },
+  {
+    "convention": "timestamp",
+    "input": "MECP/3/L06 eta=@1430",
     "expect": {}
   },
   {
