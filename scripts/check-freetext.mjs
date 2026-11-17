@@ -18,8 +18,15 @@ const B_CLASS =
 const B_ONE = new RegExp(`^${B_CLASS}$`);
 const MESSAGE_RE = new RegExp(patterns.message.decode);
 
+/** §6.1 decoder preprocessing: remove at most one trailing `\n`, `\r`, or `\r\n`. */
+function stripTrailingLineEnding(input) {
+  if (input.endsWith('\r\n')) return input.slice(0, -2);
+  if (input.endsWith('\n') || input.endsWith('\r')) return input.slice(0, -1);
+  return input;
+}
+
 function extractEnvelope(input) {
-  const m = input.match(MESSAGE_RE);
+  const m = stripTrailingLineEnding(input).match(MESSAGE_RE);
   if (!m) return null;
   return { severity: m[1], codes: m[2].split(' '), freetext: m[3] ?? '' };
 }
