@@ -16,7 +16,7 @@ designators are long; SI symbols are identical in every language.
 
 MECP uses SI unit symbols for all convention values that are quantities.
 
-- Time: `s`, `min`, `h`, `d`
+- Time: `min`, `h`, `d`
 
 SI symbols are not translated. `45min` is not an English word; `分` is the
 translation of it. The wire carries the symbol; the reader's device renders the

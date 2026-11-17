@@ -15,6 +15,9 @@ const tests = JSON.parse(readFileSync(join(ROOT, 'freetext/tests.json'), 'utf8')
 /** Boundary class B, read from §6.1 rule 4 so the harness cannot drift from the brief. */
 function boundaryClass() {
   const rule = BRIEF.split('\n').find((line) => line.startsWith('4. Decoding patterns'));
+  if (!rule?.includes(', a space') || !/one of `[^`]+`/.test(rule)) {
+    throw new Error('Cannot read the boundary list B from §6.1 rule 4 in the brief; update boundaryClass() to match its wording.');
+  }
   const controls = [...rule.slice(0, rule.indexOf(', a space')).matchAll(/`(\\[tnfr])`/g)].map((m) => m[1]);
   const ascii = rule.match(/one of `([^`]+)`/)[1].split(' ').map((c) => c.replace(/[\\[\]^-]/g, '\\$&'));
   const codePoints = [...rule.matchAll(/U\+([0-9A-F]{4})(?:–U\+([0-9A-F]{4}))?/g)].map(([, lo, hi]) =>
@@ -89,8 +92,6 @@ function toMinutes(kind, m) {
       return a;
     case 'd':
       return a * 1440;
-    case 's':
-      return a / 60;
     default:
       return NaN;
   }
@@ -102,12 +103,16 @@ function decodeConvention(name, freetext, codes) {
   if (spec.scope && !codes.includes(spec.scope)) return null;
 
   if (name === 'duration') {
-    const kinds = ['hm', 'h', 'min', 'd', 's', 'bare'];
+    const kinds = ['hm', 'h', 'min', 'd', 'bare'];
     let best = null;
     spec.decode.forEach((pat, i) => {
-      // The bare number (last) is a fallback, so `47` in `47.3769,12.1048 45min` never beats `45min`.
+      // The bare number (last) is a fallback, used only when no unit-bearing value matches.
       if (best && kinds[i] === 'bare') return;
-      const m = firstValidMatch(pat, freetext, (mm) => toMinutes(kinds[i], mm) >= 1);
+      const m = firstValidMatch(
+        pat,
+        freetext,
+        (mm) => toMinutes(kinds[i], mm) > 0 && (kinds[i] !== 'bare' || mm[2] === undefined),
+      );
       // First by position; on a tie the earlier pattern (already in best) wins.
       if (m && (!best || m.index < best.m.index)) best = { m, kind: kinds[i] };
     });

@@ -22,7 +22,7 @@ Reference implementations live in [mecp-org/mecp-app](https://github.com/mecp-or
 - **Examples** — Python, Arduino/ESP32, shell
 - **Design plan** — product/UX design notes
 
-That repo submodules this protocol repository for language packs (`vendor/mecp`). Third-party implementations are listed in the section below.
+That repo submodules this protocol repository for language packs (`vendor/mecp`). mecp-app was built against pre-release spec items and is not yet compliant with the current spec. Third-party implementations are listed in the section below.
 
 ## Quick Start
 

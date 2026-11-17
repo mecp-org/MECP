@@ -367,7 +367,7 @@ A single digit 0-3:
 - **Decode:** `@([01]?[0-9]|2[0-3]):?([0-5][0-9])` (group 1 is the hour, group 2 the minute)
 - **Example:** `MECP/2/T01 @0630`
 - **Also decoded:** `@630`, `@6:30`, `@06:30`, `@123` (read as 01:23 — three digits are HMM)
-- **Time zone:** the sender's local time.
+- **Time zone:** the sender's local time. The message carries no zone, so a receiver cannot convert it and displays it as sent.
 - **Meaning:** "SAFETY, road blocked as of 06:30"
 
 #### Language hint
@@ -403,21 +403,19 @@ A single digit 0-3:
 `R03` already means ETA, so a duration is its value. This convention is **scoped to `R03`** (rule 9): if the code section does not contain `R03`, a duration-like token is ordinary freetext and MUST NOT be decoded. Position is otherwise free for unit-bearing forms — `MECP/2/C01 R03 P05 47.3769,12.1048 45min` and `MECP/2/R03 45min` are equally valid. See [#21](https://github.com/mecp-org/MECP/issues/21).
 
 - **Encode** (SI symbols only, no space between number and unit; a bare number is not encodable):
-  - `([1-9][0-9]*)min` — total minutes (canonical: `45min`)
+  - `([1-9][0-9]*)min` — minutes (canonical: `45min`)
   - `([1-9][0-9]*)h(?:([0-5]?[0-9])min)?` — hours with optional minutes (`2h`, `1h30min`)
   - `([1-9][0-9]*)d` — days
-  - `([1-9][0-9]*)s` — seconds
-- **Decode** (the first match by position among patterns 1–5 wins, per rule 5, and where two match at the same position the earlier one in this list wins; pattern 6 applies only when none of 1–5 matches; group values convert to a total in minutes):
+- **Decode** (a match that fails Additional Validation counts as no match, per rule 6; the first match by position among patterns 1–4 wins, per rule 5, and where two match at the same position the earlier one in this list wins; pattern 5 applies only when none of 1–4 matches):
   1. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Hh] ?([0-9]+) ?[Mm][Ii][Nn]` — hours and minutes (`1h 30min`, `ETA 1h30min`)
   2. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Hh]` — hours only
   3. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Mm][Ii][Nn]` — minutes (`45min`, `ETA 45min`, `ETA45min`)
   4. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Dd]` — days
-  5. `(?:[Ee][Tt][Aa] ?)?([0-9]+) ?[Ss]` — seconds
-  6. Bare number (decode-only, **first freetext token only**): `^(?:[Ee][Tt][Aa] ?)?([0-9]+)` — read as minutes. `MECP/2/R03 45` is 45 minutes; `MECP/2/C01 R03 1pax 45` is not (the trailing `45` is not the first freetext token).
+  5. Bare number (decode-only, **first freetext token only**): `^(?:[Ee][Tt][Aa] ?)?([0-9]+)([.,][0-9]+)?` — group 1 read as minutes. `MECP/2/R03 45` is 45 minutes; `MECP/2/C01 R03 1pax 45` is not (the trailing `45` is not the first freetext token).
 - **Example:** `MECP/2/C01 R03 45min @en`
 - **Also decoded:** `R03 45`, `R03 ETA 45`, `R03 ETA 45min`, `R03 ETA45min`, `R03 45 min`, `R03 1h30min`, `R03 1h 30min`, `R03 2h`, `R03 2d`
 - **Meaning:** "SAFETY, send rescue, ETA 45 minutes, English"
-- **Additional Validation:** convert the match to a total in minutes, without rounding; require total ≥ 1, so `30s` (0.5) is ignored and `60s` is 1. There is no upper bound — any SI time unit (`s`, `min`, `h`, `d`) is valid for any duration of at least one minute (`2d`, `2880min`, and `48h` are equivalent). Localised unit words (`分`, `dakika`, `minutos`) are not part of these patterns — they remain freetext unless a client recognises them as a local alias.
+- **Additional Validation:** the duration MUST be greater than zero, so `0min` and a bare `0` are not durations. For pattern 5, group 2 MUST be absent, so the `47` of `R03 47.3769,12.1048` is not a duration. There is no upper bound — `2d`, `48h` and `2880min` are the same duration. `30s` is not a duration: seconds are not a unit of this convention. Localised unit words (`分`, `dakika`, `minutos`) are not part of these patterns — they remain freetext unless a client recognises them as a local alias.
 
 ### 6.2 Protocol Vocabulary
 
@@ -427,7 +425,7 @@ The tokens above, the sigils and the unit symbols form a **closed vocabulary**. 
 |---|---|---|
 | `pax` | person count | MECP (recorded decision, #18) |
 | `ETA` | decode-only prefix on an `R03` duration | IMO SMCP |
-| `min`, `h`, `d`, `s` | duration units | SI Brochure / NIST SP 330 |
+| `min`, `h`, `d` | duration units | SI Brochure / NIST SP 330 |
 | `@`, `#`, `~` | sigils | MECP |
 
 Every token in this table is an ASCII token, identical in every language. A localised form (`4人`, `45分`, `45 دقیقه`) is ordinary freetext; a decoder MAY recognise local equivalents as aliases, but those aliases are not part of the protocol and are not enumerated by this standard. See §5.3.
@@ -744,7 +742,7 @@ IMO Resolution A.351(IX) (1975) made SI the unit system of SOLAS and later IMO i
 
 | Quantity | SI symbols accepted | Notes |
 |---|---|---|
-| Time | `s`, `min`, `h`, `d` | seconds, minutes, hours, days |
+| Time | `min`, `h`, `d` | minutes, hours, days |
 
 The only maritime exceptions are **speed and distance** (knots, nautical miles, cables) — operational units for navigation, not SI. They are not used by MECP conventions; where a duration is encoded, an SI symbol is required on the wire (`R03 45min`, never `R03 45` with an implied unit, never `R03 45 minutes`, never `R03 45分`).
 

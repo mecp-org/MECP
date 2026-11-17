@@ -20,6 +20,10 @@ Examples of unacceptable behavior:
 - Publishing others' private information without explicit permission
 - Other conduct which could reasonably be considered inappropriate
 
+## Enforcement
+
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project maintainers privately by opening a [private report](https://github.com/mecp-org/MECP/security/advisories/new) from the repository's Security tab; only maintainers can see it. All complaints will be reviewed and investigated promptly and fairly.
+
 ## Attribution
 
 This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org/), version 2.1.

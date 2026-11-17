@@ -36,6 +36,31 @@
   },
   {
     "convention": "reference",
+    "input": "MECP/2/C08 #hut\u3000ok",
+    "expect": { "reference": "hut" }
+  },
+  {
+    "convention": "reference",
+    "input": "MECP/2/C08 #hut\u060Cok",
+    "expect": { "reference": "hut" }
+  },
+  {
+    "convention": "reference",
+    "input": "MECP/2/C08 #hut\u201Dok",
+    "expect": { "reference": "hut" }
+  },
+  {
+    "convention": "reference",
+    "input": "MECP/2/C08 #hut\u3001ok",
+    "expect": { "reference": "hut" }
+  },
+  {
+    "convention": "reference",
+    "input": "MECP/2/C08 #hut\uFF0Cok",
+    "expect": { "reference": "hut" }
+  },
+  {
+    "convention": "reference",
     "input": "MECP/2/C08 #hut2/basecamp",
     "expect": {}
   },
@@ -151,23 +176,33 @@
   },
   {
     "convention": "duration",
-    "input": "MECP/2/R03 0s",
-    "expect": {}
-  },
-  {
-    "convention": "duration",
     "input": "MECP/2/R03 30s",
     "expect": {}
   },
   {
     "convention": "duration",
-    "input": "MECP/2/R03 60s",
-    "expect": { "duration": 1 }
+    "input": "MECP/2/R03 30s 45min",
+    "expect": { "duration": 45 }
   },
   {
     "convention": "duration",
-    "input": "MECP/2/R03 30s 45min",
+    "input": "MECP/2/R03 47.3769,12.1048",
+    "expect": {}
+  },
+  {
+    "convention": "duration",
+    "input": "MECP/2/R03 45.",
     "expect": { "duration": 45 }
+  },
+  {
+    "convention": "duration",
+    "input": "MECP/2/R03 45 0h",
+    "expect": { "duration": 45 }
+  },
+  {
+    "convention": "duration",
+    "input": "MECP/2/R03 45 2h",
+    "expect": { "duration": 120 }
   },
   {
     "convention": "duration",
