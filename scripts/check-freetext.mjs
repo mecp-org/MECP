@@ -16,7 +16,7 @@ const tests = JSON.parse(readFileSync(join(ROOT, 'freetext/tests.json'), 'utf8')
 function boundaryClass() {
   const rule = BRIEF.split('\n').find((line) => line.startsWith('4. Decoding patterns'));
   const controls = [...rule.slice(0, rule.indexOf(', a space')).matchAll(/`(\\[tnfr])`/g)].map((m) => m[1]);
-  const ascii = rule.match(/one of `([^`]+)`/)[1].split(' ').map((c) => c.replace(/[\\[\]^-]/, '\\$&'));
+  const ascii = rule.match(/one of `([^`]+)`/)[1].split(' ').map((c) => c.replace(/[\\[\]^-]/g, '\\$&'));
   const codePoints = [...rule.matchAll(/U\+([0-9A-F]{4})(?:–U\+([0-9A-F]{4}))?/g)].map(([, lo, hi]) =>
     hi ? `\\u${lo}-\\u${hi}` : `\\u${lo}`,
   );
