@@ -143,5 +143,40 @@
     "convention": "message",
     "input": "MECP/1/T05 T05 damaged",
     "expect": { "valid": true }
+  },
+  {
+    "convention": "message",
+    "input": "MECP/1/T05 T05 damaged\n",
+    "expect": { "valid": true }
+  },
+  {
+    "convention": "message",
+    "input": "MECP/1/T05 T05 damaged\r\n",
+    "expect": { "valid": true }
+  },
+  {
+    "convention": "message",
+    "input": "MECP/1/T05 T05 damaged\r",
+    "expect": { "valid": true }
+  },
+  {
+    "convention": "message",
+    "input": "MECP/1/T05 foo\nbar",
+    "expect": { "valid": false }
+  },
+  {
+    "convention": "message",
+    "input": "MECP/1/T05 foo\u2028bar",
+    "expect": { "valid": false }
+  },
+  {
+    "convention": "message",
+    "input": "MECP/1/T05 foo\fbar",
+    "expect": { "valid": false }
+  },
+  {
+    "convention": "message",
+    "input": "MECP/0/M01 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "expect": { "valid": true }
   }
 ]
