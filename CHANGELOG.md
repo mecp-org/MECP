@@ -4,6 +4,10 @@ All notable changes to MECP will be documented in this file.
 
 ## [Unreleased]
 
+### Docs
+- Beacon §B is semantic-only: B01/B02/B03 mean automated distress active, acknowledged, and cancelled — not a mandated client state machine ([#42](https://github.com/mecp-org/MECP/issues/42))
+- [ADR 0005](docs/adr/0005-beacon-semantics-vs-client.md): non-normative guidance for retransmit/ACK/drill behaviour, B02/B03 binding and authenticity, and MeshCore airtime
+
 ---
 
 ## [1.4.0] - 2026-11-17

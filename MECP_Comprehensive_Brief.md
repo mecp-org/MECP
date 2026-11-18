@@ -528,7 +528,9 @@ MECP defines **109 codes** across **12 categories**. Each code is a single lette
 ### B — Beacon (3 codes)
 `B01` `B02` `B03`
 
-The Beacon category provides a PLB-style (Personal Locator Beacon) distress mechanism for mesh networks. When activated, B01 automatically retransmits the sender's GPS position at decaying intervals (every 5 minutes initially, slowing to 15 minutes after 6 hours, and 30 minutes after 24 hours). This ensures that even if the sender becomes unconscious, their position continues broadcasting. B02 allows responders to acknowledge the beacon (which reduces the sender's transmission rate to conserve battery), and B03 lets the sender cancel when they are safe. Combined with D01 (drill), beacon can be practised safely with automatic shutdown after 3 transmissions.
+The Beacon category is a PLB-style (Personal Locator Beacon) distress vocabulary for mesh networks. **B01** means an automated distress beacon is active — the sender may be unresponsive; the message typically carries GPS position. **B02** means a beacon has been acknowledged. **B03** means the sender is cancelling their beacon and reports they are OK. Combined with D01 (drill), beacon practice stays clearly marked as non-emergency.
+
+MECP defines these meanings only. Retransmit schedules, slowing after B02, drill auto-stop, how B02/B03 are bound to a specific sender, authenticity, and airtime policy are **non-normative client and transport concerns** — see [ADR 0005](docs/adr/0005-beacon-semantics-vs-client.md).
 
 ---
 
