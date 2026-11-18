@@ -1,7 +1,10 @@
 /**
  * Conformance harness for §6.1 freetext patterns.
  * - Asserts every pattern string in freetext/patterns.json appears verbatim in the brief
- * - Runs freetext/tests.json cases with RE2-compatible JS RegExp (no lookaround)
+ * - Decodes every convention in each freetext/tests.json input
+ *   with RE2-compatible JS RegExp (no lookaround) and compares the result with expect;
+ *   an absent key or a null value means the value is not decoded, and expect: null means
+ *   not an MECP message
  */
 import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -149,8 +152,32 @@ function assertPatternsInBrief() {
   return missing;
 }
 
+/** JSON with object keys sorted, so key order does not affect comparison. */
+function canonical(v) {
+  if (Array.isArray(v)) return `[${v.map(canonical).join(',')}]`;
+  if (v && typeof v === 'object') {
+    return `{${Object.keys(v)
+      .sort()
+      .map((k) => `${JSON.stringify(k)}:${canonical(v[k])}`)
+      .join(',')}}`;
+  }
+  return JSON.stringify(v);
+}
+
 function deepEqual(a, b) {
-  return JSON.stringify(a) === JSON.stringify(b);
+  return canonical(a) === canonical(b);
+}
+
+/** Every convention value a decoder extracts from a message, or null if it is not an MECP message. */
+function decodeMessage(input) {
+  const env = extractEnvelope(input);
+  if (!env) return null;
+  const got = {};
+  for (const name of Object.keys(patterns)) {
+    if (name === 'message') continue;
+    Object.assign(got, decodeConvention(name, env.freetext, env.codes) ?? {});
+  }
+  return got;
 }
 
 const errors = [];
@@ -159,21 +186,11 @@ for (const m of assertPatternsInBrief()) {
 }
 
 for (const t of tests) {
-  if (t.convention === 'message') {
-    const got = { valid: !!extractEnvelope(t.input) };
-    if (!deepEqual(got, t.expect)) {
-      errors.push(`${t.input}: expected ${JSON.stringify(t.expect)}, got ${JSON.stringify(got)}`);
-    }
-    continue;
-  }
-  const env = extractEnvelope(t.input);
-  if (!env) {
-    errors.push(`${t.input}: envelope failed unexpectedly`);
-    continue;
-  }
-  const got = decodeConvention(t.convention, env.freetext, env.codes) ?? {};
-  if (!deepEqual(got, t.expect)) {
-    errors.push(`${t.convention} ${t.input}: expected ${JSON.stringify(t.expect)}, got ${JSON.stringify(got)}`);
+  const got = decodeMessage(t.input);
+  // "x": null states that x is not decoded, the same as leaving x out.
+  const expect = t.expect && Object.fromEntries(Object.entries(t.expect).filter(([, v]) => v !== null));
+  if (!deepEqual(got, expect)) {
+    errors.push(`${t.title} (${JSON.stringify(t.input)}): expected ${JSON.stringify(t.expect)}, got ${JSON.stringify(got)}`);
   }
 }
 
