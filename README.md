@@ -12,6 +12,10 @@ This repository is the **protocol home**: message format, code table, and offici
 
 See [Releases](https://github.com/mecp-org/MECP/releases) for the current protocol version. Clients claim adherence by that version string (also the matching git tag, GitHub Release, and `version` field in `package.json`). The normative wire format lives in [MECP_Comprehensive_Brief.md](MECP_Comprehensive_Brief.md).
 
+### Freetext conformance for implementers
+
+Pin the §6.1 decode suite from a **release tag** (or the `freetext-conformance-vX.Y.Z.zip` asset on that release), not floating `main`. See [`freetext/README.md`](freetext/README.md) for the case shape and a CI sketch. When MECP adds discrepancy pins, bump your pin to the new tag so unknown clients pick up the cases in their own CI.
+
 ## Implementations
 
 Reference implementations live in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app):
@@ -83,9 +87,9 @@ MECP/2/B03                                   Cancel beacon — I am OK
 
 ```
 languages/                   Official translation packs (JSON, one per language)
-freetext/                    §6.1 convention patterns and decode test cases
+freetext/                    §6.1 patterns, decode cases, manifest (pin by release tag)
 docs/adr/                    Architecture decision records
-scripts/                     Validators run by `npm run validate`
+scripts/                     Validators + cut-release (run by `npm run validate` / Actions)
 MECP_Comprehensive_Brief.md  Protocol narrative and design rationale
 ```
 

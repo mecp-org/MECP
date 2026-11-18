@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    # Weekly self-validate (bitrot / runner drift); not a client matrix.
+    - cron: '0 15 * * 1'
 
 permissions:
   contents: read

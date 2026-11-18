@@ -5,3 +5,5 @@ dist/
 MECP_Developer_Brief_v2.md
 MECP_Comprehensive_Brief.pdf
 mecp-site/
+freetext-conformance-*.zip
+.release-notes.md

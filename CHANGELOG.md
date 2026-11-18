@@ -7,6 +7,11 @@ All notable changes to MECP will be documented in this file.
 ### Docs
 - Beacon §B is semantic-only: B01/B02/B03 mean automated distress active, acknowledged, and cancelled — not a mandated client state machine ([#42](https://github.com/mecp-org/MECP/issues/42))
 - [ADR 0005](docs/adr/0005-beacon-semantics-vs-client.md): non-normative guidance for retransmit/ACK/drill behaviour, B02/B03 binding and authenticity, and MeshCore airtime
+- Document freetext suite pinning for implementer CI ([`freetext/README.md`](freetext/README.md)); cut-release runbook in CONTRIBUTING
+
+### Infrastructure
+- Weekly scheduled `validate` workflow (MECP-only)
+- `Cut release` workflow + `scripts/cut-release.mjs`: bump versions, stamp `freetext/manifest.json`, publish `freetext-conformance-vX.Y.Z.zip` on the GitHub Release
 
 ---
 
