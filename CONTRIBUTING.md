@@ -63,7 +63,21 @@ Run the full suite before opening a PR (also runs on git pre-commit and in CI):
 npm run validate
 ```
 
-That runs language-pack checks, brief/spec invariants, freetext conformance, and markdownlint.
+That runs language-pack checks, brief/spec invariants, freetext conformance, and markdownlint. CI also runs the same job on a weekly schedule (bitrot check for this repo only).
+
+### Freetext cases for external CI
+
+Add or tighten decode pins in [`freetext/tests.json`](freetext/tests.json) via a normal PR (document under `## [Unreleased]` in the changelog). Implementers pin a release tag of [`freetext/`](freetext/) in their own CI — see [`freetext/README.md`](freetext/README.md). Bumping that pin is how clients you do not know about pick up new cases.
+
+## Cutting a release
+
+Maintainers cut from GitHub Actions — no manual version edits, tags, or release assets:
+
+1. Land protocol / language / freetext PRs on `main` with notes under `## [Unreleased]` in [`CHANGELOG.md`](CHANGELOG.md).
+2. Actions → **Cut release** → enter the next semver (e.g. `1.5.0`).
+3. The workflow bumps `package.json` / lock / brief version, folds Unreleased into that version, stamps [`freetext/manifest.json`](freetext/manifest.json), runs `npm run validate`, commits `release: vX.Y.Z` on `main`, tags `vX.Y.Z`, creates the GitHub Release, and uploads `freetext-conformance-vX.Y.Z.zip`.
+
+Refuse to cut if Unreleased is empty or the tag already exists.
 
 ## Code of Conduct
 
