@@ -109,10 +109,25 @@ function toMinutes(kind, m) {
   }
 }
 
+function scopeApplies(spec, codes) {
+  if (spec.scopeCategory) {
+    return codes.some((c) => c[0] === spec.scopeCategory && /^[A-Z][0-9]{2}$/.test(c));
+  }
+  if (spec.scope) return codes.includes(spec.scope);
+  return true;
+}
+
 function decodeConvention(name, freetext, codes) {
   const spec = patterns[name];
   if (!spec) throw new Error(`unknown convention ${name}`);
-  if (spec.scope && !codes.includes(spec.scope)) return null;
+  if (!scopeApplies(spec, codes)) return null;
+
+  if (name === 'appDesignator') {
+    // First freetext token only (Additional Validation: match index 0).
+    const m = firstValidMatch(spec.decode, freetext, null);
+    if (!m || m.index !== 0) return null;
+    return { appDesignator: m[1] };
+  }
 
   if (name === 'duration') {
     const kinds = ['hm', 'h', 'min', 'd', 'bare'];

@@ -57,6 +57,8 @@ function main() {
       continue;
     }
     for (const code of m[2].split(' ')) {
+      // U01–U99 are Private Use (ADR 0006): well-formed, not in the shared codebook.
+      if (/^U[0-9]{2}$/.test(code)) continue;
       if (!EN_CODES.includes(code)) errors.push(`Example uses code ${code} which is not in en.json: ${text}`);
     }
     if (/(?:^| )[A-Z][0-9]{2}(?: |$)/.test(m[3] ?? '')) {

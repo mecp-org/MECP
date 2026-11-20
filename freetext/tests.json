@@ -408,5 +408,45 @@
     "title": "Message: decoders accept a message longer than 200 bytes (202 bytes)",
     "input": "MECP/0/M01 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
     "expect": {}
+  },
+  {
+    "title": "App designator: first freetext token when a U code is present",
+    "input": "MECP/2/U04 rem #site-a",
+    "expect": { "appDesignator": "rem", "reference": "site-a" }
+  },
+  {
+    "title": "App designator: still decoded alongside a shared code",
+    "input": "MECP/1/M01 U04 rem needs help",
+    "expect": { "appDesignator": "rem" }
+  },
+  {
+    "title": "App designator: hyphenated designator",
+    "input": "MECP/2/U01 mecp-app",
+    "expect": { "appDesignator": "mecp-app" }
+  },
+  {
+    "title": "App designator: not decoded without a U code",
+    "input": "MECP/3/L01 rem running late",
+    "expect": { "appDesignator": null }
+  },
+  {
+    "title": "App designator: U code with no freetext has no designator",
+    "input": "MECP/2/U04",
+    "expect": { "appDesignator": null }
+  },
+  {
+    "title": "App designator: a leading reference is not a designator, and a later word is not taken",
+    "input": "MECP/2/U04 #site-a rem",
+    "expect": { "appDesignator": null, "reference": "site-a" }
+  },
+  {
+    "title": "App designator: uppercase first token is not a designator",
+    "input": "MECP/2/U04 REM payload",
+    "expect": { "appDesignator": null }
+  },
+  {
+    "title": "App designator: a bare digit after R03+U is not a designator",
+    "input": "MECP/0/R03 U02 4",
+    "expect": { "appDesignator": null, "duration": 4 }
   }
 ]
