@@ -126,10 +126,14 @@ function decodeConvention(name, freetext, codes) {
         if (kind === 'bare') {
           // Group 2 present (47.3769), or `.`/`,` used as B before more digits (1.5h).
           if (mm[2] !== undefined) return false;
+          const group1Start = ctx.pos + mm.indices[1][0];
           const group1End = ctx.pos + mm.indices[1][1];
           const sep = freetext[group1End];
           const next = freetext[group1End + 1];
           if ((sep === '.' || sep === ',') && next >= '0' && next <= '9') return false;
+          // Yield to person count on the same digits (`R03 4 pax` is pax, not minutes).
+          const paxAtDigits = firstValidMatch(patterns.pax.decode, freetext.slice(group1Start), null);
+          if (paxAtDigits && paxAtDigits.index === 0) return false;
           return true;
         }
         // Patterns 1–4: reject a number that is only the fractional part of a decimal.

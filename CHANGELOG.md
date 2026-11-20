@@ -10,6 +10,7 @@ All notable changes to MECP will be documented in this file.
 
 ### Protocol
 - **Meaning change:** unit-bearing R03 durations must not be read from the digits after a decimal mark (`R03 1.5h` is not 5 h) ([#46](https://github.com/mecp-org/MECP/issues/46))
+- **Meaning change:** the R03 bare number yields to person count when those digits start a pax match (`R03 4 pax` is 4 people, not 4 minutes) ([#48](https://github.com/mecp-org/MECP/issues/48))
 
 ### Docs
 - Beacon §B is semantic-only: B01/B02/B03 mean automated distress active, acknowledged, and cancelled — not a mandated client state machine ([#42](https://github.com/mecp-org/MECP/issues/42))

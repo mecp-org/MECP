@@ -35,7 +35,9 @@ The bounded leniency rules:
 1. **All decode aliases MUST be listed in the spec.** No silent aliases.
 2. **Position matters only where self-identification fails** (bare number).
    When several values match, the first by position wins (§6.1 rule 5); a
-   bare number is used only when no unit-bearing value matches.
+   bare number is used only when no unit-bearing value matches. Across
+   conventions, a bare R03 number also yields when those digits start a
+   person-count match (`R03 4 pax` is pax, not minutes; see [#48](https://github.com/mecp-org/MECP/issues/48)).
 3. **Validation is normative before a match is used** (6.1 rule 6).
 4. **Encoders emit canonical forms only**, so every conforming encoder
    interoperates with every conforming decoder without ambiguity.
