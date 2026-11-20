@@ -225,6 +225,31 @@
     "expect": { "pax": 1, "duration": null }
   },
   {
+    "title": "Duration: a bare number that is the start of spaced pax is not a duration",
+    "input": "MECP/2/R03 4 pax",
+    "expect": { "pax": 4, "duration": null }
+  },
+  {
+    "title": "Duration: a bare number after ETA that is the start of spaced pax is not a duration",
+    "input": "MECP/2/R03 ETA 4 pax",
+    "expect": { "pax": 4, "duration": null }
+  },
+  {
+    "title": "Duration: glued pax as the first freetext token is pax only",
+    "input": "MECP/2/R03 4pax",
+    "expect": { "pax": 4, "duration": null }
+  },
+  {
+    "title": "Duration: spaced pax still allows a later unit-bearing duration",
+    "input": "MECP/2/R03 4 pax 45min",
+    "expect": { "pax": 4, "duration": 45 }
+  },
+  {
+    "title": "Duration: a bare number and a later glued pax are both decoded",
+    "input": "MECP/2/R03 45 4pax",
+    "expect": { "duration": 45, "pax": 4 }
+  },
+  {
     "title": "Duration: seconds are not a unit",
     "input": "MECP/2/R03 30s",
     "expect": { "duration": null }
