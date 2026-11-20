@@ -35,14 +35,14 @@ future shared proposals evaluated on their merits.
 Apps still need a sanctioned place for local codes. IANA-style Private Use
 ([RFC 8126](https://www.rfc-editor.org/rfc/rfc8126.html)) carves a range with no
 central assignments; sites avoid collisions within their own scope. MECP can do
-the same with an unused category letter.
+the same with an unused category letter, plus a short app designator so foreign
+clients can optionally dispatch without a vendor TLV.
 
-A first-token “app designator” in freetext was considered so foreign clients
-could optionally dispatch. That pattern is positional (like the R03 bare-number
-duration). Review feedback preferred not to add another positional freetext
-convention, and preferred either a future glyph-based marker or no designator
-in this ADR. This decision omits a designator; apps may still put whatever
-local markers they need in ordinary freetext.
+A glyph-based designator (new sigil beside `@ # ~`) was considered as an
+alternative to a first-token rule. It avoids positional coupling with other
+freetext conventions, but it is a larger vocabulary change. This ADR keeps the
+lighter first-token designator; a glyph MAY supersede it in a later ADR if
+positional scope proves too costly in the field.
 
 ## Decision
 
@@ -68,13 +68,31 @@ local markers they need in ordinary freetext.
   A later proposal that wants a shared code is judged on substance, not on
   whether someone already shipped a private meaning under that ID.
 
-### No app designator in this ADR
+### App designator (normative, scoped)
 
-MECP does **not** define a normative app-designator convention (positional first
-token or new glyph) here. Optional client support for Private Use remains
-app-local: recognise `Uxx` and whatever freetext contract the peer uses.
-A glyph-based designator MAY be proposed in a later ADR if cross-client
-dispatch proves necessary.
+Codes in a message must stay contiguous (§6.1 rule 3), so a designator cannot
+sit between `U` codes. When the code section contains one or more `U[0-9]{2}`
+codes, the **first freetext token** is the app designator:
+
+| | |
+|---|---|
+| Encode | `([a-z][a-z0-9-]{0,31})` (encoders MUST emit lowercase) |
+| Decode | `^([a-z][a-z0-9-]{0,31})` at the start of freetext (first token only) |
+| Encoder | SHOULD emit a designator when emitting any `U` code |
+| Decoder | MAY expose the designator structurally; MAY interpret the remainder of freetext only when it recognises that designator |
+
+The encode alphabet **must start with a letter**, so it does not collide with the
+R03 bare-number duration (digits). `MECP/0/R03 U02 4` has no designator (`4`
+fails the pattern); `MECP/2/U04 rem …` does. Scope is only when a `U` code is
+present, so ordinary leisure freetext is untouched.
+
+MECP does **not** maintain a registry of designator strings (`rem`, `mecp-app`,
+…). Other freetext conventions (`#`, `~`, `@`, `pax`, …) still apply to the whole
+freetext. Example shape:
+
+```
+MECP/2/U04 rem #HH_0123456789abcdef …
+```
 
 ### Path to shared meaning
 
@@ -84,9 +102,11 @@ substitute for that process when shared meaning is the goal.
 
 ## Consequences
 
-- Brief §7 notes letter `U` as Private Use outside the 109/12 shared counts.
-- REM (and any other app) can migrate local status to `Uxx` without MECP
-  adopting their payload schema.
+- Brief §6.1 documents the scoped app-designator convention; §7 notes letter `U`
+  as Private Use outside the 109/12 shared counts.
+- The freetext harness pins the designator patterns and scope behaviour.
+- REM (and any other app) can migrate local status to `Uxx` + designator without
+  MECP adopting their payload schema.
 - A future proposal that needs a shared “household/community status” code is
   evaluated on its merits; this ADR does not bank `B04` for that purpose, and
   does not treat prior private use of an ID as either a claim on that ID or a
@@ -104,5 +124,3 @@ substitute for that process when shared meaning is the goal.
 - Giving `U01`–`U99` MECP-defined meanings or language-pack strings in this
   decision’s scope.
 - Requiring every client to understand every app’s Private Use payload.
-- Treating this ADR as having adopted a positional or glyph app-designator
-  convention.

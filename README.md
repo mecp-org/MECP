@@ -69,7 +69,7 @@ MECP/<severity>/<codes> [freetext]
 | B | Beacon | B01 Distress beacon active |
 | U | Private Use | U01–U99 app-local (no shared MECP meaning) |
 
-See `languages/en.json` for the complete shared code table, or [MECP_Comprehensive_Brief.md](MECP_Comprehensive_Brief.md) for protocol detail. Letter `U` is Private Use ([ADR 0006](docs/adr/0006-private-use-and-b04.md)): not in the language packs.
+See `languages/en.json` for the complete shared code table, or [MECP_Comprehensive_Brief.md](MECP_Comprehensive_Brief.md) for protocol detail. Letter `U` is Private Use ([ADR 0006](docs/adr/0006-private-use-and-b04.md)): not in the language packs; first freetext token is the app designator.
 
 ## Examples
 
@@ -82,7 +82,7 @@ MECP/2/H03 H07 P05 5pax 48.65,20.13         Offering: medical supplies + shelter
 MECP/0/B01 M01 P05 48.65,20.13 @1430        Beacon: automated distress signal with GPS
 MECP/2/B02 R01                               Beacon acknowledged
 MECP/2/B03                                   Cancel beacon — I am OK
-MECP/2/U04 #site-a                           Private Use: app-local code (no shared meaning)
+MECP/2/U04 rem #site-a                       Private Use: app designator rem
 ```
 
 ## Project Structure
