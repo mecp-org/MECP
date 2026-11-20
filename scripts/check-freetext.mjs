@@ -51,7 +51,9 @@ function extractEnvelope(input) {
  * token (full match minus trailing B), per rule 6.
  */
 function firstValidMatch(pattern, freetext, validate) {
-  const re = new RegExp(`(?:^|${B_CLASS})(?:${pattern})(?:${B_CLASS}|$)`);
+  // `d` gives capture indices so Additional Validation can inspect characters
+  // before group 1 (e.g. R03 decimal-fraction rejection).
+  const re = new RegExp(`(?:^|${B_CLASS})(?:${pattern})(?:${B_CLASS}|$)`, 'd');
   let pos = 0;
   while (pos <= freetext.length) {
     const slice = freetext.slice(pos);
@@ -62,7 +64,7 @@ function firstValidMatch(pattern, freetext, validate) {
     const full = m[0];
     const usedRightB = B_ONE.test(full[full.length - 1]);
 
-    if (validate && !validate(m)) {
+    if (validate && !validate(m, { freetext, pos })) {
       pos = Math.max(abs + full.length - (usedRightB ? 1 : 0), abs + 1);
       continue;
     }
@@ -70,6 +72,13 @@ function firstValidMatch(pattern, freetext, validate) {
     return m;
   }
   return null;
+}
+
+/** True when group 1 is the fractional part of a decimal (digit + .|, before it). */
+function isDecimalFraction(freetext, group1Start) {
+  const before = freetext[group1Start - 1];
+  const before2 = freetext[group1Start - 2];
+  return (before === '.' || before === ',') && before2 >= '0' && before2 <= '9';
 }
 
 function validateGps(m) {
@@ -111,13 +120,24 @@ function decodeConvention(name, freetext, codes) {
     spec.decode.forEach((pat, i) => {
       // The bare number (last) is a fallback, used only when no unit-bearing value matches.
       if (best && kinds[i] === 'bare') return;
-      const m = firstValidMatch(
-        pat,
-        freetext,
-        (mm) => toMinutes(kinds[i], mm) > 0 && (kinds[i] !== 'bare' || mm[2] === undefined),
-      );
+      const kind = kinds[i];
+      const m = firstValidMatch(pat, freetext, (mm, ctx) => {
+        if (!(toMinutes(kind, mm) > 0)) return false;
+        if (kind === 'bare') {
+          // Group 2 present (47.3769), or `.`/`,` used as B before more digits (1.5h).
+          if (mm[2] !== undefined) return false;
+          const group1End = ctx.pos + mm.indices[1][1];
+          const sep = freetext[group1End];
+          const next = freetext[group1End + 1];
+          if ((sep === '.' || sep === ',') && next >= '0' && next <= '9') return false;
+          return true;
+        }
+        // Patterns 1–4: reject a number that is only the fractional part of a decimal.
+        const group1Start = ctx.pos + mm.indices[1][0];
+        return !isDecimalFraction(freetext, group1Start);
+      });
       // First by position; on a tie the earlier pattern (already in best) wins.
-      if (m && (!best || m.index < best.m.index)) best = { m, kind: kinds[i] };
+      if (m && (!best || m.index < best.m.index)) best = { m, kind };
     });
     return best ? { duration: toMinutes(best.kind, best.m) } : null;
   }
