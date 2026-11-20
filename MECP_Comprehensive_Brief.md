@@ -415,7 +415,7 @@ A single digit 0-3:
 - **Example:** `MECP/2/C01 R03 45min @en`
 - **Also decoded:** `R03 45`, `R03 ETA 45`, `R03 ETA 45min`, `R03 ETA45min`, `R03 45 min`, `R03 1h30min`, `R03 1h 30min`, `R03 2h`, `R03 2d`
 - **Meaning:** "SAFETY, send rescue, ETA 45 minutes, English"
-- **Additional Validation:** the duration MUST be greater than zero, so `0min` and a bare `0` are not durations. For pattern 5, group 2 MUST be absent, so the `47` of `R03 47.3769,12.1048` is not a duration. There is no upper bound — `2d`, `48h` and `2880min` are the same duration. `30s` is not a duration: seconds are not a unit of this convention. Localised unit words (`分`, `dakika`, `minutos`) are not part of these patterns — they remain freetext unless a client recognises them as a local alias.
+- **Additional Validation:** the duration MUST be greater than zero, so `0min` and a bare `0` are not durations. For pattern 5, group 2 MUST be absent, so the `47` of `R03 47.3769,12.1048` is not a duration; if `.` or `,` after group 1 is taken as a boundary instead, and the next character is a digit, the match also fails (`1.5h` is not 1 minute). For patterns 1–4, the number MUST NOT be the fractional part of a decimal: if the character before group 1 is `.` or `,` and the character before that is a digit, the match fails. There is no upper bound — `2d`, `48h` and `2880min` are the same duration. `30s` is not a duration: seconds are not a unit of this convention. Localised unit words (`分`, `dakika`, `minutos`) are not part of these patterns — they remain freetext unless a client recognises them as a local alias.
 
 ### 6.2 Protocol Vocabulary
 
