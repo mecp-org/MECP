@@ -6,10 +6,9 @@ All notable changes to MECP will be documented in this file.
 
 ### Protocol
 - Letter **U** is Private Use (`U01`–`U99`): no shared MECP meanings, not in language packs ([#50](https://github.com/mecp-org/MECP/issues/50))
-- Scoped **app designator** convention: when any `U` code is present, the first freetext token (`[a-z][a-z0-9-]{0,31}`) names the app so clients MAY dispatch ([#50](https://github.com/mecp-org/MECP/issues/50))
 
 ### Docs
-- [ADR 0006](docs/adr/0006-private-use-and-b04.md): reject adopting FreeTAKTeam REM’s `B04` / `REMCS1:` into MECP; do not one-off-reserve `B04`; establish Private Use `U` + app designator ([#50](https://github.com/mecp-org/MECP/issues/50))
+- [ADR 0006](docs/adr/0006-private-use-and-b04.md): reject adopting FreeTAKTeam REM’s `B04` / `REMCS1:` into MECP; do not one-off-reserve `B04`; establish Private Use `U` (no app-designator convention in this ADR) ([#50](https://github.com/mecp-org/MECP/issues/50))
 
 ---
 

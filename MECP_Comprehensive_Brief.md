@@ -339,7 +339,7 @@ A single digit 0-3:
 6. Additional Validation is normative. Before using a match, a decoder MUST apply the validation for that convention. If the match fails, the decoder MUST ignore it and resume searching from the end of the failed match. A convention that fails Additional Validation MUST NOT invalidate the message, and its text MUST be left in the freetext unchanged. An encoder MUST apply the same validation and MUST NOT emit a value that fails it.
 7. When rendering, a decoder replaces the matched **token** — the match excluding the one-code-point boundary on each side, where present — with its human-readable form, then re-emits the boundary characters. Boundaries are separators and MUST be preserved. Decoders SHOULD also expose each extracted value structurally.
 8. Unicode whitespace (NBSP, U+2000–U+200A, U+3000, U+FEFF, etc.) is handled inconsistently across languages and platforms. Encoders MUST NOT emit it.
-9. A convention MAY be scoped to a code or to a category letter: its patterns apply only when that scope is present in the code section, and its value MUST NOT be decoded otherwise. Duration is scoped to `R03`. App designator is scoped to any Private Use code `U[0-9]{2}`. Every other convention in this section is unscoped.
+9. A convention MAY be scoped to a code: its patterns apply only when that code is present in the code section, and its value MUST NOT be decoded otherwise. Duration is scoped to `R03`; every other convention in this section is unscoped.
 
 #### Person count
 
@@ -397,19 +397,6 @@ A single digit 0-3:
 - **Example:** `MECP/2/C08 #basecamp`
 - **Also decoded:** `#base-camp`, `#base_camp`
 - **Meaning:** "SAFETY, rendezvous at basecamp"
-
-#### App designator (any U code)
-
-Letter `U` is Private Use (see §7). Codes `U01`–`U99` carry no MECP meaning; apps use them locally. When the code section contains one or more `U` codes, the **first freetext token** is the app designator so foreign clients MAY dispatch without understanding the rest of the payload. This convention is **scoped to any `U[0-9]{2}`** (rule 9): without a `U` code, a leading word is ordinary freetext and MUST NOT be decoded as a designator. Codes must stay contiguous (rule 3), so the designator cannot sit between `U` codes. See [ADR 0006](docs/adr/0006-private-use-and-b04.md).
-
-- **Encode:** `([a-z][a-z0-9-]{0,31})` — ASCII lowercase letter, then up to 31 letters, digits or hyphens (encoders MUST emit lowercase).
-- **Decode:** `^([a-z][a-z0-9-]{0,31})` — **first freetext token only** (the `^` anchors the start of the freetext; rule 4 supplies the trailing boundary). `MECP/2/U04 rem #site-a` is designator `rem`; `MECP/2/U04 #site-a rem` is not a designator (`#site-a` fails, and a later `rem` MUST NOT be taken).
-- **Example:** `MECP/2/U04 rem #site-a`
-- **Also decoded:** `MECP/1/M01 U04 rem needs help` (designator `rem`; `M01` remains a shared code)
-- **Meaning:** the designator names the app or product that defines the `U` codes and the remainder of the freetext. MECP does not register designator strings.
-- **Encoder duty:** an encoder that emits any `U` code SHOULD emit a designator. A `U` message with no freetext is still a valid MECP message but is not dispatchable by designator.
-- **Decoder duty:** decoders MAY expose the designator structurally and MAY interpret the remainder of freetext only when they recognise that designator; unknown designators stay opaque. Other conventions (`#`, `~`, `@`, `pax`, …) still apply to the whole freetext.
-- **Additional Validation:** the match MUST begin at the first freetext character (index 0). Group 1 MUST match the encode alphabet (already enforced by the pattern). A match that fails MUST be ignored (rule 6); `#tag` or `REM` as the first token is not a designator.
 
 #### Duration (R03 only)
 
@@ -547,7 +534,7 @@ MECP defines these meanings only. Retransmit schedules, slowing after B02, drill
 
 ### Private Use — letter U (not in the 109)
 
-Letter **`U`** is reserved for **Private Use** ([ADR 0006](docs/adr/0006-private-use-and-b04.md)). Codes `U01`–`U99` are well-formed MECP codes (§6.1 rule 5) but carry **no shared MECP semantics**, are **not** listed above, and have **no** language-pack strings. Apps MAY use them for local meaning. Unallocated IDs in the twelve shared categories (including `B04`–`B99`) remain MECP-owned — apps MUST NOT invent meanings there. When any `U` code is present, the first freetext token is the [app designator](#app-designator-any-u-code).
+Letter **`U`** is reserved for **Private Use** ([ADR 0006](docs/adr/0006-private-use-and-b04.md)). Codes `U01`–`U99` are well-formed MECP codes (§6.1 rule 5) but carry **no shared MECP semantics**, are **not** listed above, and have **no** language-pack strings. Apps MAY use them for local meaning; MECP does not register app mappings. Unallocated IDs in the twelve shared categories (including `B04`–`B99`) remain available for future shared proposals. This ADR does not define an app-designator convention — local markers stay in ordinary freetext.
 
 ---
 

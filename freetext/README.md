@@ -37,7 +37,7 @@ Each element of `tests.json` is:
 }
 ```
 
-- `convention` — which convention to decode (`timestamp`, `reference`, `pax`, `gps`, `callsign`, `language`, `duration`, `appDesignator`), or `message` for envelope validity only.
+- `convention` — which convention to decode (`timestamp`, `reference`, `pax`, `gps`, `callsign`, `language`, `duration`), or `message` for envelope validity only.
 - `input` — full MECP wire string.
 - `expect` — for a named convention, the decoded fields (empty object `{}` means that convention does not decode). For `message`, `{ "valid": true }` or `{ "valid": false }`.
 
