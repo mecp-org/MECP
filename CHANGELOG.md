@@ -4,6 +4,10 @@ All notable changes to MECP will be documented in this file.
 
 ## [Unreleased]
 
+---
+
+## [1.4.1] - 2026-11-20
+
 ### Protocol
 - **Meaning change:** unit-bearing R03 durations must not be read from the digits after a decimal mark (`R03 1.5h` is not 5 h) ([#46](https://github.com/mecp-org/MECP/issues/46))
 
