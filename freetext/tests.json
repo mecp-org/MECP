@@ -195,6 +195,26 @@
     "expect": { "duration": 14 }
   },
   {
+    "title": "Duration: bare number before colon rejects on the next two minute digits only",
+    "input": "MECP/2/R03 14:300",
+    "expect": { "duration": null }
+  },
+  {
+    "title": "Duration: ordinary colon punctuation after a bare number still decodes",
+    "input": "MECP/2/R03 45: on the way",
+    "expect": { "duration": 45 }
+  },
+  {
+    "title": "Duration: clock minutes without @ are not a unit-bearing duration",
+    "input": "MECP/2/R03 14:30h",
+    "expect": { "duration": null }
+  },
+  {
+    "title": "Pax: clock minutes without @ are not a person count",
+    "input": "MECP/1/S01 14:30 pax",
+    "expect": { "pax": null }
+  },
+  {
     "title": "App designator: ETA-shaped first token with U is a designator, not a duration",
     "input": "MECP/2/U04 R03 eta 45",
     "expect": { "appDesignator": "eta", "duration": null }

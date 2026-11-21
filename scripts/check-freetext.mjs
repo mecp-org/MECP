@@ -122,11 +122,15 @@ function isDecimalFraction(freetext, group1Start) {
   return (before === '.' || before === ',') && before2 >= '0' && before2 <= '9';
 }
 
-/** True when group 1 is `@H:MM` minutes (glued forms where timestamp cannot claim). */
-function isColonTimestampMinutes(freetext, group1Start, digits) {
+/**
+ * True when group 1 is the minute field of an `H:MM` / `@H:MM` clock
+ * (with or without `@`; covers glued forms where timestamp cannot claim).
+ */
+function isColonClockMinutes(freetext, group1Start, digits) {
   if (freetext[group1Start - 1] !== ':') return false;
   if (!/^[0-5][0-9]$/.test(digits)) return false;
-  return /@([01]?[0-9]|2[0-3])$/.test(freetext.slice(0, group1Start - 1));
+  // Hour immediately before the colon; `@` is optional.
+  return /(?:^|[^0-9])([01]?[0-9]|2[0-3])$/.test(freetext.slice(0, group1Start - 1));
 }
 
 function validateGps(m) {
@@ -138,7 +142,7 @@ function validateGps(m) {
 function validatePax(m, { freetext, pos }) {
   const group1Start = pos + m.indices[1][0];
   if (isDecimalFraction(freetext, group1Start)) return false;
-  if (isColonTimestampMinutes(freetext, group1Start, m[1])) return false;
+  if (isColonClockMinutes(freetext, group1Start, m[1])) return false;
   return true;
 }
 
@@ -198,7 +202,7 @@ function decodeConvention(name, freetext, codes, claimed) {
         (mm, ctx) => {
           if (!(toMinutes(kind, mm) > 0)) return false;
           const group1Start = ctx.pos + mm.indices[1][0];
-          if (isColonTimestampMinutes(freetext, group1Start, mm[1])) return false;
+          if (isColonClockMinutes(freetext, group1Start, mm[1])) return false;
           if (kind === 'bare') {
             // Group 2 present (47.3769), or `.`/`,` used as B before more digits (1.5h).
             if (mm[2] !== undefined) return false;
@@ -207,6 +211,8 @@ function decodeConvention(name, freetext, codes, claimed) {
             const next = freetext[group1End + 1];
             if ((sep === '.' || sep === ',') && next >= '0' && next <= '9') return false;
             // Clock-shaped `H:MM` without `@` is not a bare ETA (`R03 14:30`).
+            // Only the next two characters need form a minute value; further digits
+            // do not revive the match (`R03 14:300` also fails).
             if (sep === ':' && /^[0-5][0-9]/.test(freetext.slice(group1End + 1))) return false;
             // Overlap with an earlier person-count claim is handled by rule 5 claiming.
             return true;
