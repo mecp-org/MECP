@@ -558,7 +558,7 @@ A deliberate and non-obvious design decision in MECP is the inclusion of "mundan
 
 ### Why Drill Codes Exist
 
-Emergency communication systems fail when people encounter them for the first time during an actual emergency. If the first time you ever compose an MECP message is when someone is bleeding on a mountainside, you will fumble. Drill codes (D01-D04) allow communities to run regular practice exercises:
+Emergency communication systems fail when people encounter them for the first time during an actual emergency. If the first time you ever compose an MECP message is when someone is bleeding on a mountainside, you will fumble. Drill codes (D01–D05) allow communities to run regular practice exercises:
 
 ```
 MECP/3/D01 M01 M07 C01 2pax Training scenario @en
@@ -566,7 +566,7 @@ MECP/3/D01 M01 M07 C01 2pax Training scenario @en
 
 This message is clearly flagged as a drill (D01 sets a machine-readable `isDrill` flag in the decoder), so it won't trigger real emergency responses, but it lets participants practice the exact same compose flow they would use in a real emergency.
 
-Note: D04 ("Ignore previous -- sent in error") does **not** set the drill flag. It is a retraction code, not a drill indicator.
+`isDrill` is set only by the start codes **D01** (drill) and **D02** (test). **D03** (end of drill) and **D05** (end of test) close an exercise and do **not** set the flag by themselves. **D04** ("Ignore previous — sent in error") also does not: it is a retraction code, not a drill indicator.
 
 ### Why Leisure Codes Exist
 
