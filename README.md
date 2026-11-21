@@ -16,18 +16,6 @@ See [Releases](https://github.com/mecp-org/MECP/releases) for the current protoc
 
 Pin the §6.1 decode suite from a **release tag** (or the `freetext-conformance-vX.Y.Z.zip` asset on that release), not floating `main`. See [`freetext/README.md`](freetext/README.md) for the case shape and a CI sketch. When MECP adds discrepancy pins, bump your pin to the new tag so unknown clients pick up the cases in their own CI.
 
-## Implementations
-
-Reference implementations live in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app):
-
-- **TypeScript engine** (`@mecp/engine`) — encode/decode, beacon helpers, tests
-- **Web tool (PWA)** — offline compose/decode HTML tool
-- **Expo / React Native app** — Meshtastic AIDL client (compose, inbox, beacon)
-- **Examples** — Python, Arduino/ESP32, shell
-- **Design plan** — product/UX design notes
-
-That repo submodules this protocol repository for language packs (`vendor/mecp`). mecp-app was built against pre-release spec items and is not yet compliant with the current spec. Third-party implementations are listed in the section below.
-
 ## Quick Start
 
 **Decode a message:**
@@ -95,7 +83,7 @@ scripts/                     Validators + cut-release (run by `npm run validate`
 MECP_Comprehensive_Brief.md  Protocol narrative and design rationale
 ```
 
-Clients and reference code: [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app).
+Clients: see [Known implementations](#known-implementations).
 
 ## Why This Exists
 
@@ -128,7 +116,7 @@ Czech, Dutch, English, Farsi, French, German, Italian, Japanese, Norwegian, Poli
 
 ## Known implementations
 
-- **mecp-app** — [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app): reference MECP stack with an Expo/React Native Meshtastic client, offline web PWA, TypeScript `@mecp/engine`, and language examples.
+- **mecp-app** — [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app): MECP stack with an Expo/React Native Meshtastic client, offline web PWA, TypeScript `@mecp/engine`, and language examples. Built against pre-release spec items; not yet compliant with the current spec.
 - **mesh-client** — [Colorado-Mesh/mesh-client](https://github.com/Colorado-Mesh/mesh-client): cross-platform Electron desktop client for Meshtastic, MeshCore, and Reticulum with MECP compose, decode, and incident handling.
 - **TAK bridge** — [Colorado-Mesh/meshcore-tak-bridge](https://github.com/Colorado-Mesh/meshcore-tak-bridge): Android bridge from a MeshCore companion radio to ATAK that surfaces inbound MECP messages in English and as severity-coloured map markers.
 - **REM** — [FreeTAKTeam/reticulum_mobile_emergency_management](https://github.com/FreeTAKTeam/reticulum_mobile_emergency_management): Android situational-awareness app for Reticulum mesh that uses MECP for events, household status, and cross-language field messaging.

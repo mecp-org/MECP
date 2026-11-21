@@ -4,7 +4,7 @@
 **Version:** 1.4.1
 **Date:** November 2026
 **Repository:** [github.com/mecp-org/MECP](https://github.com/mecp-org/MECP) (protocol + languages)
-**Implementations:** [github.com/mecp-org/mecp-app](https://github.com/mecp-org/mecp-app) (engine, web, Expo app, examples)
+**Implementations:** see the [README](README.md#known-implementations)
 **License:** CC0 (protocol) | CC BY 4.0 (translations) | GPLv3 (implementations in mecp-app)
 **Status:** Protocol and 21 language packs published; clients in mecp-app
 
@@ -498,7 +498,7 @@ MECP/3/D01 M01 M09 5pax This is a training exercise
 
 ### 6.4 The Encoder and Decoder
 
-Reference encoder/decoder implementations (TypeScript `@mecp/engine`, Python, Arduino, shell) live in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app). They provide `encode` / `decode` helpers, drill and beacon detection, and the 200-byte limit — but the **wire format documented in this brief is authoritative**. Anyone may reimplement MECP from this specification alone (CC0).
+Encoder/decoder implementations are listed in the [README](README.md#known-implementations). The **wire format documented in this brief is authoritative**. Anyone may reimplement MECP from this specification alone (CC0).
 
 ---
 
@@ -629,7 +629,7 @@ Each language file is a JSON document containing: localised severity labels, all
 
 ### 9.2 Implementations
 
-Reference implementations live in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app). The [README](README.md#implementations) lists them along with third-party clients and their per-form decode behaviour.
+The [README](README.md#known-implementations) lists mecp-app and third-party clients and their per-form decode behaviour.
 
 ### 9.3 Project Infrastructure (this repository)
 
@@ -657,7 +657,7 @@ The React Native app will integrate directly with the Meshtastic Android app via
 
 ### For Firmware Developers
 
-Reference implementations are in [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app). You can:
+Implementations include [mecp-org/mecp-app](https://github.com/mecp-org/mecp-app). You can:
 
 - Import `@mecp/engine` from that repository into any JavaScript/TypeScript project
 - Use the Python / Arduino / shell examples there
