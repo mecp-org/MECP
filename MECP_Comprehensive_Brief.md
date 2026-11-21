@@ -504,19 +504,19 @@ Reference encoder/decoder implementations (TypeScript `@mecp/engine`, Python, Ar
 
 ## 7. The Full Code Table
 
-MECP defines **109 codes** across **12 categories**. Each code is a single letter (category) plus two digits. The English text of each code is in [`languages/en.json`](languages/en.json), the single source of truth.
+MECP defines **120 codes** across **12 categories**. Each code is a single letter (category) plus two digits. The English text of each code is in [`languages/en.json`](languages/en.json), the single source of truth.
 
-### M — Medical (16 codes)
-`M01` `M02` `M03` `M04` `M05` `M06` `M07` `M08` `M09` `M10` `M11` `M12` `M13` `M14` `M15` `M16`
+### M — Medical (20 codes)
+`M01` `M02` `M03` `M04` `M05` `M06` `M07` `M08` `M09` `M10` `M11` `M12` `M13` `M14` `M15` `M16` `M17` `M18` `M19` `M20`
 
-### T — Terrain / Infrastructure (17 codes)
-`T01` `T02` `T03` `T04` `T05` `T06` `T07` `T08` `T09` `T10` `T11` `T12` `T13` `T14` `T15` `T16` `T17`
+### T — Terrain / Infrastructure (20 codes)
+`T01` `T02` `T03` `T04` `T05` `T06` `T07` `T08` `T09` `T10` `T11` `T12` `T13` `T14` `T15` `T16` `T17` `T18` `T19` `T20`
 
-### W — Weather / Environment (6 codes)
-`W01` `W02` `W03` `W04` `W05` `W06`
+### W — Weather / Environment (8 codes)
+`W01` `W02` `W03` `W04` `W05` `W06` `W07` `W08`
 
-### S — Supplies (6 codes)
-`S01` `S02` `S03` `S04` `S05` `S06`
+### S — Supplies (7 codes)
+`S01` `S02` `S03` `S04` `S05` `S06` `S07`
 
 ### P — Position / Movement (7 codes)
 `P01` `P02` `P03` `P04` `P05` `P06` `P07`
@@ -527,8 +527,8 @@ MECP defines **109 codes** across **12 categories**. Each code is a single lette
 ### R — Response (7 codes)
 `R01` `R02` `R03` `R04` `R05` `R06` `R07`
 
-### D — Drill / Test (4 codes)
-`D01` `D02` `D03` `D04`
+### D — Drill / Test (5 codes)
+`D01` `D02` `D03` `D04` `D05`
 
 ### L — Life / Leisure (20 codes)
 `L01` `L02` `L03` `L04` `L05` `L06` `L07` `L08` `L09` `L10` `L11` `L12` `L13` `L14` `L15` `L16` `L17` `L18` `L19` `L20`
@@ -546,7 +546,7 @@ The Beacon category is a PLB-style (Personal Locator Beacon) distress vocabulary
 
 MECP defines these meanings only. Retransmit schedules, slowing after B02, drill auto-stop, how B02/B03 are bound to a specific sender, authenticity, and airtime policy are **non-normative client and transport concerns** — see [ADR 0005](docs/adr/0005-beacon-semantics-vs-client.md).
 
-### Private Use — letter U (not in the 109)
+### Private Use — letter U (not in the 120)
 
 Letter **`U`** is reserved for **Private Use** ([ADR 0006](docs/adr/0006-private-use-and-b04.md)). Codes `U01`–`U99` are well-formed MECP codes (§6.1 rule 5) but carry **no shared MECP semantics**, are **not** listed above, and have **no** language-pack strings. Apps MAY use them for local meaning. Unallocated IDs in the twelve shared categories (including `B04`–`B99`) remain available for future shared proposals. When any `U` code is present, the first freetext token is the [app designator](#app-designator-any-u-code).
 
@@ -625,7 +625,7 @@ Every MECP code, severity level, category name, and UI string has been translate
 | Traditional Chinese | zh-tw | CJK | LTR |
 | Farsi (Persian) | fa | Arabic | **RTL** |
 
-Each language file is a JSON document containing: localised severity labels, all 12 category names, all 109 code descriptions, and UI strings for the application interface.
+Each language file is a JSON document containing: localised severity labels, all 12 category names, all 120 code descriptions, and UI strings for the application interface.
 
 ### 9.2 Implementations
 
@@ -673,7 +673,7 @@ The language files are CC BY 4.0 licensed. See [CONTRIBUTING.md](CONTRIBUTING.md
 
 MECP can be adopted as a messaging standard for any organisation that uses or plans to use LoRa mesh networks for field communications. The protocol is public domain -- you can implement it in your own tools, train your teams on the code table, and print reference cards without any licensing constraints.
 
-The 109-code table covers the scenarios most commonly encountered in disaster response, search and rescue, wilderness safety, and community emergency communication. The four severity levels align with existing emergency triage conventions.
+The 120-code table covers the scenarios most commonly encountered in disaster response, search and rescue, wilderness safety, and community emergency communication. The four severity levels align with existing emergency triage conventions.
 
 ---
 
@@ -682,7 +682,7 @@ The 109-code table covers the scenarios most commonly encountered in disaster re
 The project roadmap includes:
 
 - **Mobile app completion:** Finalising the Meshtastic Bluetooth integration, iOS support, and app store distribution
-- **Community feedback:** The code table (109 codes, 12 categories) is open for community review and proposals via GitHub issues
+- **Community feedback:** The code table (120 codes, 12 categories) is open for community review and proposals via GitHub issues
 - **Additional language support:** The template system makes adding new languages straightforward -- community contributions welcome
 - **Cross-platform adoption:** Encouraging other mesh networking platforms (Reticulum/Sideband, etc.) to support MECP message encoding/decoding
 

@@ -5,6 +5,7 @@ All notable changes to MECP will be documented in this file.
 ## [Unreleased]
 
 ### Protocol
+- **11 new codes** (109 → **120**): `M17` Heat stroke, `M18` Possible stroke, `M19` Head trauma, `M20` Medical evacuation needed, `S07` Need shelter / space for [N]pax, `D05` End of test, `T18` Railroad track damage / derailment, `T19` Dam damaged / collapsed, `T20` Power line / tower down, `W07` Tornado, `W08` Tropical cyclone / hurricane — suggested by [@rneese1969](https://github.com/rneese1969) (Rich, N4CNR) via [#7](https://github.com/mecp-org/MECP/issues/7); EmComm remaps / jurisdiction-specific codes rejected (append-only, worldwide)
 - Letter **U** is Private Use (`U01`–`U99`): no shared MECP meanings, not in language packs ([#50](https://github.com/mecp-org/MECP/issues/50))
 - Scoped **app designator** convention: when any `U` code is present, the first freetext token (`[a-z][a-z0-9-]{0,31}`) names the app so clients MAY dispatch ([#50](https://github.com/mecp-org/MECP/issues/50))
 - **Meaning change:** freetext conventions decode in a fixed order and claim their tokens; a later match that overlaps claimed characters fails (rule 6). GPS/timestamp before person count, and person count before duration, so coordinates and `@H:MM` are not re-read as headcounts or ETAs ([#52](https://github.com/mecp-org/MECP/issues/52), subsumes the digit-overlap intent of [#48](https://github.com/mecp-org/MECP/issues/48))
