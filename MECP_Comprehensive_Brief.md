@@ -349,6 +349,7 @@ A single digit 0-3:
 - **Also decoded:** `4 pax`, `4PAX`, `4Pax.`, `04pax`
 - **Meaning:** "URGENT, 4 people need water"
 - **Protocol keyword:** `pax` is a protocol keyword, not an English word. It is never translated on the wire and is not affected by the language hint; a localised form (`4人`, `4 Personen`) is ordinary freetext.
+- **Additional Validation:** group 1 MUST NOT be the minute field of an immediately preceding timestamp that used a colon. If the character before group 1 is `:`, and immediately before that colon is a valid timestamp hour (`[01]?[0-9]` or `2[0-3]`) preceded by `@`, and group 1 is exactly `[0-5][0-9]`, the match fails (rule 6). So `MECP/1/S01 @6:30 pax` is a timestamp only (`06:30`); the bare word `pax` does not make the minutes a person count. A separate count still decodes: `MECP/1/S01 @06:30 4 pax` is 4 people at 06:30.
 
 #### GPS coordinates
 

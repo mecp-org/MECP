@@ -87,6 +87,16 @@ function validateGps(m) {
   return Number.isFinite(lat) && Number.isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
 }
 
+/** Reject minutes of `@H:MM` claimed as a person count (`@6:30 pax` is time only). */
+function validatePax(m, { freetext, pos }) {
+  const group1Start = pos + m.indices[1][0];
+  if (freetext[group1Start - 1] !== ':') return true;
+  const minutes = m[1];
+  if (!/^[0-5][0-9]$/.test(minutes)) return true;
+  const beforeColon = freetext.slice(0, group1Start - 1);
+  return !/@([01]?[0-9]|2[0-3])$/.test(beforeColon);
+}
+
 function validateCallsign(m) {
   return m[1].length <= 12;
 }
@@ -162,7 +172,13 @@ function decodeConvention(name, freetext, codes) {
   }
 
   const validate =
-    spec.validate === 'gps' ? validateGps : spec.validate === 'callsign' ? validateCallsign : null;
+    spec.validate === 'gps'
+      ? validateGps
+      : spec.validate === 'callsign'
+        ? validateCallsign
+        : spec.validate === 'pax'
+          ? validatePax
+          : null;
   const m = firstValidMatch(spec.decode, freetext, validate);
   if (!m) return null;
   if (name === 'timestamp') {

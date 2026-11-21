@@ -125,6 +125,26 @@
     "expect": { "pax": null }
   },
   {
+    "title": "Pax: timestamp minutes after a colon are not a person count",
+    "input": "MECP/1/S01 @6:30 pax",
+    "expect": { "timestamp": "06:30", "pax": null }
+  },
+  {
+    "title": "Pax: two-digit hour timestamp minutes are not a person count",
+    "input": "MECP/1/S01 @14:30 pax",
+    "expect": { "timestamp": "14:30", "pax": null }
+  },
+  {
+    "title": "Pax: a count after a colon timestamp still decodes",
+    "input": "MECP/1/S01 @06:30 4 pax",
+    "expect": { "timestamp": "06:30", "pax": 4 }
+  },
+  {
+    "title": "Pax: a count before a colon timestamp still decodes",
+    "input": "MECP/2/T05 Rockfall near #base-camp, 3 PAX turned back @6:30.",
+    "expect": { "pax": 3, "timestamp": "06:30", "reference": "base-camp" }
+  },
+  {
     "title": "GPS: an out-of-range position is skipped and the next valid one is used",
     "input": "MECP/3/L06 95.0,200.0 47.3,8.5",
     "expect": { "gps": { "lat": 47.3, "lon": 8.5 } }
