@@ -1,6 +1,6 @@
 # Freetext conformance suite
 
-Shared §6.1 decode vectors for MECP implementers. Pin a **release tag** (or the release zip), run every case against your decoder in CI, and bump the pin when you want new discrepancy cases.
+Shared §6.1 decode vectors for MECP implementers. The normative wire rules live in [`SPEC.md`](../SPEC.md). Pin a **release tag** (or the release zip), run every case against your decoder in CI, and bump the pin when you want new discrepancy cases.
 
 ## Files
 

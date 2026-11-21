@@ -15,7 +15,11 @@ All notable changes to MECP will be documented in this file.
 - **Meaning change:** person count and unit-bearing duration must not read colon-clock minutes even without `@` (`14:30 pax`, `14:30h`)
 
 ### Docs
+- Documentation structure for three audiences ([#55](https://github.com/mecp-org/MECP/issues/55), [#56](https://github.com/mecp-org/MECP/pull/56)): normative wire format in [`SPEC.md`](SPEC.md) with stable §6 numbering; brief §6/§7 stubs; README reordered (Protocol version after Known implementations); demote mecp-app from “reference implementation”; citation form `MECP v{semver} §{section}`; [`docs/EXTENDING.md`](docs/EXTENDING.md) and [`docs/adr/README.md`](docs/adr/README.md)
 - [ADR 0006](docs/adr/0006-private-use-and-b04.md): reject adopting FreeTAKTeam REM’s `B04` / `REMCS1:` into MECP; do not one-off-reserve `B04`; establish Private Use `U` + app designator ([#50](https://github.com/mecp-org/MECP/issues/50))
+
+### Infrastructure
+- `validate-spec` / `check-freetext` / `cut-release` read and bump [`SPEC.md`](SPEC.md) as the normative home (patterns and §6.1 rule 4 boundary text)
 
 ---
 

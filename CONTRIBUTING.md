@@ -30,7 +30,7 @@ MECP codes are permanent. A code once assigned never changes meaning. This is by
 
 ### Changing the Protocol
 
-The protocol lives in [`MECP_Comprehensive_Brief.md`](MECP_Comprehensive_Brief.md). Changes to it require:
+The normative wire format lives in [`SPEC.md`](SPEC.md). Design rationale lives in [`MECP_Comprehensive_Brief.md`](MECP_Comprehensive_Brief.md). For the full extender path, see [`docs/EXTENDING.md`](docs/EXTENDING.md). Changes require:
 
 1. **New vocabulary MUST be ASCII** and either inherited from GMDSS/SMCP or justified in a new ADR under [`docs/adr/`](docs/adr/).
 2. **No localised token may appear in normative text.** Localised input is freetext; recognition is a local alias, not the protocol.
@@ -44,6 +44,7 @@ When proposing a change:
 1. Open an issue first (e.g. "Add …") — never silently edit normative text in a feature PR.
 2. Link the issue and the ADR that governs the decision.
 3. Include the before/after message strings that must keep working.
+4. Prefer citations of the form `MECP v{semver} §{section}` (e.g. `MECP v1.4.1 §6.1 rule 4`).
 
 ### Bug Reports
 
@@ -75,7 +76,7 @@ Maintainers cut from GitHub Actions — no manual version edits, tags, or releas
 
 1. Land protocol / language / freetext PRs on `main` with notes under `## [Unreleased]` in [`CHANGELOG.md`](CHANGELOG.md).
 2. Actions → **Cut release** → enter the next semver (e.g. `1.5.0`).
-3. The workflow bumps `package.json` / lock / brief version, folds Unreleased into that version, stamps [`freetext/manifest.json`](freetext/manifest.json), runs `npm run validate`, commits `release: vX.Y.Z` on `main`, tags `vX.Y.Z`, creates the GitHub Release, and uploads `freetext-conformance-vX.Y.Z.zip`.
+3. The workflow bumps `package.json` / lock / brief and [`SPEC.md`](SPEC.md) versions, folds Unreleased into that version, stamps [`freetext/manifest.json`](freetext/manifest.json), runs `npm run validate`, commits `release: vX.Y.Z` on `main`, tags `vX.Y.Z`, creates the GitHub Release, and uploads `freetext-conformance-vX.Y.Z.zip`.
 
 Refuse to cut if Unreleased is empty or the tag already exists.
 

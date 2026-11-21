@@ -23,4 +23,4 @@ What actually happened.
 ## Context
 - MECP version: (e.g. 1.4.0 / v1.4.0)
 - Language pack (if applicable):
-- Where it is wrong: (brief section, `languages/xx.json` key, or validation script)
+- Where it is wrong: (`SPEC.md` §, brief section, `languages/xx.json` key, or validation script)

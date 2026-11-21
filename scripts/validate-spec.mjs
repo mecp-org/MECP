@@ -1,5 +1,5 @@
 /**
- * Validate MECP_Comprehensive_Brief.md (and the README's examples) for basic protocol invariants.
+ * Validate SPEC.md, MECP_Comprehensive_Brief.md, and README examples for protocol invariants.
  */
 import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -21,35 +21,50 @@ function extractMecpExamples(md) {
   return [...inline, ...fenced];
 }
 
-/** Codes listed in §7, one backticked line per category. */
-function extractSection7Codes(brief) {
-  const section = brief.slice(brief.indexOf('## 7. '), brief.indexOf('## 8. '));
-  return [...section.matchAll(/^`[A-Z]\d{2}`(?: `[A-Z]\d{2}`)*$/gm)].flatMap((m) =>
-    m[0].replaceAll('`', '').split(' '),
-  );
-}
-
 function main() {
   const brief = readFileSync(join(ROOT, 'MECP_Comprehensive_Brief.md'), 'utf8');
+  const spec = readFileSync(join(ROOT, 'SPEC.md'), 'utf8');
+  const readme = readFileSync(join(ROOT, 'README.md'), 'utf8');
   const errors = [];
-
-  const listed = extractSection7Codes(brief);
-  const listedSet = new Set(listed);
-  const missing = EN_CODES.filter((c) => !listedSet.has(c));
-  const extra = listed.filter((c) => !EN_CODES.includes(c));
-  if (missing.length) errors.push(`§7 is missing codes from en.json: ${missing.join(', ')}`);
-  if (extra.length) errors.push(`§7 lists codes not in en.json: ${extra.join(', ')}`);
-  if (listedSet.size !== listed.length) errors.push('§7 lists a code more than once');
 
   const categories = new Set(EN_CODES.map((c) => c[0]));
   if (!brief.includes(`**${EN_CODES.length} codes** across **${categories.size} categories**`)) {
-    errors.push(`§7 must say "**${EN_CODES.length} codes** across **${categories.size} categories**"`);
+    errors.push(`Brief §7 must say "**${EN_CODES.length} codes** across **${categories.size} categories**"`);
   }
-  if (!brief.includes(`**Version:** ${VERSION}\n`)) errors.push(`Brief version must match package.json (${VERSION})`);
+  if (!spec.includes(`**Version:** ${VERSION}\n`)) {
+    errors.push(`SPEC version must match package.json (${VERSION})`);
+  }
+  if (!brief.includes(`**Version:** ${VERSION}\n`)) {
+    errors.push(`Brief version must match package.json (${VERSION})`);
+  }
 
-  const readme = readFileSync(join(ROOT, 'README.md'), 'utf8');
-  // Skip format templates with <placeholders>
-  const examples = [...extractMecpExamples(brief), ...extractMecpExamples(readme)].filter((t) => !t.includes('<'));
+  for (const heading of [
+    '### 6.1 Message Format',
+    '### 6.2 Protocol Vocabulary',
+    '### 6.3 Example Messages',
+    '### 6.4 The Encoder and Decoder',
+    '### 6.5 Codes, Beacon, and Private Use',
+  ]) {
+    if (!spec.includes(heading)) errors.push(`SPEC must include "${heading}"`);
+  }
+
+  for (const heading of ['## Appendix A. SI Units', '### 5.3 Lineage: GMDSS']) {
+    if (!brief.includes(heading)) errors.push(`Brief must include "${heading}"`);
+  }
+
+  // Brief §6 must point at SPEC and must not still hold the full normative dump.
+  if (!brief.includes('[`SPEC.md`](SPEC.md)') && !brief.includes('[SPEC.md](SPEC.md)')) {
+    errors.push('Brief §6 must link to SPEC.md');
+  }
+  if (brief.includes('### 6.1 Message Format')) {
+    errors.push('Brief must not duplicate ### 6.1 Message Format (lives in SPEC.md)');
+  }
+
+  const examples = [
+    ...extractMecpExamples(spec),
+    ...extractMecpExamples(brief),
+    ...extractMecpExamples(readme),
+  ].filter((t) => !t.includes('<'));
   for (const text of examples) {
     const m = text.match(MESSAGE_RE);
     if (!m) {
@@ -72,17 +87,15 @@ function main() {
     }
   }
 
-  for (const heading of ['## Appendix A. SI Units', '### 5.3 Lineage: GMDSS', '### 6.2 Protocol Vocabulary']) {
-    if (!brief.includes(heading)) errors.push(`Brief must include "${heading}"`);
-  }
-
   if (errors.length > 0) {
-    console.error(`Brief validation failed with ${errors.length} error(s):\n`);
+    console.error(`Spec validation failed with ${errors.length} error(s):\n`);
     for (const err of errors) console.error(`  - ${err}`);
     process.exit(1);
   }
 
-  console.log(`Brief validation passed (${listed.length} codes in §7, ${examples.length} examples).`);
+  console.log(
+    `Spec validation passed (${EN_CODES.length} codes in en.json, ${examples.length} examples).`,
+  );
 }
 
 main();
