@@ -58,7 +58,7 @@ positional scope proves too costly in the field.
 ### Private Use letter U
 
 - Letter **`U`** is Private Use. Codes `U01`–`U99` carry **no MECP semantics**.
-- They are **not** listed in §7’s 109-code shared table and have **no** language-pack
+- They are **not** listed in §7’s shared code table and have **no** language-pack
   strings. Decoders already MUST preserve well-formed unknown codes (§6.1).
 - Apps MAY emit `Uxx` for local meaning. MECP does **not** register which app
   owns which `Uxx`. Collisions are the apps’ problem (classic Private Use).
@@ -103,7 +103,7 @@ substitute for that process when shared meaning is the goal.
 ## Consequences
 
 - Brief §6.1 documents the scoped app-designator convention; §7 notes letter `U`
-  as Private Use outside the 109/12 shared counts.
+  as Private Use outside the shared 12-category counts.
 - The freetext harness pins the designator patterns and scope behaviour.
 - REM (and any other app) can migrate local status to `Uxx` + designator without
   MECP adopting their payload schema.
