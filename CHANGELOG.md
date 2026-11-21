@@ -7,6 +7,10 @@ All notable changes to MECP will be documented in this file.
 ### Protocol
 - Letter **U** is Private Use (`U01`–`U99`): no shared MECP meanings, not in language packs ([#50](https://github.com/mecp-org/MECP/issues/50))
 - Scoped **app designator** convention: when any `U` code is present, the first freetext token (`[a-z][a-z0-9-]{0,31}`) names the app so clients MAY dispatch ([#50](https://github.com/mecp-org/MECP/issues/50))
+- **Meaning change:** freetext conventions decode in a fixed order and claim their tokens; a later match that overlaps claimed characters fails (rule 6). GPS/timestamp before person count, and person count before duration, so coordinates and `@H:MM` are not re-read as headcounts or ETAs ([#52](https://github.com/mecp-org/MECP/issues/52), subsumes the digit-overlap intent of [#48](https://github.com/mecp-org/MECP/issues/48))
+- **Meaning change:** person count must not read a decimal fraction (`1.5 pax` is not 5 people) or glued `@H:MM` minutes (`@6:30pax`); unit-bearing duration must not read those same colon minutes (`@6:30h`, `@14:30min`)
+- **Meaning change:** an R03 bare number must not be the hour of a colon clock (`R03 14:30` / `ETA 14:30` are not 14-minute ETAs; use `@1430` for time); the next two characters after `:` are what count (`R03 14:300` also fails)
+- **Meaning change:** person count and unit-bearing duration must not read colon-clock minutes even without `@` (`14:30 pax`, `14:30h`)
 
 ### Docs
 - [ADR 0006](docs/adr/0006-private-use-and-b04.md): reject adopting FreeTAKTeam REM’s `B04` / `REMCS1:` into MECP; do not one-off-reserve `B04`; establish Private Use `U` + app designator ([#50](https://github.com/mecp-org/MECP/issues/50))

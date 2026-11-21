@@ -15,6 +15,18 @@ const BRIEF = readFileSync(join(ROOT, 'MECP_Comprehensive_Brief.md'), 'utf8');
 const patterns = JSON.parse(readFileSync(join(ROOT, 'freetext/patterns.json'), 'utf8'));
 const tests = JSON.parse(readFileSync(join(ROOT, 'freetext/tests.json'), 'utf8'));
 
+/** §6.1 rule 5 decode order (claimed tokens; later overlaps fail). */
+const DECODE_ORDER = [
+  'appDesignator',
+  'gps',
+  'timestamp',
+  'language',
+  'callsign',
+  'reference',
+  'pax',
+  'duration',
+];
+
 /** Boundary class B, read from §6.1 rule 4 so the harness cannot drift from the brief. */
 function boundaryClass() {
   const rule = BRIEF.split('\n').find((line) => line.startsWith('4. Decoding patterns'));
@@ -45,12 +57,33 @@ function extractEnvelope(input) {
   return { severity: m[1], codes: m[2].split(' '), freetext: m[3] ?? '' };
 }
 
+/** Token extent: match minus one-code-point boundary on each side (rule 7). */
+function tokenSpan(m, absIndex) {
+  const full = m[0];
+  let lo = absIndex;
+  let hi = absIndex + full.length;
+  if (full.length > 0 && B_ONE.test(full[0])) lo += 1;
+  if (hi > lo && B_ONE.test(full[full.length - 1])) hi -= 1;
+  return [lo, hi];
+}
+
+function overlapsClaimed(lo, hi, claimed) {
+  for (let i = lo; i < hi; i++) {
+    if (claimed.has(i)) return true;
+  }
+  return false;
+}
+
+function claimRange(claimed, lo, hi) {
+  for (let i = lo; i < hi; i++) claimed.add(i);
+}
+
 /**
- * Find the first decode match that passes validate().
- * Wrapped as (?:^|B)(pattern)(?:B|$). On validation failure, resume after the
+ * Find the first decode match that passes validate() and does not overlap claimed.
+ * Wrapped as (?:^|B)(pattern)(?:B|$). On validation/overlap failure, resume after the
  * token (full match minus trailing B), per rule 6.
  */
-function firstValidMatch(pattern, freetext, validate) {
+function firstValidMatch(pattern, freetext, validate, claimed) {
   // `d` gives capture indices so Additional Validation can inspect characters
   // before group 1 (e.g. R03 decimal-fraction rejection).
   const re = new RegExp(`(?:^|${B_CLASS})(?:${pattern})(?:${B_CLASS}|$)`, 'd');
@@ -63,12 +96,20 @@ function firstValidMatch(pattern, freetext, validate) {
     const abs = pos + m.index;
     const full = m[0];
     const usedRightB = B_ONE.test(full[full.length - 1]);
+    const [lo, hi] = tokenSpan(m, abs);
+    const resume = Math.max(abs + full.length - (usedRightB ? 1 : 0), abs + 1);
 
+    if (overlapsClaimed(lo, hi, claimed)) {
+      pos = resume;
+      continue;
+    }
     if (validate && !validate(m, { freetext, pos })) {
-      pos = Math.max(abs + full.length - (usedRightB ? 1 : 0), abs + 1);
+      pos = resume;
       continue;
     }
     m.index = abs;
+    m.tokenLo = lo;
+    m.tokenHi = hi;
     return m;
   }
   return null;
@@ -81,10 +122,28 @@ function isDecimalFraction(freetext, group1Start) {
   return (before === '.' || before === ',') && before2 >= '0' && before2 <= '9';
 }
 
+/**
+ * True when group 1 is the minute field of an `H:MM` / `@H:MM` clock
+ * (with or without `@`; covers glued forms where timestamp cannot claim).
+ */
+function isColonClockMinutes(freetext, group1Start, digits) {
+  if (freetext[group1Start - 1] !== ':') return false;
+  if (!/^[0-5][0-9]$/.test(digits)) return false;
+  // Hour immediately before the colon; `@` is optional.
+  return /(?:^|[^0-9])([01]?[0-9]|2[0-3])$/.test(freetext.slice(0, group1Start - 1));
+}
+
 function validateGps(m) {
   const lat = Number(m[1]);
   const lon = Number(m[2]);
   return Number.isFinite(lat) && Number.isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
+}
+
+function validatePax(m, { freetext, pos }) {
+  const group1Start = pos + m.indices[1][0];
+  if (isDecimalFraction(freetext, group1Start)) return false;
+  if (isColonClockMinutes(freetext, group1Start, m[1])) return false;
+  return true;
 }
 
 function validateCallsign(m) {
@@ -117,16 +176,17 @@ function scopeApplies(spec, codes) {
   return true;
 }
 
-function decodeConvention(name, freetext, codes) {
+/** @returns {{ value: object, lo: number, hi: number } | null} */
+function decodeConvention(name, freetext, codes, claimed) {
   const spec = patterns[name];
   if (!spec) throw new Error(`unknown convention ${name}`);
   if (!scopeApplies(spec, codes)) return null;
 
   if (name === 'appDesignator') {
     // First freetext token only (Additional Validation: match index 0).
-    const m = firstValidMatch(spec.decode, freetext, null);
+    const m = firstValidMatch(spec.decode, freetext, null, claimed);
     if (!m || m.index !== 0) return null;
-    return { appDesignator: m[1] };
+    return { value: { appDesignator: m[1] }, lo: m.tokenLo, hi: m.tokenHi };
   }
 
   if (name === 'duration') {
@@ -136,44 +196,70 @@ function decodeConvention(name, freetext, codes) {
       // The bare number (last) is a fallback, used only when no unit-bearing value matches.
       if (best && kinds[i] === 'bare') return;
       const kind = kinds[i];
-      const m = firstValidMatch(pat, freetext, (mm, ctx) => {
-        if (!(toMinutes(kind, mm) > 0)) return false;
-        if (kind === 'bare') {
-          // Group 2 present (47.3769), or `.`/`,` used as B before more digits (1.5h).
-          if (mm[2] !== undefined) return false;
+      const m = firstValidMatch(
+        pat,
+        freetext,
+        (mm, ctx) => {
+          if (!(toMinutes(kind, mm) > 0)) return false;
           const group1Start = ctx.pos + mm.indices[1][0];
-          const group1End = ctx.pos + mm.indices[1][1];
-          const sep = freetext[group1End];
-          const next = freetext[group1End + 1];
-          if ((sep === '.' || sep === ',') && next >= '0' && next <= '9') return false;
-          // Yield to person count on the same digits (`R03 4 pax` is pax, not minutes).
-          const paxAtDigits = firstValidMatch(patterns.pax.decode, freetext.slice(group1Start), null);
-          if (paxAtDigits && paxAtDigits.index === 0) return false;
-          return true;
-        }
-        // Patterns 1–4: reject a number that is only the fractional part of a decimal.
-        const group1Start = ctx.pos + mm.indices[1][0];
-        return !isDecimalFraction(freetext, group1Start);
-      });
+          if (isColonClockMinutes(freetext, group1Start, mm[1])) return false;
+          if (kind === 'bare') {
+            // Group 2 present (47.3769), or `.`/`,` used as B before more digits (1.5h).
+            if (mm[2] !== undefined) return false;
+            const group1End = ctx.pos + mm.indices[1][1];
+            const sep = freetext[group1End];
+            const next = freetext[group1End + 1];
+            if ((sep === '.' || sep === ',') && next >= '0' && next <= '9') return false;
+            // Clock-shaped `H:MM` without `@` is not a bare ETA (`R03 14:30`).
+            // Only the next two characters need form a minute value; further digits
+            // do not revive the match (`R03 14:300` also fails).
+            if (sep === ':' && /^[0-5][0-9]/.test(freetext.slice(group1End + 1))) return false;
+            // Overlap with an earlier person-count claim is handled by rule 5 claiming.
+            return true;
+          }
+          // Patterns 1–4: reject a number that is only the fractional part of a decimal.
+          return !isDecimalFraction(freetext, group1Start);
+        },
+        claimed,
+      );
       // First by position; on a tie the earlier pattern (already in best) wins.
       if (m && (!best || m.index < best.m.index)) best = { m, kind };
     });
-    return best ? { duration: toMinutes(best.kind, best.m) } : null;
+    if (!best) return null;
+    return {
+      value: { duration: toMinutes(best.kind, best.m) },
+      lo: best.m.tokenLo,
+      hi: best.m.tokenHi,
+    };
   }
 
   const validate =
-    spec.validate === 'gps' ? validateGps : spec.validate === 'callsign' ? validateCallsign : null;
-  const m = firstValidMatch(spec.decode, freetext, validate);
+    spec.validate === 'gps'
+      ? validateGps
+      : spec.validate === 'callsign'
+        ? validateCallsign
+        : spec.validate === 'pax'
+          ? validatePax
+          : null;
+  const m = firstValidMatch(spec.decode, freetext, validate, claimed);
   if (!m) return null;
+  let value;
   if (name === 'timestamp') {
-    return { timestamp: `${String(Number(m[1])).padStart(2, '0')}:${m[2]}` };
+    value = { timestamp: `${String(Number(m[1])).padStart(2, '0')}:${m[2]}` };
+  } else if (name === 'pax') {
+    value = { pax: Number(m[1]) };
+  } else if (name === 'gps') {
+    value = { gps: { lat: Number(m[1]), lon: Number(m[2]) } };
+  } else if (name === 'language') {
+    value = { language: m[1].toLowerCase().replace(/_/g, '-') };
+  } else if (name === 'callsign') {
+    value = { callsign: m[1].toUpperCase() };
+  } else if (name === 'reference') {
+    value = { reference: m[1] };
+  } else {
+    return null;
   }
-  if (name === 'pax') return { pax: Number(m[1]) };
-  if (name === 'gps') return { gps: { lat: Number(m[1]), lon: Number(m[2]) } };
-  if (name === 'language') return { language: m[1].toLowerCase().replace(/_/g, '-') };
-  if (name === 'callsign') return { callsign: m[1].toUpperCase() };
-  if (name === 'reference') return { reference: m[1] };
-  return null;
+  return { value, lo: m.tokenLo, hi: m.tokenHi };
 }
 
 function assertPatternsInBrief() {
@@ -212,9 +298,12 @@ function decodeMessage(input) {
   const env = extractEnvelope(input);
   if (!env) return null;
   const got = {};
-  for (const name of Object.keys(patterns)) {
-    if (name === 'message') continue;
-    Object.assign(got, decodeConvention(name, env.freetext, env.codes) ?? {});
+  const claimed = new Set();
+  for (const name of DECODE_ORDER) {
+    const result = decodeConvention(name, env.freetext, env.codes, claimed);
+    if (!result) continue;
+    Object.assign(got, result.value);
+    claimRange(claimed, result.lo, result.hi);
   }
   return got;
 }
@@ -222,6 +311,15 @@ function decodeMessage(input) {
 const errors = [];
 for (const m of assertPatternsInBrief()) {
   errors.push(`pattern not found verbatim in brief: ${m}`);
+}
+
+for (const name of DECODE_ORDER) {
+  if (!patterns[name]) errors.push(`DECODE_ORDER names unknown convention: ${name}`);
+}
+for (const name of Object.keys(patterns)) {
+  if (name !== 'message' && !DECODE_ORDER.includes(name)) {
+    errors.push(`convention ${name} missing from DECODE_ORDER`);
+  }
 }
 
 for (const t of tests) {
