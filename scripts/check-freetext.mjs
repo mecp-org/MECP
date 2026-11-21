@@ -206,6 +206,8 @@ function decodeConvention(name, freetext, codes, claimed) {
             const sep = freetext[group1End];
             const next = freetext[group1End + 1];
             if ((sep === '.' || sep === ',') && next >= '0' && next <= '9') return false;
+            // Clock-shaped `H:MM` without `@` is not a bare ETA (`R03 14:30`).
+            if (sep === ':' && /^[0-5][0-9]/.test(freetext.slice(group1End + 1))) return false;
             // Overlap with an earlier person-count claim is handled by rule 5 claiming.
             return true;
           }

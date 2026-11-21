@@ -180,6 +180,21 @@
     "expect": { "timestamp": "14:30", "duration": null }
   },
   {
+    "title": "Duration: a bare number before colon clock digits is not an ETA",
+    "input": "MECP/2/R03 14:30",
+    "expect": { "duration": null }
+  },
+  {
+    "title": "Duration: ETA-prefixed bare number before colon clock digits is not an ETA",
+    "input": "MECP/2/R03 ETA 14:30",
+    "expect": { "duration": null }
+  },
+  {
+    "title": "Duration: a bare number without a following colon clock still decodes",
+    "input": "MECP/2/R03 14",
+    "expect": { "duration": 14 }
+  },
+  {
     "title": "App designator: ETA-shaped first token with U is a designator, not a duration",
     "input": "MECP/2/U04 R03 eta 45",
     "expect": { "appDesignator": "eta", "duration": null }
