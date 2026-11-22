@@ -1,6 +1,6 @@
 /**
  * Conformance harness for §6.1 freetext patterns.
- * - Asserts every pattern string in freetext/patterns.json appears verbatim in the brief
+ * - Asserts every pattern string in freetext/patterns.json appears verbatim in SPEC.md
  * - Decodes every convention in each freetext/tests.json input
  *   with RE2-compatible JS RegExp (no lookaround) and compares the result with expect;
  *   an absent key or a null value means the value is not decoded, and expect: null means
@@ -11,7 +11,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const BRIEF = readFileSync(join(ROOT, 'MECP_Comprehensive_Brief.md'), 'utf8');
+const SPEC = readFileSync(join(ROOT, 'SPEC.md'), 'utf8');
 const patterns = JSON.parse(readFileSync(join(ROOT, 'freetext/patterns.json'), 'utf8'));
 const tests = JSON.parse(readFileSync(join(ROOT, 'freetext/tests.json'), 'utf8'));
 
@@ -27,11 +27,11 @@ const DECODE_ORDER = [
   'duration',
 ];
 
-/** Boundary class B, read from §6.1 rule 4 so the harness cannot drift from the brief. */
+/** Boundary class B, read from §6.1 rule 4 so the harness cannot drift from SPEC.md. */
 function boundaryClass() {
-  const rule = BRIEF.split('\n').find((line) => line.startsWith('4. Decoding patterns'));
+  const rule = SPEC.split('\n').find((line) => line.startsWith('4. Decoding patterns'));
   if (!rule?.includes(', a space') || !/one of `[^`]+`/.test(rule)) {
-    throw new Error('Cannot read the boundary list B from §6.1 rule 4 in the brief; update boundaryClass() to match its wording.');
+    throw new Error('Cannot read the boundary list B from §6.1 rule 4 in SPEC.md; update boundaryClass() to match its wording.');
   }
   const controls = [...rule.slice(0, rule.indexOf(', a space')).matchAll(/`(\\[tnfr])`/g)].map((m) => m[1]);
   const ascii = rule.match(/one of `([^`]+)`/)[1].split(' ').map((c) => c.replace(/[\\[\]^-]/g, '\\$&'));
@@ -262,7 +262,7 @@ function decodeConvention(name, freetext, codes, claimed) {
   return { value, lo: m.tokenLo, hi: m.tokenHi };
 }
 
-function assertPatternsInBrief() {
+function assertPatternsInSpec() {
   const missing = [];
   for (const [name, spec] of Object.entries(patterns)) {
     const list = [];
@@ -271,7 +271,7 @@ function assertPatternsInBrief() {
     if (typeof spec.decode === 'string') list.push(spec.decode);
     if (Array.isArray(spec.decode)) list.push(...spec.decode);
     for (const p of list) {
-      if (!BRIEF.includes(p)) missing.push(`${name}: ${p}`);
+      if (!SPEC.includes(p)) missing.push(`${name}: ${p}`);
     }
   }
   return missing;
@@ -309,8 +309,8 @@ function decodeMessage(input) {
 }
 
 const errors = [];
-for (const m of assertPatternsInBrief()) {
-  errors.push(`pattern not found verbatim in brief: ${m}`);
+for (const m of assertPatternsInSpec()) {
+  errors.push(`pattern not found verbatim in SPEC.md: ${m}`);
 }
 
 for (const name of DECODE_ORDER) {
@@ -335,4 +335,4 @@ if (errors.length) {
   console.error(`freetext check failed (${errors.length}):\n` + errors.map((e) => `  - ${e}`).join('\n'));
   process.exit(1);
 }
-console.log(`freetext check passed (${tests.length} cases, patterns present in brief).`);
+console.log(`freetext check passed (${tests.length} cases, patterns present in SPEC.md).`);

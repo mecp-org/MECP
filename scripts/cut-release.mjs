@@ -54,12 +54,16 @@ function bumpPackageLock(ver) {
   writeFileSync(lockPath, `${JSON.stringify(lock, null, 2)}\n`);
 }
 
-function bumpBrief(ver) {
-  const rel = 'MECP_Comprehensive_Brief.md';
+function bumpVersionLine(rel, ver, label) {
   const text = read(rel);
   const next = text.replace(/^\*\*Version:\*\* .+$/m, `**Version:** ${ver}`);
-  if (next === text) throw new Error('Could not find **Version:** line in the brief');
+  if (next === text) throw new Error(`Could not find **Version:** line in ${label}`);
   write(rel, next);
+}
+
+function bumpBrief(ver) {
+  bumpVersionLine('MECP_Comprehensive_Brief.md', ver, 'the brief');
+  bumpVersionLine('SPEC.md', ver, 'SPEC.md');
 }
 
 function foldChangelog(ver) {
