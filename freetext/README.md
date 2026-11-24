@@ -7,6 +7,7 @@ Shared §6.1 decode vectors for MECP implementers. The normative wire rules live
 | File | Role |
 |------|------|
 | `tests.json` | Decode cases |
+| `canonical.json` | Canonical-form cases: each `tests.json` input with its [§6.6](../SPEC.md#66-canonical-form) canonical string, or `null` if it is not an MECP message |
 | `patterns.json` | Reference encode/decode patterns (optional if you only need vectors) |
 | `manifest.json` | `protocolVersion`, `schemaVersion`, file pointers |
 

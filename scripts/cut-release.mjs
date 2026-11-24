@@ -94,6 +94,7 @@ function stampManifest(ver, schemaVersion) {
     schemaVersion,
     generatedAt: new Date().toISOString(),
     tests: 'tests.json',
+    canonical: 'canonical.json',
     patterns: 'patterns.json',
   };
   write(rel, `${JSON.stringify(manifest, null, 2)}\n`);
@@ -105,7 +106,7 @@ function buildZip(ver) {
   if (existsSync(zipPath)) {
     // overwrite on re-run
   }
-  const files = ['manifest.json', 'README.md', 'tests.json', 'patterns.json'];
+  const files = ['manifest.json', 'README.md', 'tests.json', 'canonical.json', 'patterns.json'];
   for (const f of files) {
     if (!existsSync(join(ROOT, 'freetext', f))) {
       throw new Error(`missing freetext/${f}`);
