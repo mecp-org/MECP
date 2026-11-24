@@ -339,30 +339,18 @@ function runSuite() {
   console.log(`freetext check passed (${tests.length} cases, patterns present in SPEC.md).`);
 }
 
-const USAGE = 'usage: node scripts/check-freetext.mjs [--decode [input ...]]';
+const USAGE = 'usage: node scripts/check-freetext.mjs [--decode < messages.txt]';
 
 /**
- * Inputs for --decode from stdin, as JSON so that \r and \n inside an input survive:
- * either one array of strings, or one JSON string per line (blank lines skipped).
+ * --decode: run the reference decoder on messages from stdin, one per line (blank lines
+ * skipped), instead of the suite. Prints one JSON line per message, {"input": ..., "decoded": ...},
+ * where decoded is every convention value decoded (as in tests.json expect), or null when it is
+ * not an MECP message.
  */
-function readStdinInputs() {
-  const text = readFileSync(0, 'utf8').trim();
-  const inputs = text.startsWith('[')
-    ? JSON.parse(text)
-    : text.split('\n').filter((line) => line.trim() !== '').map((line) => JSON.parse(line));
-  if (!Array.isArray(inputs) || inputs.some((s) => typeof s !== 'string')) {
-    throw new Error('stdin must be a JSON array of strings or one JSON string per line');
-  }
-  return inputs;
-}
-
-/**
- * --decode: run the reference decoder on your own inputs instead of the suite.
- * Inputs are the remaining arguments as raw strings, or JSON on stdin when there are none.
- * Prints one JSON line per input, {"input": ..., "decoded": ...}, where decoded is every
- * convention value decoded (as in tests.json expect), or null when it is not an MECP message.
- */
-function runDecode(inputs) {
+function runDecode() {
+  const inputs = readFileSync(0, 'utf8')
+    .split(/\r?\n/)
+    .filter((line) => line.trim() !== '');
   const lines = inputs.map((input) => JSON.stringify({ input, decoded: decodeMessage(input) }));
   if (lines.length) process.stdout.write(lines.join('\n') + '\n');
 }
@@ -370,8 +358,8 @@ function runDecode(inputs) {
 const args = process.argv.slice(2);
 if (args.length === 0) {
   runSuite();
-} else if (args[0] === '--decode') {
-  runDecode(args.length > 1 ? args.slice(1) : readStdinInputs());
+} else if (args.length === 1 && args[0] === '--decode') {
+  runDecode();
 } else {
   console.error(USAGE);
   process.exitCode = 2;

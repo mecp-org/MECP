@@ -62,10 +62,8 @@ When MECP finds a new edge case it lands in a PR, ships in the next cut, and app
 
 This repo’s oracle is `npm run test-freetext` (`scripts/check-freetext.mjs`). It is the normative RE2-style reference, not a required client dependency.
 
-To see what the reference decoder makes of your own inputs (for example, to compare it with your decoder on a bug's neighbours), use `--decode`. It prints one JSON line per input, `{"input": ..., "decoded": ...}`, with `decoded` in the same shape as a case's `expect` (`null` means not an MECP message), and does not run the suite:
+To see what the reference decoder makes of your own messages (for example, to compare it with your decoder on a bug's neighbours), pipe them to `--decode`, one per line. It prints one JSON line per message, `{"input": ..., "decoded": ...}`, with `decoded` in the same shape as a case's `expect` (`null` means not an MECP message), and does not run the suite:
 
 ```bash
-node scripts/check-freetext.mjs --decode 'MECP/1/M01 4pax @1430' 'not mecp'
-# Inputs that hold \r or \n: JSON on stdin, one string per line or one array
-printf '%s\n' '"MECP/1/M01 4pax\r\n"' | node scripts/check-freetext.mjs --decode
+echo 'MECP/1/M01 4pax @1430' | node scripts/check-freetext.mjs --decode
 ```
