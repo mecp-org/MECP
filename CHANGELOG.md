@@ -13,6 +13,7 @@ All notable changes to MECP will be documented in this file.
 - **Meaning change:** person count must not read a decimal fraction (`1.5 pax` is not 5 people) or glued `@H:MM` minutes (`@6:30pax`); unit-bearing duration must not read those same colon minutes (`@6:30h`, `@14:30min`)
 - **Meaning change:** an R03 bare number must not be the hour of a colon clock (`R03 14:30` / `ETA 14:30` are not 14-minute ETAs; use `@1430` for time); the next two characters after `:` are what count (`R03 14:300` also fails)
 - **Meaning change:** person count and unit-bearing duration must not read colon-clock minutes even without `@` (`14:30 pax`, `14:30h`)
+- Canonical form (§6.6): one encoded string per decoded message — codes in ASCII order, conventions in decode order, then the remaining freetext; [`freetext/canonical.json`](freetext/canonical.json) gives the canonical string for every `tests.json` input ([#57](https://github.com/mecp-org/MECP/issues/57))
 
 ### Docs
 - Documentation structure for three audiences ([#55](https://github.com/mecp-org/MECP/issues/55), [#56](https://github.com/mecp-org/MECP/pull/56)): normative wire format in [`SPEC.md`](SPEC.md) with stable §6 numbering; brief §6/§7 stubs; README reordered (Protocol version after Known implementations); demote mecp-app from “reference implementation”; citation form `MECP v{semver} §{section}`; [`docs/EXTENDING.md`](docs/EXTENDING.md) and [`docs/adr/README.md`](docs/adr/README.md)
@@ -20,6 +21,7 @@ All notable changes to MECP will be documented in this file.
 
 ### Infrastructure
 - `validate-spec` / `check-freetext` / `cut-release` read and bump [`SPEC.md`](SPEC.md) as the normative home (patterns and §6.1 rule 4 boundary text)
+- `cut-release` ships `canonical.json` in the conformance zip and lists it in `manifest.json`
 
 ---
 

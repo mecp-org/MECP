@@ -1,0 +1,547 @@
+[
+  {
+    "title": "Timestamp: out-of-range values are skipped and the first valid one is used",
+    "input": "MECP/3/L06 @2460 @1400 @1530",
+    "canonical": "MECP/3/L06 @1400 @2460 @1530"
+  },
+  {
+    "title": "Timestamp: an out-of-range value is not decoded",
+    "input": "MECP/3/L06 @9999",
+    "canonical": "MECP/3/L06 @9999"
+  },
+  {
+    "title": "Timestamp: a three-digit value implies a leading zero hour",
+    "input": "MECP/3/L01 @123",
+    "canonical": "MECP/3/L01 @0123"
+  },
+  {
+    "title": "Timestamp: trailing punctuation is a boundary",
+    "input": "MECP/2/T05 @1430,",
+    "canonical": "MECP/2/T05 @1430 ,"
+  },
+  {
+    "title": "Timestamp: a sigil inside a word is not decoded",
+    "input": "MECP/2/T05 meet@1430",
+    "canonical": "MECP/2/T05 meet@1430"
+  },
+  {
+    "title": "Timestamp: an equals sign is not a boundary",
+    "input": "MECP/3/L06 eta=@1430",
+    "canonical": "MECP/3/L06 eta=@1430"
+  },
+  {
+    "title": "Reference: trailing punctuation is a boundary",
+    "input": "MECP/2/C08 #base-camp,",
+    "canonical": "MECP/2/C08 #base-camp ,"
+  },
+  {
+    "title": "Reference: parentheses are boundaries",
+    "input": "MECP/2/C08 (#tag)",
+    "canonical": "MECP/2/C08 #tag ()"
+  },
+  {
+    "title": "Reference: the full tag is kept, not truncated",
+    "input": "MECP/2/C08 #basecamp",
+    "canonical": "MECP/2/C08 #basecamp"
+  },
+  {
+    "title": "Reference: an ideographic space (U+3000) is a boundary",
+    "input": "MECP/2/C08 #hut\u3000ok",
+    "canonical": "MECP/2/C08 #hut ok"
+  },
+  {
+    "title": "Reference: an Arabic comma (U+060C) is a boundary",
+    "input": "MECP/2/C08 #hut\u060Cok",
+    "canonical": "MECP/2/C08 #hut \u060Cok"
+  },
+  {
+    "title": "Reference: a right double quotation mark (U+201D) is a boundary",
+    "input": "MECP/2/C08 #hut\u201Dok",
+    "canonical": "MECP/2/C08 #hut \u201Dok"
+  },
+  {
+    "title": "Reference: an ideographic comma (U+3001) is a boundary",
+    "input": "MECP/2/C08 #hut\u3001ok",
+    "canonical": "MECP/2/C08 #hut \u3001ok"
+  },
+  {
+    "title": "Reference: a fullwidth comma (U+FF0C) is a boundary",
+    "input": "MECP/2/C08 #hut\uFF0Cok",
+    "canonical": "MECP/2/C08 #hut \uFF0Cok"
+  },
+  {
+    "title": "Reference: a slash is not a boundary",
+    "input": "MECP/2/C08 #hut2/basecamp",
+    "canonical": "MECP/2/C08 #hut2/basecamp"
+  },
+  {
+    "title": "Reference: a fragment inside a URL is not decoded",
+    "input": "MECP/3/L06 see https://example.org/#notes",
+    "canonical": "MECP/3/L06 see https://example.org/#notes"
+  },
+  {
+    "title": "Pax: letters after the unit prevent a match",
+    "input": "MECP/1/S01 3paxmore",
+    "canonical": "MECP/1/S01 3paxmore"
+  },
+  {
+    "title": "Pax: zero fails validation and the next value is used",
+    "input": "MECP/1/S01 0pax 2pax",
+    "canonical": "MECP/1/S01 2pax 0pax"
+  },
+  {
+    "title": "Pax: leading zeros are ignored",
+    "input": "MECP/1/S01 04pax",
+    "canonical": "MECP/1/S01 4pax"
+  },
+  {
+    "title": "Pax: parentheses are boundaries",
+    "input": "MECP/1/S01 (4pax)",
+    "canonical": "MECP/1/S01 4pax ()"
+  },
+  {
+    "title": "Pax: the unit is case-insensitive and a trailing period is a boundary",
+    "input": "MECP/1/S01 4Pax.",
+    "canonical": "MECP/1/S01 4pax ."
+  },
+  {
+    "title": "Pax: a no-break space (U+00A0) is a boundary",
+    "input": "MECP/1/S01 4pax\u00A0water",
+    "canonical": "MECP/1/S01 4pax water"
+  },
+  {
+    "title": "Pax: a vertical tab (U+000B) is not a boundary",
+    "input": "MECP/1/S01 4pax\u000bwater",
+    "canonical": "MECP/1/S01 4pax\u000bwater"
+  },
+  {
+    "title": "Pax: the first value wins",
+    "input": "MECP/1/S01 2pax 5pax",
+    "canonical": "MECP/1/S01 2pax 5pax"
+  },
+  {
+    "title": "Pax: an asterisk is not a boundary",
+    "input": "MECP/1/S01 3pax*",
+    "canonical": "MECP/1/S01 3pax*"
+  },
+  {
+    "title": "Claim order: timestamp minutes are not a person count",
+    "input": "MECP/1/S01 @6:30 pax",
+    "canonical": "MECP/1/S01 @0630 pax"
+  },
+  {
+    "title": "Claim order: two-digit hour timestamp minutes are not a person count",
+    "input": "MECP/1/S01 @14:30 pax",
+    "canonical": "MECP/1/S01 @1430 pax"
+  },
+  {
+    "title": "Claim order: a count after a colon timestamp still decodes",
+    "input": "MECP/1/S01 @06:30 4 pax",
+    "canonical": "MECP/1/S01 @0630 4pax"
+  },
+  {
+    "title": "Claim order: a count before a colon timestamp still decodes",
+    "input": "MECP/2/T05 Rockfall near #base-camp, 3 PAX turned back @6:30.",
+    "canonical": "MECP/2/T05 @0630 #base-camp 3pax Rockfall near , turned back ."
+  },
+  {
+    "title": "Claim order: GPS longitude digits are not a person count",
+    "input": "MECP/0/M01 47.3769,8.5417 pax",
+    "canonical": "MECP/0/M01 47.3769,8.5417 pax"
+  },
+  {
+    "title": "Pax: a decimal fraction is not a person count",
+    "input": "MECP/1/S01 1.5 pax",
+    "canonical": "MECP/1/S01 1.5 pax"
+  },
+  {
+    "title": "Pax: a comma decimal fraction is not a person count",
+    "input": "MECP/1/S01 2,5 pax",
+    "canonical": "MECP/1/S01 2,5 pax"
+  },
+  {
+    "title": "Pax: glued timestamp minutes are not a person count",
+    "input": "MECP/1/S01 @6:30pax",
+    "canonical": "MECP/1/S01 @6:30pax"
+  },
+  {
+    "title": "Duration: glued hour after colon timestamp minutes is not a duration",
+    "input": "MECP/2/R03 @6:30h",
+    "canonical": "MECP/2/R03 @6:30h"
+  },
+  {
+    "title": "Duration: glued min after colon timestamp minutes is not a duration",
+    "input": "MECP/2/R03 @14:30min",
+    "canonical": "MECP/2/R03 @14:30min"
+  },
+  {
+    "title": "Duration: spaced min after colon timestamp is time only",
+    "input": "MECP/2/R03 @14:30 min",
+    "canonical": "MECP/2/R03 @1430 min"
+  },
+  {
+    "title": "Duration: a bare number before colon clock digits is not an ETA",
+    "input": "MECP/2/R03 14:30",
+    "canonical": "MECP/2/R03 14:30"
+  },
+  {
+    "title": "Duration: ETA-prefixed bare number before colon clock digits is not an ETA",
+    "input": "MECP/2/R03 ETA 14:30",
+    "canonical": "MECP/2/R03 ETA 14:30"
+  },
+  {
+    "title": "Duration: a bare number without a following colon clock still decodes",
+    "input": "MECP/2/R03 14",
+    "canonical": "MECP/2/R03 14min"
+  },
+  {
+    "title": "Duration: bare number before colon rejects on the next two minute digits only",
+    "input": "MECP/2/R03 14:300",
+    "canonical": "MECP/2/R03 14:300"
+  },
+  {
+    "title": "Duration: ordinary colon punctuation after a bare number still decodes",
+    "input": "MECP/2/R03 45: on the way",
+    "canonical": "MECP/2/R03 45min : on the way"
+  },
+  {
+    "title": "Duration: clock minutes without @ are not a unit-bearing duration",
+    "input": "MECP/2/R03 14:30h",
+    "canonical": "MECP/2/R03 14:30h"
+  },
+  {
+    "title": "Pax: clock minutes without @ are not a person count",
+    "input": "MECP/1/S01 14:30 pax",
+    "canonical": "MECP/1/S01 14:30 pax"
+  },
+  {
+    "title": "App designator: ETA-shaped first token with U is a designator, not a duration",
+    "input": "MECP/2/U04 R03 eta 45",
+    "canonical": "MECP/2/R03 U04 eta 45"
+  },
+  {
+    "title": "GPS: an out-of-range position is skipped and the next valid one is used",
+    "input": "MECP/3/L06 95.0,200.0 47.3,8.5",
+    "canonical": "MECP/3/L06 47.3,8.5 95.0,200.0"
+  },
+  {
+    "title": "GPS: integers with a decimal comma are not a position",
+    "input": "MECP/3/L02 2,5 km",
+    "canonical": "MECP/3/L02 2,5 km"
+  },
+  {
+    "title": "GPS: a plus sign and a space after the comma are accepted",
+    "input": "MECP/0/M04 +48.8566, 2.3522",
+    "canonical": "MECP/0/M04 48.8566,2.3522"
+  },
+  {
+    "title": "GPS: a latitude just above 90 is not decoded",
+    "input": "MECP/0/M04 90.0001,0.0",
+    "canonical": "MECP/0/M04 90.0001,0.0"
+  },
+  {
+    "title": "GPS: letters before the position prevent a match",
+    "input": "MECP/0/M01 x48.65,20.13",
+    "canonical": "MECP/0/M01 x48.65,20.13"
+  },
+  {
+    "title": "Callsign: a prefix separated by a slash is kept",
+    "input": "MECP/3/L20 ~DL/OK1ABC",
+    "canonical": "MECP/3/L20 ~DL/OK1ABC"
+  },
+  {
+    "title": "Callsign: one longer than 12 characters is skipped and the next valid one is used",
+    "input": "MECP/3/L20 ~ABCDEFGHIJKLM ~OK1ABC",
+    "canonical": "MECP/3/L20 ~OK1ABC ~ABCDEFGHIJKLM"
+  },
+  {
+    "title": "Callsign: exactly 12 characters is accepted",
+    "input": "MECP/3/L20 ~ABCDEFGHIJKL",
+    "canonical": "MECP/3/L20 ~ABCDEFGHIJKL"
+  },
+  {
+    "title": "Callsign: an APRS/AX.25 SSID is not decoded, and the message is still valid",
+    "input": "MECP/3/L20 ~W1AW-9",
+    "canonical": "MECP/3/L20 ~W1AW-9"
+  },
+  {
+    "title": "Language: an underscore region tag is normalised to lowercase with a hyphen",
+    "input": "MECP/3/L04 @zh_CN",
+    "canonical": "MECP/3/L04 @zh-cn"
+  },
+  {
+    "title": "Language: an uppercase tag is normalised to lowercase",
+    "input": "MECP/3/L04 @DE",
+    "canonical": "MECP/3/L04 @de"
+  },
+  {
+    "title": "Duration: minutes",
+    "input": "MECP/2/R03 45min",
+    "canonical": "MECP/2/R03 45min"
+  },
+  {
+    "title": "Duration: days are converted to minutes, with no upper bound",
+    "input": "MECP/2/R03 2d",
+    "canonical": "MECP/2/R03 2d"
+  },
+  {
+    "title": "Duration: hours are converted to minutes",
+    "input": "MECP/2/R03 48h",
+    "canonical": "MECP/2/R03 2d"
+  },
+  {
+    "title": "Duration: a large minute count is not capped",
+    "input": "MECP/2/R03 2880min",
+    "canonical": "MECP/2/R03 2d"
+  },
+  {
+    "title": "Duration: an ETA prefix is accepted",
+    "input": "MECP/2/R03 ETA 45min",
+    "canonical": "MECP/2/R03 45min"
+  },
+  {
+    "title": "Duration: a bare number as the first freetext token is minutes",
+    "input": "MECP/2/R03 45",
+    "canonical": "MECP/2/R03 45min"
+  },
+  {
+    "title": "Duration: R03 applies when it is not the first code, alongside a position",
+    "input": "MECP/2/C01 R03 P05 47.3769,12.1048 45min",
+    "canonical": "MECP/2/C01 P05 R03 47.3769,12.1048 45min"
+  },
+  {
+    "title": "Duration: not decoded without R03",
+    "input": "MECP/3/L06 45min",
+    "canonical": "MECP/3/L06 45min"
+  },
+  {
+    "title": "Duration: a bare number that is not the first freetext token is not decoded",
+    "input": "MECP/2/C01 R03 1pax 45",
+    "canonical": "MECP/2/C01 R03 1pax 45"
+  },
+  {
+    "title": "Duration: a bare number that is the start of spaced pax is not a duration",
+    "input": "MECP/2/R03 4 pax",
+    "canonical": "MECP/2/R03 4pax"
+  },
+  {
+    "title": "Duration: a bare number after ETA that is the start of spaced pax is not a duration",
+    "input": "MECP/2/R03 ETA 4 pax",
+    "canonical": "MECP/2/R03 4pax ETA"
+  },
+  {
+    "title": "Duration: glued pax as the first freetext token is pax only",
+    "input": "MECP/2/R03 4pax",
+    "canonical": "MECP/2/R03 4pax"
+  },
+  {
+    "title": "Duration: spaced pax still allows a later unit-bearing duration",
+    "input": "MECP/2/R03 4 pax 45min",
+    "canonical": "MECP/2/R03 4pax 45min"
+  },
+  {
+    "title": "Duration: a bare number and a later glued pax are both decoded",
+    "input": "MECP/2/R03 45 4pax",
+    "canonical": "MECP/2/R03 4pax 45min"
+  },
+  {
+    "title": "Duration: seconds are not a unit",
+    "input": "MECP/2/R03 30s",
+    "canonical": "MECP/2/R03 30s"
+  },
+  {
+    "title": "Duration: a value in seconds is skipped and the next value is used",
+    "input": "MECP/2/R03 30s 45min",
+    "canonical": "MECP/2/R03 45min 30s"
+  },
+  {
+    "title": "Duration: a position as the first freetext token is not a bare number",
+    "input": "MECP/2/R03 47.3769,12.1048",
+    "canonical": "MECP/2/R03 47.3769,12.1048"
+  },
+  {
+    "title": "Duration: a bare number followed by a period is minutes",
+    "input": "MECP/2/R03 45.",
+    "canonical": "MECP/2/R03 45min ."
+  },
+  {
+    "title": "Duration: a zero value is skipped and the bare number is used",
+    "input": "MECP/2/R03 45 0h",
+    "canonical": "MECP/2/R03 45min 0h"
+  },
+  {
+    "title": "Duration: a value with a unit is preferred over a bare number",
+    "input": "MECP/2/R03 45 2h",
+    "canonical": "MECP/2/R03 2h 45"
+  },
+  {
+    "title": "Duration: the first value by position wins (days before minutes)",
+    "input": "MECP/2/R03 2d 45min",
+    "canonical": "MECP/2/R03 2d 45min"
+  },
+  {
+    "title": "Duration: the first value by position wins (minutes before hours)",
+    "input": "MECP/2/R03 45min 2h",
+    "canonical": "MECP/2/R03 45min 2h"
+  },
+  {
+    "title": "Duration: hours and minutes separated by a space are combined",
+    "input": "MECP/2/R03 1h 30min",
+    "canonical": "MECP/2/R03 1h30min"
+  },
+  {
+    "title": "Duration: a space between the number and the unit is accepted",
+    "input": "MECP/2/R03 2 h",
+    "canonical": "MECP/2/R03 2h"
+  },
+  {
+    "title": "Duration: a decimal hour is not read from its fractional part",
+    "input": "MECP/2/R03 1.5h",
+    "canonical": "MECP/2/R03 1.5h"
+  },
+  {
+    "title": "Duration: a decimal with a comma is not read from its fractional part",
+    "input": "MECP/2/R03 2,5h",
+    "canonical": "MECP/2/R03 2,5h"
+  },
+  {
+    "title": "Duration: a decimal below one is not read from its fractional part",
+    "input": "MECP/2/R03 0.5h",
+    "canonical": "MECP/2/R03 0.5h"
+  },
+  {
+    "title": "Duration: a decimal day is not read from its fractional part",
+    "input": "MECP/2/R03 1.25d",
+    "canonical": "MECP/2/R03 1.25d"
+  },
+  {
+    "title": "Duration: a decimal minute value is not read from its fractional part",
+    "input": "MECP/2/R03 2.5min",
+    "canonical": "MECP/2/R03 2.5min"
+  },
+  {
+    "title": "Duration: a skipped decimal value lets the next value be used",
+    "input": "MECP/2/R03 1.5h 45min",
+    "canonical": "MECP/2/R03 45min 1.5h"
+  },
+  {
+    "title": "Duration: a period after a letter still separates a value",
+    "input": "MECP/2/R03 hut.2h",
+    "canonical": "MECP/2/R03 2h hut."
+  },
+  {
+    "title": "Message: a trailing space is invalid",
+    "input": "MECP/1/T05 ",
+    "canonical": null
+  },
+  {
+    "title": "Message: a lowercase first code is not a code, so the message has no codes and is invalid",
+    "input": "MECP/1/t05 x",
+    "canonical": null
+  },
+  {
+    "title": "Message: a repeated code is still valid",
+    "input": "MECP/1/T05 T05 damaged",
+    "canonical": "MECP/1/T05 T05 damaged"
+  },
+  {
+    "title": "Message: an unknown but well-formed code is still a valid message",
+    "input": "MECP/3/Z99 hello",
+    "canonical": "MECP/3/Z99 hello"
+  },
+  {
+    "title": "Message: a lowercase code ends the code section, so a lowercase r03 does not enable duration",
+    "input": "MECP/2/L01 r03 45min",
+    "canonical": "MECP/2/L01 r03 45min"
+  },
+  {
+    "title": "Message: no codes after the severity is invalid",
+    "input": "MECP/0/",
+    "canonical": null
+  },
+  {
+    "title": "Message: a missing code section is invalid",
+    "input": "MECP/0",
+    "canonical": null
+  },
+  {
+    "title": "Message: severity above 3 is invalid",
+    "input": "MECP/4/M01",
+    "canonical": null
+  },
+  {
+    "title": "Message: one trailing LF is removed before matching",
+    "input": "MECP/1/T05 T05 damaged\n",
+    "canonical": "MECP/1/T05 T05 damaged"
+  },
+  {
+    "title": "Message: one trailing CRLF is removed before matching",
+    "input": "MECP/1/T05 T05 damaged\r\n",
+    "canonical": "MECP/1/T05 T05 damaged"
+  },
+  {
+    "title": "Message: one trailing CR is removed before matching",
+    "input": "MECP/1/T05 T05 damaged\r",
+    "canonical": "MECP/1/T05 T05 damaged"
+  },
+  {
+    "title": "Message: an embedded LF is invalid",
+    "input": "MECP/1/T05 foo\nbar",
+    "canonical": null
+  },
+  {
+    "title": "Message: an embedded line separator (U+2028) is invalid",
+    "input": "MECP/1/T05 foo\u2028bar",
+    "canonical": null
+  },
+  {
+    "title": "Message: an embedded form feed is invalid",
+    "input": "MECP/1/T05 foo\fbar",
+    "canonical": null
+  },
+  {
+    "title": "Message: decoders accept a message longer than 200 bytes (202 bytes)",
+    "input": "MECP/0/M01 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "canonical": "MECP/0/M01 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+  },
+  {
+    "title": "App designator: first freetext token when a U code is present",
+    "input": "MECP/2/U04 rem #site-a",
+    "canonical": "MECP/2/U04 rem #site-a"
+  },
+  {
+    "title": "App designator: still decoded alongside a shared code",
+    "input": "MECP/1/M01 U04 rem needs help",
+    "canonical": "MECP/1/M01 U04 rem needs help"
+  },
+  {
+    "title": "App designator: hyphenated designator",
+    "input": "MECP/2/U01 mecp-app",
+    "canonical": "MECP/2/U01 mecp-app"
+  },
+  {
+    "title": "App designator: not decoded without a U code",
+    "input": "MECP/3/L01 rem running late",
+    "canonical": "MECP/3/L01 rem running late"
+  },
+  {
+    "title": "App designator: U code with no freetext has no designator",
+    "input": "MECP/2/U04",
+    "canonical": "MECP/2/U04"
+  },
+  {
+    "title": "App designator: a leading reference is not a designator, and a later word is not taken",
+    "input": "MECP/2/U04 #site-a rem",
+    "canonical": "MECP/2/U04 #site-a rem"
+  },
+  {
+    "title": "App designator: uppercase first token is not a designator",
+    "input": "MECP/2/U04 REM payload",
+    "canonical": "MECP/2/U04 REM payload"
+  },
+  {
+    "title": "App designator: a bare digit after R03+U is not a designator",
+    "input": "MECP/0/R03 U02 4",
+    "canonical": "MECP/0/R03 U02 4min"
+  }
+]

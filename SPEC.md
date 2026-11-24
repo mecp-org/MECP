@@ -238,3 +238,29 @@ MECP defines these meanings only. Retransmit schedules, slowing after B02, drill
 ### Private Use — letter U (not in the 120)
 
 Letter **`U`** is reserved for **Private Use** ([ADR 0006](docs/adr/0006-private-use-and-b04.md)). Codes `U01`–`U99` are well-formed MECP codes (§6.1 rule 5) but carry **no shared MECP semantics**, are **not** in [`languages/en.json`](languages/en.json), and have **no** language-pack strings. Apps MAY use them for local meaning. Unallocated IDs in the twelve shared categories (including `B04`–`B99`) remain available for future shared proposals. When any `U` code is present, the first freetext token is the [app designator](#app-designator-any-u-code) (§6.1).
+
+### 6.6 Canonical Form
+
+The canonical form of an MECP message is the single string that an encoder emits for the message's decoded content. An encoder that claims canonical output MUST emit exactly this string. Vectors are in [`freetext/canonical.json`](freetext/canonical.json).
+
+To produce it, decode the message (§6.1), then emit:
+
+1. `MECP/`, the severity, `/`, then the codes in ascending ASCII order, separated by single spaces. Duplicate codes are kept.
+2. Each decoded convention value in the rule 5 decode order, each preceded by a single space, in this form:
+
+   | Convention | Canonical form | Example |
+   |---|---|---|
+   | App designator | As decoded | `rem` |
+   | GPS coordinates | Each coordinate rounded to 6 fractional digits, half away from zero; no `+`, no leading zeros; trailing fractional zeros removed, keeping at least one fractional digit; no `-` on a value that rounds to zero | `48.8566,2.3522` |
+   | Timestamp | `@HHMM` | `@0630` |
+   | Language hint | Lowercase, `-` between subtags | `@zh-cn` |
+   | Callsign | Uppercase | `~DL/OK1ABC` |
+   | Reference | Lowercase, `_` replaced by `-` | `#base-camp` |
+   | Person count | `Npax`, no leading zeros | `4pax` |
+   | Duration | `Nd` for whole days, else `Nh` for whole hours, else `NhMmin` above 60 minutes, else `Nmin`; no leading zeros | `1h30min` |
+
+3. The remaining freetext, if any, preceded by a single space: the freetext with every claimed token removed (boundaries stay, rule 7), each run of tabs, spaces, U+00A0, U+1680, U+2000–U+200A, U+202F, U+205F, U+3000 and U+FEFF replaced by one space, and leading and trailing spaces removed.
+
+For example, `MECP/2/T05 Rockfall near #base-camp, 3 PAX turned back @6:30.` has the canonical form `MECP/2/T05 @0630 #base-camp 3pax Rockfall near , turned back .`
+
+An input that is not an MECP message has no canonical form. The canonical form does not depend on the 200-byte limit; an encoder applies that limit (§6.1) to the canonical string.
