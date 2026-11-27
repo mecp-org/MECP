@@ -20,6 +20,7 @@ All notable changes to MECP will be documented in this file.
 
 ### Infrastructure
 - `validate-spec` / `check-freetext` / `cut-release` read and bump [`SPEC.md`](SPEC.md) as the normative home (patterns and §6.1 rule 4 boundary text)
+- `check-freetext --decode` runs the reference decoder on messages piped to stdin (one per line) and prints one JSON line each, so implementers can probe cases without copying the harness ([#57](https://github.com/mecp-org/MECP/issues/57))
 
 ---
 

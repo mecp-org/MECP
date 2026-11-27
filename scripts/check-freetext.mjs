@@ -308,31 +308,59 @@ function decodeMessage(input) {
   return got;
 }
 
-const errors = [];
-for (const m of assertPatternsInSpec()) {
-  errors.push(`pattern not found verbatim in SPEC.md: ${m}`);
-}
-
-for (const name of DECODE_ORDER) {
-  if (!patterns[name]) errors.push(`DECODE_ORDER names unknown convention: ${name}`);
-}
-for (const name of Object.keys(patterns)) {
-  if (name !== 'message' && !DECODE_ORDER.includes(name)) {
-    errors.push(`convention ${name} missing from DECODE_ORDER`);
+function runSuite() {
+  const errors = [];
+  for (const m of assertPatternsInSpec()) {
+    errors.push(`pattern not found verbatim in SPEC.md: ${m}`);
   }
-}
 
-for (const t of tests) {
-  const got = decodeMessage(t.input);
-  // "x": null states that x is not decoded, the same as leaving x out.
-  const expect = t.expect && Object.fromEntries(Object.entries(t.expect).filter(([, v]) => v !== null));
-  if (!deepEqual(got, expect)) {
-    errors.push(`${t.title} (${JSON.stringify(t.input)}): expected ${JSON.stringify(t.expect)}, got ${JSON.stringify(got)}`);
+  for (const name of DECODE_ORDER) {
+    if (!patterns[name]) errors.push(`DECODE_ORDER names unknown convention: ${name}`);
   }
+  for (const name of Object.keys(patterns)) {
+    if (name !== 'message' && !DECODE_ORDER.includes(name)) {
+      errors.push(`convention ${name} missing from DECODE_ORDER`);
+    }
+  }
+
+  for (const t of tests) {
+    const got = decodeMessage(t.input);
+    // "x": null states that x is not decoded, the same as leaving x out.
+    const expect = t.expect && Object.fromEntries(Object.entries(t.expect).filter(([, v]) => v !== null));
+    if (!deepEqual(got, expect)) {
+      errors.push(`${t.title} (${JSON.stringify(t.input)}): expected ${JSON.stringify(t.expect)}, got ${JSON.stringify(got)}`);
+    }
+  }
+
+  if (errors.length) {
+    console.error(`freetext check failed (${errors.length}):\n` + errors.map((e) => `  - ${e}`).join('\n'));
+    process.exit(1);
+  }
+  console.log(`freetext check passed (${tests.length} cases, patterns present in SPEC.md).`);
 }
 
-if (errors.length) {
-  console.error(`freetext check failed (${errors.length}):\n` + errors.map((e) => `  - ${e}`).join('\n'));
-  process.exit(1);
+const USAGE = 'usage: node scripts/check-freetext.mjs [--decode < messages.txt]';
+
+/**
+ * --decode: run the reference decoder on messages from stdin, one per line (blank lines
+ * skipped), instead of the suite. Prints one JSON line per message, {"input": ..., "decoded": ...},
+ * where decoded is every convention value decoded (as in tests.json expect), or null when it is
+ * not an MECP message.
+ */
+function runDecode() {
+  const inputs = readFileSync(0, 'utf8')
+    .split(/\r?\n/)
+    .filter((line) => line.trim() !== '');
+  const lines = inputs.map((input) => JSON.stringify({ input, decoded: decodeMessage(input) }));
+  if (lines.length) process.stdout.write(lines.join('\n') + '\n');
 }
-console.log(`freetext check passed (${tests.length} cases, patterns present in SPEC.md).`);
+
+const args = process.argv.slice(2);
+if (args.length === 0) {
+  runSuite();
+} else if (args.length === 1 && args[0] === '--decode') {
+  runDecode();
+} else {
+  console.error(USAGE);
+  process.exitCode = 2;
+}
